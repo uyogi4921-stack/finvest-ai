@@ -687,25 +687,35 @@ function loadSDChart(sym, interval) {
   var tvSym = TV_MAP[sym] || 'NSE:' + sym;
   chartEl.innerHTML = '';
 
-  // Map interval buttons to TradingView URL intervals
-  var intMap = { '1': '1D', 'D': '1D', 'W': '1W', 'M': '1M', '3M': '3M', '12M': '12M', '60M': '60M', 'All': 'ALL' };
-  var tvInterval = intMap[interval] || '1D';
+  // Map interval buttons to TradingView intervals
+  var intMap = { '1': 'D', 'D': 'D', 'W': 'W', 'M': 'M', '3M': '3M', '12M': '12M', '60M': '60M', 'All': 'ALL' };
+  var tvInterval = intMap[interval] || 'D';
 
-  // Use iframe embed — most reliable method, unique per stock
+  // Use TradingView widget URL with symbol as query param — unique real-time chart per stock
+  var params = [
+    'symbol=' + encodeURIComponent(tvSym),
+    'interval=' + tvInterval,
+    'theme=dark',
+    'style=1',
+    'locale=en',
+    'timezone=Asia%2FKolkata',
+    'hide_top_toolbar=0',
+    'hide_legend=0',
+    'hide_volume=0',
+    'hideideas=1',
+    'saveimage=0',
+    'calendar=0',
+    'hide_side_toolbar=1',
+    'allow_symbol_change=0',
+    'referral_id=43547',
+    '_=ts' + Date.now()
+  ].join('&');
+
   var iframe = document.createElement('iframe');
-  iframe.src = 'https://s.tradingview.com/widgetembed/?hideideas=1&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en'
-    + '#%7B%22symbol%22%3A%22' + encodeURIComponent(tvSym)
-    + '%22%2C%22frameElementId%22%3A%22tv_' + sym + '_' + Date.now()
-    + '%22%2C%22interval%22%3A%22' + tvInterval
-    + '%22%2C%22hide_top_toolbar%22%3A%220%22'
-    + '%2C%22hide_legend%22%3A%220%22'
-    + '%2C%22save_image%22%3A%220%22'
-    + '%2C%22style%22%3A%223%22'
-    + '%2C%22theme%22%3A%22dark%22'
-    + '%2C%22timezone%22%3A%22Asia%2FKolkata%22%7D';
+  iframe.src = 'https://s.tradingview.com/widgetembed/?' + params;
   iframe.style.cssText = 'width:100%;height:100%;border:none;';
-  iframe.allowFullscreen = true;
-  iframe.loading = 'lazy';
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('scrolling', 'no');
   chartEl.appendChild(iframe);
 }
 

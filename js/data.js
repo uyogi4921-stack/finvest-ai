@@ -200,8 +200,9 @@ window.Store = {
 // ─── USER PROFILE ───────────────────────────────────────
 window.userProfile = Store.get('profile', null);
 
-// ─── HOLDINGS (loaded from storage or defaults) ─────────
-window.HOLDS = Store.get('holdings', DEFAULT_HOLDS);
+// ─── HOLDINGS (empty for new users, loaded from storage for returning users) ─
+// New users start with empty portfolio and build from scratch
+window.HOLDS = Store.get('holdings', []);
 
 // ─── TRADE HISTORY ──────────────────────────────────────
 window.tradeHistory = Store.get('trades', []);
@@ -232,7 +233,8 @@ function checkStreak() {
 window.completedChallenges = Store.get('challenges', {});
 
 // ─── WALLET ─────────────────────────────────────────────
-window.wallet = Store.get('wallet', { balance: 1000000, transactions: [] });
+// New users start with ₹1,000 to invest
+window.wallet = Store.get('wallet', { balance: 1000, transactions: [] });
 
 function walletDeposit(amount) {
   if (amount <= 0) return false;
