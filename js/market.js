@@ -443,6 +443,11 @@ function openBS(sym, type) {
 
   document.getElementById('bsqty').value = '1';
   updBS();
+
+  // Show wallet balance
+  var bsbal = document.getElementById('bsWalBal');
+  if (bsbal) bsbal.textContent = 'Balance: ' + fINR(wallet.balance);
+
   document.getElementById('bsov').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
@@ -460,6 +465,14 @@ function confirmBS() {
   var total = q * BSC.price;
 
   if (isBuy) {
+    // Check wallet balance
+    if (total > wallet.balance) {
+      showToast('Insufficient balance! You have ' + fINR(wallet.balance));
+      return;
+    }
+    // Deduct from wallet
+    walletTrade('buy', BSC.sym, Math.round(total));
+
     // Add to holdings
     var existing = HOLDS.find(function(h) { return h.sym === BSC.sym; });
     if (existing) {
@@ -480,11 +493,21 @@ function confirmBS() {
     // Remove from holdings
     var hold = HOLDS.find(function(h) { return h.sym === BSC.sym; });
     if (hold) {
+      if (q > hold.qty) {
+        showToast('You only own ' + hold.qty + ' shares of ' + BSC.sym);
+        return;
+      }
+      // Add to wallet
+      walletTrade('sell', BSC.sym, Math.round(total));
+
       hold.qty -= q;
       if (hold.qty <= 0) {
         HOLDS = HOLDS.filter(function(h) { return h.sym !== BSC.sym; });
         window.HOLDS = HOLDS;
       }
+    } else {
+      showToast('You don\'t own any ' + BSC.sym + ' shares');
+      return;
     }
   }
 
@@ -564,88 +587,177 @@ var TV_MAP = {
   INFO: 'NSE:NAUKRI', ZOMM: 'NSE:ZOMATO', PAYT: 'NSE:PAYTM', PLCY: 'NSE:POLICYBZR', NYKA: 'NSE:NYKAA', DMRT: 'NSE:DELHIVERY'
 };
 
+var sdCurrentSym = '';
+var sdCurrentTab = 'buy';
+
 function openStockDetail(sym) {
   var s = ST.find(function(x) { return x.s === sym; });
   if (!s) return;
+  sdCurrentSym = sym;
+  sdCurrentTab = 'buy';
   var p = prices[sym] || s.p;
   var ch = +((p - s.p) / s.p * 100).toFixed(2);
   var pos = ch >= 0;
 
-  // Header info
+  // Top bar
   document.getElementById('sdSym').textContent = sym;
+  var topPrice = document.getElementById('sdTopPrice');
+  if (topPrice) topPrice.textContent = fINR(p);
+
+  // Hero row
   document.getElementById('sdName').textContent = s.n + ' \u00B7 ' + s.sec;
-  document.getElementById('sdPrice').textContent = fINR(p);
-
-  var chEl = document.getElementById('sdChange');
-  chEl.textContent = (pos ? '\u25B2 +' : '\u25BC ') + Math.abs(ch) + '%';
-  chEl.style.background = pos ? 'rgba(0,229,160,.12)' : 'rgba(255,77,106,.12)';
-  chEl.style.color = pos ? 'var(--gr)' : 'var(--rd)';
-
-  // Logo
   var lw = document.getElementById('sdLogo');
   lw.innerHTML = '';
-  lw.appendChild(mkLogo(sym, 48));
+  lw.appendChild(mkLogo(sym, 52));
+
+  // Price
+  document.getElementById('sdPrice').textContent = fINR(p);
+  var chEl = document.getElementById('sdChange');
+  chEl.textContent = (pos ? '\u25B2 +' : '\u25BC ') + Math.abs(ch) + '% today';
+  chEl.className = 'sd-change ' + (pos ? 'sd-up' : 'sd-down');
+
+  // Watchlist
+  var wlBtn = document.getElementById('sdWlBtn');
+  if (wlBtn) {
+    wlBtn.innerHTML = watchlist.indexOf(sym) !== -1 ? '&#9733;' : '&#9734;';
+    wlBtn.className = 'sd-wl-btn' + (watchlist.indexOf(sym) !== -1 ? ' active' : '');
+  }
 
   // Stats grid
   var hold = HOLDS.find(function(h) { return h.sym === sym; });
   var holdQty = hold ? hold.qty : 0;
   var holdVal = hold ? hold.qty * p : 0;
-  var dayChange = (p * 0.012 * (Math.random() > 0.5 ? 1 : -1)).toFixed(0);
+  var dayHigh = (p * (1 + Math.random() * 0.02)).toFixed(0);
+  var dayLow = (p * (1 - Math.random() * 0.02)).toFixed(0);
   var vol = (Math.random() * 50 + 5).toFixed(1);
+  var pe = (15 + Math.random() * 30).toFixed(1);
 
   document.getElementById('sdStats').innerHTML =
-    '<div class="sd-stat"><div class="sd-stat-lbl">Day Change</div><div class="sd-stat-val" style="color:' + (dayChange >= 0 ? 'var(--gr)' : 'var(--rd)') + '">' + (dayChange >= 0 ? '+' : '') + fINR(Math.abs(dayChange)) + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Volume</div><div class="sd-stat-val">' + vol + 'L</div></div>'
+    '<div class="sd-stat"><div class="sd-stat-lbl">Day High</div><div class="sd-stat-val">' + fINR(dayHigh) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Day Low</div><div class="sd-stat-val">' + fINR(dayLow) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Volume</div><div class="sd-stat-val">' + vol + ' L</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">P/E Ratio</div><div class="sd-stat-val">' + pe + '</div></div>'
     + '<div class="sd-stat"><div class="sd-stat-lbl">Sector</div><div class="sd-stat-val">' + s.sec + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">You Own</div><div class="sd-stat-val">' + holdQty + ' shares</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Your Value</div><div class="sd-stat-val">' + (holdVal > 0 ? fINR(holdVal) : '-') + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">52W High</div><div class="sd-stat-val">' + fINR(Math.round(s.p * 1.25)) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">52W Low</div><div class="sd-stat-val">' + fINR(Math.round(s.p * 0.7)) + '</div></div>'
     + '<div class="sd-stat"><div class="sd-stat-lbl">Base Price</div><div class="sd-stat-val">' + fINR(s.p) + '</div></div>';
 
-  // Buy/Sell buttons
-  document.getElementById('sdBuy').onclick = function() { closeSD(); openBS(sym, 'buy'); };
-  document.getElementById('sdSell').onclick = function() { closeSD(); openBS(sym, 'sell'); };
+  // Order card
+  document.getElementById('sdOrderPrice').textContent = fINR(p);
+  document.getElementById('sdOrderQty').value = '1';
+  document.getElementById('sdOrderTotal').textContent = fINR(p);
+  sdSetTab('buy');
 
-  // TradingView chart
-  var chartEl = document.getElementById('sdChart');
-  var tvSym = TV_MAP[sym] || 'NSE:' + sym;
-  chartEl.innerHTML = '';
-  var widgetDiv = document.createElement('div');
-  widgetDiv.className = 'tradingview-widget-container';
-  widgetDiv.style.cssText = 'width:100%;height:100%';
-  widgetDiv.innerHTML = '<div class="tradingview-widget-container__widget" style="width:100%;height:100%"></div>';
-  chartEl.appendChild(widgetDiv);
+  // Holdings info
+  var holdInfo = document.getElementById('sdHoldInfo');
+  if (holdInfo) {
+    if (hold) {
+      var pnl = (p - hold.avgPrice) * hold.qty;
+      holdInfo.innerHTML = '<div class="sd-hold-title">Your Holdings</div>'
+        + '<div class="sd-hold-row"><span>Shares</span><span>' + hold.qty + '</span></div>'
+        + '<div class="sd-hold-row"><span>Avg Price</span><span>' + fINR(hold.avgPrice) + '</span></div>'
+        + '<div class="sd-hold-row"><span>Current Value</span><span>' + fINR(holdVal) + '</span></div>'
+        + '<div class="sd-hold-row"><span>P&L</span><span class="' + (pnl >= 0 ? 'pos' : 'neg') + '">' + (pnl >= 0 ? '+' : '') + fINR(pnl) + '</span></div>';
+    } else {
+      holdInfo.innerHTML = '<div class="sd-hold-empty">You don\'t own this stock yet</div>';
+    }
+  }
 
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-  script.async = true;
-  script.textContent = JSON.stringify({
-    autosize: true,
-    symbol: tvSym,
-    interval: 'D',
-    timezone: 'Asia/Kolkata',
-    theme: 'dark',
-    style: '1',
-    locale: 'en',
-    backgroundColor: 'rgba(13, 18, 33, 1)',
-    gridColor: 'rgba(255, 255, 255, 0.04)',
-    hide_top_toolbar: false,
-    hide_legend: false,
-    save_image: false,
-    calendar: false,
-    hide_volume: false,
-    support_host: 'https://www.tradingview.com'
+  // Interval buttons
+  document.querySelectorAll('.sd-int').forEach(function(btn) {
+    btn.classList.remove('active');
+    btn.onclick = function() {
+      document.querySelectorAll('.sd-int').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      loadSDChart(sym, btn.getAttribute('data-int'));
+    };
   });
-  widgetDiv.appendChild(script);
+  var firstInt = document.querySelector('.sd-int[data-int="1"]');
+  if (firstInt) firstInt.classList.add('active');
+
+  // Load chart
+  loadSDChart(sym, 'D');
 
   document.getElementById('sdov').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
 
+function loadSDChart(sym, interval) {
+  var chartEl = document.getElementById('sdChart');
+  var tvSym = TV_MAP[sym] || 'NSE:' + sym;
+  chartEl.innerHTML = '';
+
+  // Map interval buttons to TradingView URL intervals
+  var intMap = { '1': '1D', 'D': '1D', 'W': '1W', 'M': '1M', '3M': '3M', '12M': '12M', '60M': '60M', 'All': 'ALL' };
+  var tvInterval = intMap[interval] || '1D';
+
+  // Use iframe embed — most reliable method, unique per stock
+  var iframe = document.createElement('iframe');
+  iframe.src = 'https://s.tradingview.com/widgetembed/?hideideas=1&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en'
+    + '#%7B%22symbol%22%3A%22' + encodeURIComponent(tvSym)
+    + '%22%2C%22frameElementId%22%3A%22tv_' + sym + '_' + Date.now()
+    + '%22%2C%22interval%22%3A%22' + tvInterval
+    + '%22%2C%22hide_top_toolbar%22%3A%220%22'
+    + '%2C%22hide_legend%22%3A%220%22'
+    + '%2C%22save_image%22%3A%220%22'
+    + '%2C%22style%22%3A%223%22'
+    + '%2C%22theme%22%3A%22dark%22'
+    + '%2C%22timezone%22%3A%22Asia%2FKolkata%22%7D';
+  iframe.style.cssText = 'width:100%;height:100%;border:none;';
+  iframe.allowFullscreen = true;
+  iframe.loading = 'lazy';
+  chartEl.appendChild(iframe);
+}
+
+function sdSetTab(tab) {
+  sdCurrentTab = tab;
+  var buyTab = document.getElementById('sdBuyTab');
+  var sellTab = document.getElementById('sdSellTab');
+  var btn = document.getElementById('sdOrderBtn');
+
+  if (tab === 'buy') {
+    buyTab.classList.add('active');
+    sellTab.classList.remove('active');
+    btn.textContent = 'Buy';
+    btn.className = 'sd-order-btn buy';
+  } else {
+    buyTab.classList.remove('active');
+    sellTab.classList.add('active');
+    btn.textContent = 'Sell';
+    btn.className = 'sd-order-btn sell';
+  }
+}
+
+function updateSDTotal() {
+  var qty = parseInt(document.getElementById('sdOrderQty').value) || 0;
+  var s = ST.find(function(x) { return x.s === sdCurrentSym; });
+  var p = prices[sdCurrentSym] || (s ? s.p : 0);
+  document.getElementById('sdOrderTotal').textContent = fINR(qty * p);
+}
+
+function sdPlaceOrder() {
+  if (!userProfile) { closeSD(); showProfilePrompt(); return; }
+  var qty = parseInt(document.getElementById('sdOrderQty').value) || 0;
+  if (qty < 1) { showToast('Enter at least 1 share'); return; }
+  closeSD();
+  openBS(sdCurrentSym, sdCurrentTab);
+  document.getElementById('bsqty').value = qty;
+  updBS();
+}
+
+function toggleSDWatchlist() {
+  toggleWatchlist(sdCurrentSym);
+  var wlBtn = document.getElementById('sdWlBtn');
+  if (wlBtn) {
+    var inWL = watchlist.indexOf(sdCurrentSym) !== -1;
+    wlBtn.innerHTML = inWL ? '&#9733;' : '&#9734;';
+    wlBtn.className = 'sd-wl-btn' + (inWL ? ' active' : '');
+  }
+}
+
 function closeSD() {
   document.getElementById('sdov').classList.remove('on');
   document.body.style.overflow = '';
-  // Clean up chart
   var chartEl = document.getElementById('sdChart');
   if (chartEl) chartEl.innerHTML = '';
 }

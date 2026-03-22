@@ -231,6 +231,40 @@ function checkStreak() {
 // ─── CHALLENGES TRACKING ────────────────────────────────
 window.completedChallenges = Store.get('challenges', {});
 
+// ─── WALLET ─────────────────────────────────────────────
+window.wallet = Store.get('wallet', { balance: 1000000, transactions: [] });
+
+function walletDeposit(amount) {
+  if (amount <= 0) return false;
+  wallet.balance += amount;
+  wallet.transactions.unshift({ type: 'deposit', amount: amount, time: Date.now(), desc: 'Added funds' });
+  Store.set('wallet', wallet);
+  return true;
+}
+
+function walletWithdraw(amount) {
+  if (amount <= 0 || amount > wallet.balance) return false;
+  wallet.balance -= amount;
+  wallet.transactions.unshift({ type: 'withdraw', amount: amount, time: Date.now(), desc: 'Withdrawn funds' });
+  Store.set('wallet', wallet);
+  return true;
+}
+
+function walletTrade(type, sym, amount) {
+  if (type === 'buy') {
+    if (amount > wallet.balance) return false;
+    wallet.balance -= amount;
+    wallet.transactions.unshift({ type: 'buy', amount: amount, time: Date.now(), desc: 'Bought ' + sym });
+  } else {
+    wallet.balance += amount;
+    wallet.transactions.unshift({ type: 'sell', amount: amount, time: Date.now(), desc: 'Sold ' + sym });
+  }
+  // Keep only last 50 transactions
+  if (wallet.transactions.length > 50) wallet.transactions = wallet.transactions.slice(0, 50);
+  Store.set('wallet', wallet);
+  return true;
+}
+
 // ─── SEBI BOOKLET CHAPTERS ────────────────────────────────
 window.SEBI_CHAPS = [
   // 0 — Intro

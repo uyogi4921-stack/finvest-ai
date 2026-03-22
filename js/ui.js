@@ -193,6 +193,9 @@ function renderProfile() {
 
   // Achievements
   renderAchievements();
+
+  // Wallet
+  renderWallet();
 }
 
 function renderAchievements() {
@@ -217,6 +220,35 @@ function renderAchievements() {
       + (a.done ? '<div class="ach-check">&#10003;</div>' : '<div class="ach-lock">&#128274;</div>')
       + '</div>';
   }).join('');
+}
+
+function editProfile() {
+  if (!userProfile) { showProfilePrompt(); return; }
+  // Pre-fill profile modal with existing data
+  var nameInp = document.getElementById('profName');
+  if (nameInp) nameInp.value = userProfile.name || '';
+
+  var goalInp = document.getElementById('profGoal');
+  if (goalInp) {
+    for (var i = 0; i < goalInp.options.length; i++) {
+      if (goalInp.options[i].text === userProfile.goal) {
+        goalInp.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
+  // Pre-select avatar
+  document.querySelectorAll('.av-opt').forEach(function(b) {
+    b.classList.remove('sel');
+    if (b.textContent === userProfile.avatar) b.classList.add('sel');
+  });
+
+  // Pre-select risk
+  var riskInp = document.querySelector('input[name="risk"][value="' + (userProfile.risk || 'moderate') + '"]');
+  if (riskInp) riskInp.checked = true;
+
+  showProfilePrompt();
 }
 
 function resetProfile() {
@@ -344,6 +376,23 @@ function joinRoom(type) {
   joinedRooms[type] = true;
   Store.set('joinedRooms', joinedRooms);
   addXP(50, '\uD83C\uDF89 Joined ' + (type === 'beginner' ? 'Beginner' : 'Intermediate') + ' Room! +50 XP');
+  updateRoomUI();
+}
+
+function updateRoomUI() {
+  ['beginner', 'intermediate'].forEach(function(type) {
+    var btnId = type === 'beginner' ? 'joinBegBtn' : 'joinIntBtn';
+    var btn = document.getElementById(btnId);
+    var card = document.getElementById('room-' + type);
+    if (joinedRooms[type]) {
+      if (btn) {
+        btn.textContent = '\u2705 Joined';
+        btn.classList.add('joined');
+        btn.disabled = true;
+      }
+      if (card) card.classList.add('room-joined');
+    }
+  });
 }
 
 function participateChallenge(id, xp, msg) {
@@ -436,6 +485,69 @@ function showSC(i, el) {
     c.innerHTML = SEBI_CHAPS[i];
     c.scrollTop = 0;
   }
+}
+
+// ─── WALLET UI ───────────────────────────────────────────
+var walletAction = 'deposit';
+
+function renderWallet() {
+  var balEl = document.getElementById('walletBal');
+  if (balEl) balEl.textContent = fINR(wallet.balance);
+
+  var txnEl = document.getElementById('walletTxns');
+  if (!txnEl) return;
+
+  var txns = wallet.transactions.slice(0, 8);
+  if (txns.length === 0) {
+    txnEl.innerHTML = '<div class="wallet-txn-empty">No transactions yet</div>';
+    return;
+  }
+
+  txnEl.innerHTML = txns.map(function(t) {
+    var isCredit = t.type === 'deposit' || t.type === 'sell';
+    var icon = t.type === 'deposit' ? '&#128994;' : (t.type === 'withdraw' ? '&#128308;' : (t.type === 'buy' ? '&#128308;' : '&#128994;'));
+    return '<div class="wallet-txn">'
+      + '<div class="wallet-txn-icon">' + icon + '</div>'
+      + '<div class="wallet-txn-info"><div class="wallet-txn-desc">' + t.desc + '</div><div class="wallet-txn-time">' + getTimeAgo(t.time) + '</div></div>'
+      + '<div class="wallet-txn-amt ' + (isCredit ? 'pos' : 'neg') + '">' + (isCredit ? '+' : '-') + fINR(t.amount) + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function showWalletModal(type) {
+  walletAction = type;
+  document.getElementById('walletModalTitle').textContent = type === 'deposit' ? 'Add Money' : 'Withdraw Money';
+  document.getElementById('walletModalBal').textContent = fINR(wallet.balance);
+  document.getElementById('walletAmtInp').value = '';
+  var btn = document.getElementById('walletConfirmBtn');
+  btn.textContent = type === 'deposit' ? 'Add Money' : 'Withdraw';
+  btn.className = 'wallet-confirm-btn ' + type;
+  document.getElementById('walletModal').classList.add('on');
+}
+
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('on');
+}
+
+function setWalletAmt(amt) {
+  document.getElementById('walletAmtInp').value = amt;
+}
+
+function confirmWalletAction() {
+  var amt = parseInt(document.getElementById('walletAmtInp').value) || 0;
+  if (amt <= 0) { showToast('Enter a valid amount'); return; }
+
+  if (walletAction === 'deposit') {
+    walletDeposit(amt);
+    showToast('&#128994; ' + fINR(amt) + ' added to wallet!');
+  } else {
+    if (amt > wallet.balance) { showToast('Insufficient balance!'); return; }
+    walletWithdraw(amt);
+    showToast('&#128308; ' + fINR(amt) + ' withdrawn from wallet');
+  }
+
+  closeWalletModal();
+  renderWallet();
 }
 
 // ─── FAB WELCOME BUBBLE ──────────────────────────────────

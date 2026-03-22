@@ -95,34 +95,76 @@
       <span class="bstlbl">Total Value</span>
       <span class="bstval" id="bstotal">&#8377;0</span>
     </div>
+    <div class="bswalbal" id="bsWalBal" style="font-size:11px;color:var(--mu);text-align:center;margin-bottom:8px">Balance: &#8377;0</div>
     <button class="bsok" id="bsok" onclick="confirmBS()"></button>
     <button class="bscancel" onclick="closeBSModal()">Cancel</button>
   </div>
 </div>
 
-<!-- ── STOCK DETAIL MODAL (with TradingView chart) ── -->
-<div class="sdov" id="sdov" onclick="if(event.target===this)closeSD()">
+<!-- ── STOCK DETAIL MODAL (Groww-style full view) ── -->
+<div class="sdov" id="sdov">
   <div class="sdbox">
-    <div class="sd-header">
-      <div id="sdLogo" style="width:48px;height:48px;border-radius:12px;flex-shrink:0"></div>
-      <div class="sd-info">
-        <div class="sd-sym" id="sdSym"></div>
-        <div class="sd-name" id="sdName"></div>
+    <div class="sd-topbar">
+      <button class="sd-back" onclick="closeSD()">&#8592; Back</button>
+      <div class="sd-topbar-info">
+        <span class="sd-topbar-sym" id="sdSym">STOCK</span>
+        <span class="sd-topbar-price" id="sdTopPrice"></span>
       </div>
-      <div style="text-align:right">
-        <div class="sd-price-row">
-          <div class="sd-price" id="sdPrice"></div>
-        </div>
-        <div class="sd-change" id="sdChange"></div>
+      <div class="sd-topbar-actions">
+        <button class="sd-wl-btn" id="sdWlBtn" onclick="toggleSDWatchlist()">&#9734;</button>
       </div>
-      <button class="sd-close" onclick="closeSD()">&#10005;</button>
     </div>
-    <div class="sd-chart" id="sdChart"></div>
-    <div class="sd-details">
-      <div class="sd-grid" id="sdStats"></div>
-      <div class="sd-actions">
-        <button class="sd-buy" id="sdBuy">Buy</button>
-        <button class="sd-sell" id="sdSell">Sell</button>
+    <div class="sd-body">
+      <div class="sd-main">
+        <div class="sd-hero-row">
+          <div id="sdLogo" style="width:52px;height:52px;border-radius:14px;flex-shrink:0"></div>
+          <div class="sd-hero-info">
+            <div class="sd-hero-name" id="sdName"></div>
+            <div class="sd-hero-exch">NSE &middot; BSE</div>
+          </div>
+        </div>
+        <div class="sd-price-block">
+          <div class="sd-price-big" id="sdPrice"></div>
+          <div class="sd-change" id="sdChange"></div>
+        </div>
+        <div class="sd-chart" id="sdChart"></div>
+        <div class="sd-interval-row">
+          <button class="sd-int active" data-int="1">1D</button>
+          <button class="sd-int" data-int="W">1W</button>
+          <button class="sd-int" data-int="M">1M</button>
+          <button class="sd-int" data-int="3M">3M</button>
+          <button class="sd-int" data-int="12M">1Y</button>
+          <button class="sd-int" data-int="60M">5Y</button>
+          <button class="sd-int" data-int="All">All</button>
+        </div>
+        <div class="sd-stats-section">
+          <div class="sd-stats-title">Key Statistics</div>
+          <div class="sd-grid" id="sdStats"></div>
+        </div>
+      </div>
+      <div class="sd-sidebar">
+        <div class="sd-order-card">
+          <div class="sd-order-tabs">
+            <button class="sd-order-tab active" id="sdBuyTab" onclick="sdSetTab('buy')">BUY</button>
+            <button class="sd-order-tab" id="sdSellTab" onclick="sdSetTab('sell')">SELL</button>
+          </div>
+          <div class="sd-order-body">
+            <div class="sd-order-row">
+              <span class="sd-order-lbl">Price</span>
+              <span class="sd-order-val" id="sdOrderPrice"></span>
+            </div>
+            <div class="sd-order-row">
+              <span class="sd-order-lbl">Qty</span>
+              <input type="number" class="sd-order-inp" id="sdOrderQty" value="1" min="1" oninput="updateSDTotal()">
+            </div>
+            <div class="sd-order-row sd-order-total">
+              <span class="sd-order-lbl">Total</span>
+              <span class="sd-order-val" id="sdOrderTotal"></span>
+            </div>
+            <button class="sd-order-btn buy" id="sdOrderBtn" onclick="sdPlaceOrder()">Buy</button>
+          </div>
+          <div class="sd-hold-info" id="sdHoldInfo"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -185,10 +227,9 @@
 
 <!-- ── FAB (AI Advisor) with welcome bubble ── -->
 <div class="fab-wrap">
-  <div class="fab-bubble" id="fabBubble">&#128075; Hi! How can I help you?</div>
-  <button class="fab" onclick="openAI()">
-    <span class="fab-avatar">&#128161;</span>
-    <span class="fab-text">Ask Fin AI</span>
+  <div class="fab-bubble" id="fabBubble">&#128075; How can I help you?</div>
+  <button class="fab" onclick="openAI()" title="Ask Fin AI">
+    <span class="fab-avatar">💡</span>
   </button>
 </div>
 
@@ -388,27 +429,27 @@
     </div>
     <div class="sechd"><div class="sect">&#127968; Choose Your Room</div></div>
     <div class="roomgrid">
-      <div class="roomcard rbeg" onclick="joinRoom('beginner')">
+      <div class="roomcard rbeg" id="room-beginner">
         <div class="rbdge">&#127331; Beginner Friendly</div>
         <div class="rico">&#127807;</div>
         <div class="rnm">Beginner Investors</div>
         <div class="rdesc">Just starting out? Ask basic questions freely, learn together, and get guided by community mentors. No question is too simple.</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;">
           <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gr)">&#128214; Daily Q&amp;A</span>
-          <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gr)">+1,924 members</span>
+          <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gr)" id="begCount">+1,924 members</span>
         </div>
-        <button class="rjoin">Join Beginner Room &#8594;</button>
+        <button class="rjoin" id="joinBegBtn" onclick="joinRoom('beginner')">Join Beginner Room &#8594;</button>
       </div>
-      <div class="roomcard rint" onclick="joinRoom('intermediate')">
+      <div class="roomcard rint" id="room-intermediate">
         <div class="rbdge" style="background:rgba(155,109,255,.15);color:var(--pu)">&#127775; Intermediate</div>
         <div class="rico">&#9822;</div>
         <div class="rnm">Intermediate Traders</div>
         <div class="rdesc">Discuss sector analysis, portfolio strategies, earnings calls, and technical setups with experienced investors.</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;">
           <span style="background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--pu)">&#128202; Sector Analysis</span>
-          <span style="background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--pu)">+917 members</span>
+          <span style="background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--pu)" id="intCount">+917 members</span>
         </div>
-        <button class="rjoin">Join Intermediate Room &#8594;</button>
+        <button class="rjoin" id="joinIntBtn" onclick="joinRoom('intermediate')">Join Intermediate Room &#8594;</button>
       </div>
     </div>
     <div class="sechd"><div class="sect">&#127942; Weekly Challenges</div><div style="font-size:11px;color:var(--mu)">Resets Sunday midnight</div></div>
@@ -535,6 +576,7 @@
         <span class="prof-badge" id="profLevel">Level 1</span>
         <span class="prof-badge risk-badge" id="profRiskDisplay">Moderate</span>
       </div>
+      <button class="prof-edit-btn" onclick="editProfile()">&#9998; Edit Profile</button>
     </div>
 
     <div class="prof-stats-grid">
@@ -544,6 +586,45 @@
       <div class="prof-stat-card"><div class="psc-val" id="profStreak">1 days</div><div class="psc-lbl">Streak</div></div>
       <div class="prof-stat-card"><div class="psc-val" id="profHoldings">0 stocks</div><div class="psc-lbl">Holdings</div></div>
       <div class="prof-stat-card"><div class="psc-val" id="profPortValue">&#8377;0</div><div class="psc-lbl">Portfolio</div></div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="sechd"><div class="sect">&#128176; Wallet</div></div>
+    <div class="wallet-card">
+      <div class="wallet-top">
+        <div class="wallet-bal-wrap">
+          <div class="wallet-bal-lbl">Available Balance</div>
+          <div class="wallet-bal" id="walletBal">&#8377;10,00,000</div>
+        </div>
+        <div class="wallet-actions">
+          <button class="wallet-btn deposit" onclick="showWalletModal('deposit')">+ Add Money</button>
+          <button class="wallet-btn withdraw" onclick="showWalletModal('withdraw')">- Withdraw</button>
+        </div>
+      </div>
+      <div class="wallet-txn-title">Recent Transactions</div>
+      <div class="wallet-txns" id="walletTxns"></div>
+    </div>
+
+    <!-- WALLET MODAL -->
+    <div class="wallet-modal" id="walletModal">
+      <div class="wallet-modal-box">
+        <div class="wallet-modal-hd">
+          <span id="walletModalTitle">Add Money</span>
+          <button class="wallet-modal-cls" onclick="closeWalletModal()">&#10005;</button>
+        </div>
+        <div class="wallet-modal-body">
+          <div class="wallet-modal-cur">Current Balance: <b id="walletModalBal">&#8377;0</b></div>
+          <label class="wallet-modal-lbl">Amount (&#8377;)</label>
+          <input type="number" class="wallet-modal-inp" id="walletAmtInp" placeholder="Enter amount" min="1">
+          <div class="wallet-quick-amts">
+            <button onclick="setWalletAmt(5000)">&#8377;5,000</button>
+            <button onclick="setWalletAmt(10000)">&#8377;10,000</button>
+            <button onclick="setWalletAmt(50000)">&#8377;50,000</button>
+            <button onclick="setWalletAmt(100000)">&#8377;1,00,000</button>
+          </div>
+          <button class="wallet-confirm-btn" id="walletConfirmBtn" onclick="confirmWalletAction()">Add Money</button>
+        </div>
+      </div>
     </div>
 
     <div class="sechd"><div class="sect">&#127942; Achievements</div><div style="font-size:11px;color:var(--mu)" id="profJoined">Joined today</div></div>

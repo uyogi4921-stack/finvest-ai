@@ -60,6 +60,9 @@ function initApp() {
   // Update challenge button states
   updateChallengeButtons();
 
+  // Update community room UI
+  updateRoomUI();
+
   // Price simulation — tick every 8 seconds
   setInterval(tickPrices, 8000);
 
