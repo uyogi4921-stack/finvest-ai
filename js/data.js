@@ -200,9 +200,12 @@ window.Store = {
 // ─── USER PROFILE ───────────────────────────────────────
 window.userProfile = Store.get('profile', null);
 
-// ─── HOLDINGS (empty for new users, loaded from storage for returning users) ─
-// New users start with empty portfolio and build from scratch
-window.HOLDS = Store.get('holdings', []);
+// ─── HOLDINGS (loaded from storage or defaults) ─────────
+window.HOLDS = Store.get('holdings', DEFAULT_HOLDS);
+if (!HOLDS || HOLDS.length === 0) {
+  HOLDS = DEFAULT_HOLDS.slice();
+  Store.set('holdings', HOLDS);
+}
 
 // ─── TRADE HISTORY ──────────────────────────────────────
 window.tradeHistory = Store.get('trades', []);
