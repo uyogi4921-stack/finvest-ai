@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Finvest AI — Gamified Investing for Gen Z</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<div class="sbov" id="sbov" onclick="closeSB()"></div>
+
+<!-- ── PROFILE SETUP MODAL ── -->
+<div class="prof-modal" id="profModal">
+  <div class="prof-box">
+    <div class="prof-hd">
+      <div style="font-size:32px;margin-bottom:8px">&#128640;</div>
+      <div style="font-family:var(--fh);font-size:22px;font-weight:800;margin-bottom:4px">Welcome to Finvest AI</div>
+      <div style="font-size:13px;color:var(--mu)">Set up your investor profile to get started</div>
+    </div>
+    <div class="prof-body">
+      <div class="prof-field">
+        <label class="prof-label">Your Name</label>
+        <input type="text" id="profName" class="prof-input" placeholder="Enter your name" maxlength="30">
+      </div>
+      <div class="prof-field">
+        <label class="prof-label">Choose Avatar</label>
+        <div class="av-grid">
+          <button class="av-opt sel" onclick="selectAvatar(this)">&#128100;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#129489;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#128105;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#128104;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#128102;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#129474;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#128081;</button>
+          <button class="av-opt" onclick="selectAvatar(this)">&#128640;</button>
+        </div>
+      </div>
+      <div class="prof-field">
+        <label class="prof-label">Investment Goal</label>
+        <select id="profGoal" class="prof-input">
+          <option>Learn investing basics</option>
+          <option>Build long-term wealth</option>
+          <option>Generate passive income</option>
+          <option>Save for a big purchase</option>
+          <option>Beat inflation</option>
+        </select>
+      </div>
+      <div class="prof-field">
+        <label class="prof-label">Risk Appetite</label>
+        <div class="risk-opts">
+          <label class="risk-opt"><input type="radio" name="risk" value="low"><span class="risk-pill low">&#128737; Conservative</span></label>
+          <label class="risk-opt"><input type="radio" name="risk" value="moderate" checked><span class="risk-pill mod">&#9878; Moderate</span></label>
+          <label class="risk-opt"><input type="radio" name="risk" value="high"><span class="risk-pill high">&#128293; Aggressive</span></label>
+        </div>
+      </div>
+      <button class="prof-save" onclick="saveProfile()">Start Investing &#128640;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LESSON MODAL ── -->
+<div class="mov" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="mbox">
+    <div class="mhd">
+      <button class="mcls" onclick="closeModal()">&#10005;</button>
+      <div class="mtlb" id="mTag"></div>
+      <div class="mtit" id="mTit"></div>
+      <div class="mmt"  id="mMeta"></div>
+    </div>
+    <div class="mbdy" id="mBody"></div>
+    <div class="mft">
+      <div class="mxpl" id="mXpL"></div>
+      <button class="bdone" id="btnDone" onclick="completeLesson()">Mark Complete &#10003;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BUY / SELL MODAL ── -->
+<div class="bsov" id="bsov" onclick="if(event.target===this)closeBSModal()">
+  <div class="bsbox">
+    <div class="bstop">
+      <div id="bslogo" style="width:44px;height:44px;border-radius:10px;flex-shrink:0;"></div>
+      <div><div class="bssym" id="bssym"></div><div class="bsnm" id="bsnm"></div></div>
+    </div>
+    <div class="bsprice" id="bsprice"></div>
+    <div class="bstype"  id="bstype"></div>
+    <div class="bslbl">Number of Shares</div>
+    <input class="bsinp" type="number" id="bsqty" value="1" min="1" max="9999" oninput="updBS()">
+    <div class="bstot">
+      <span class="bstlbl">Total Value</span>
+      <span class="bstval" id="bstotal">&#8377;0</span>
+    </div>
+    <button class="bsok" id="bsok" onclick="confirmBS()"></button>
+    <button class="bscancel" onclick="closeBSModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ── STOCK DETAIL MODAL (with TradingView chart) ── -->
+<div class="sdov" id="sdov" onclick="if(event.target===this)closeSD()">
+  <div class="sdbox">
+    <div class="sd-header">
+      <div id="sdLogo" style="width:48px;height:48px;border-radius:12px;flex-shrink:0"></div>
+      <div class="sd-info">
+        <div class="sd-sym" id="sdSym"></div>
+        <div class="sd-name" id="sdName"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="sd-price-row">
+          <div class="sd-price" id="sdPrice"></div>
+        </div>
+        <div class="sd-change" id="sdChange"></div>
+      </div>
+      <button class="sd-close" onclick="closeSD()">&#10005;</button>
+    </div>
+    <div class="sd-chart" id="sdChart"></div>
+    <div class="sd-details">
+      <div class="sd-grid" id="sdStats"></div>
+      <div class="sd-actions">
+        <button class="sd-buy" id="sdBuy">Buy</button>
+        <button class="sd-sell" id="sdSell">Sell</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── AI PANEL ── -->
+<div class="aiov" id="aiov" onclick="closeAI()"></div>
+<div class="aipanel" id="aipanel">
+  <div class="aihd">
+    <div class="aiav">&#128161;</div>
+    <div class="aiinf">
+      <div class="ainm">Fin &mdash; AI Portfolio Advisor</div>
+      <div class="aist">&#9679; Online &middot; Always ready</div>
+    </div>
+    <button class="aicls" onclick="closeAI()">&#10005;</button>
+  </div>
+  <div class="aihlth">
+    <div class="hlr">
+      <span class="hll">Portfolio Health Score</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="hlsc">42/100</span>
+        <span class="hlgr">Needs Work</span>
+      </div>
+    </div>
+    <div class="hlsegs">
+      <div class="hls"><div class="hlsl">Diversification</div><div class="hlsv" style="color:var(--rd)">Poor</div></div>
+      <div class="hls"><div class="hlsl">Sector Spread</div><div class="hlsv" style="color:var(--gd)">2/6</div></div>
+      <div class="hls"><div class="hlsl">Risk Level</div><div class="hlsv" style="color:var(--or)">High</div></div>
+    </div>
+  </div>
+  <div class="aichat" id="aichat">
+    <div class="aimsg ai">
+      <div class="aimav">&#128161;</div>
+      <div class="aiml">
+        <div class="aimb">Hi there! &#128075; I'm <b>Fin</b>, your AI portfolio advisor. How can I help you today? You can ask me about your portfolio, stock picks, investing strategies, or anything else!</div>
+        <div class="aimt">Just now</div>
+      </div>
+    </div>
+  </div>
+  <div class="qpwrap" id="qpwrap">
+    <div class="qplbl">Quick Ask</div>
+    <div class="qpchips">
+      <div class="qpchip" onclick="qs('Am I properly diversified?')">Diversification</div>
+      <div class="qpchip" onclick="qs('What sectors am I missing?')">Missing sectors</div>
+      <div class="qpchip" onclick="qs('Which stock is my riskiest?')">Riskiest stock</div>
+      <div class="qpchip" onclick="qs('Suggest stocks to balance my portfolio')">Suggestions</div>
+      <div class="qpchip" onclick="qs('Should I hold or reduce ONGC?')">ONGC advice</div>
+      <div class="qpchip" onclick="qs('How do I start investing as a beginner?')">Beginner guide</div>
+    </div>
+  </div>
+  <div class="aiinprow">
+    <textarea class="aiinp" id="aiinp" placeholder="Ask Fin about your portfolio&#8230;" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="aisend" id="aisend" onclick="sendMsg()">&#10148;</button>
+  </div>
+</div>
+
+<!-- ── FAB (AI Advisor) with welcome bubble ── -->
+<div class="fab-wrap">
+  <div class="fab-bubble" id="fabBubble">&#128075; Hi! How can I help you?</div>
+  <button class="fab" onclick="openAI()">
+    <span class="fab-avatar">&#128161;</span>
+    <span class="fab-text">Ask Fin AI</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAVBAR (Website style)
+═══════════════════════════════════════════════════════════ -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="tn-logo" onclick="navTo('dashboard',null)">
+      <div class="tn-logo-ic">&#128200;</div>
+      Finvest<span class="tn-ai"> AI</span>
+    </div>
+
+    <button class="hbg" onclick="toggleSB()">&#9776;</button>
+
+    <div class="tn-links">
+      <button class="tn-link on" data-page="dashboard" onclick="navTo('dashboard',this)">
+        <span class="ico">&#127968;</span><span>Dashboard</span>
+      </button>
+      <button class="tn-link" data-page="market" onclick="navTo('market',this)">
+        <span class="ico">&#128202;</span><span>Market</span>
+      </button>
+      <button class="tn-link" data-page="learn" onclick="navTo('learn',this)">
+        <span class="ico">&#127891;</span><span>Learn</span><span class="tn-badge tn-badge-gr">15</span>
+      </button>
+      <button class="tn-link" data-page="leaderboard" onclick="navTo('leaderboard',this)">
+        <span class="ico">&#127942;</span><span>Leaderboard</span>
+      </button>
+      <button class="tn-link" data-page="community" onclick="navTo('community',this)">
+        <span class="ico">&#128101;</span><span>Community</span><span class="tn-badge tn-badge-nw">NEW</span>
+      </button>
+      <button class="tn-link" data-page="resources" onclick="navTo('resources',this)">
+        <span class="ico">&#128218;</span><span>Resources</span>
+      </button>
+      <button class="tn-link" data-page="profile" onclick="navTo('profile',this)">
+        <span class="ico">&#128100;</span><span>Profile</span>
+      </button>
+    </div>
+
+    <div class="tn-right">
+      <div class="tn-xp" id="tnXp">&#9889; 0 XP</div>
+      <div class="streak" onclick="navTo('profile',null)"><span>&#128293;</span> <span id="streakText">1 Day Streak</span></div>
+      <div class="avi" id="topAvi" onclick="navTo('profile',null)" style="cursor:pointer">U</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MOBILE SIDEBAR DRAWER ── -->
+<div class="sb-mobile" id="sb">
+  <div class="sb-logo">
+    <div class="tn-logo-ic">&#128200;</div>
+    Finvest<span style="color:var(--gr)"> AI</span>
+  </div>
+  <div class="sb-nav">
+    <button class="ni on" data-page="dashboard" onclick="navTo('dashboard',this)"><span class="ico">&#127968;</span>Dashboard</button>
+    <button class="ni" data-page="market" onclick="navTo('market',this)"><span class="ico">&#128202;</span>Market</button>
+    <button class="ni" data-page="learn" onclick="navTo('learn',this)"><span class="ico">&#127891;</span>Learn<span class="nb">15</span></button>
+    <button class="ni" data-page="leaderboard" onclick="navTo('leaderboard',this)"><span class="ico">&#127942;</span>Leaderboard</button>
+    <button class="ni" data-page="community" onclick="navTo('community',this)"><span class="ico">&#128101;</span>Community<span class="nb-nw">NEW</span></button>
+    <button class="ni" data-page="resources" onclick="navTo('resources',this)"><span class="ico">&#128218;</span>Resources</button>
+    <button class="ni" data-page="profile" onclick="navTo('profile',this)"><span class="ico">&#128100;</span>Profile</button>
+    <button class="ni" onclick="openAI()"><span class="ico">&#128161;</span>AI Advisor<span class="nb-ai">AI</span></button>
+  </div>
+  <div class="sb-ft">
+    <div class="xpbox">
+      <div class="xplbl">Your Progress</div>
+      <div class="xplv" id="sbLv">Level 1 &mdash; Beginner</div>
+      <div class="xptrack"><div class="xpfill" id="sbFill" style="width:0%"></div></div>
+      <div class="xpsub" id="sbSub">0 / 200 XP</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- ════ DASHBOARD ════ -->
+  <div class="page on" id="page-dashboard">
+    <div class="hero">
+      <div class="h-lbl">Total Portfolio Value</div>
+      <div class="h-bal" id="dashBal">&#8377;0</div>
+      <div class="h-chg" id="dashChg">Loading...</div>
+    </div>
+    <div class="dgrid">
+      <div class="dstat"><div class="ds-lbl">Invested</div><div class="ds-val" id="dashInvested">&#8377;0</div><div class="ds-sub" id="dashInvSub">Across 0 stocks</div></div>
+      <div class="dstat"><div class="ds-lbl">Total Gain</div><div class="ds-val pos" id="dashGain">&#8377;0</div><div class="ds-sub pos" id="dashGainSub">0% all-time</div></div>
+      <div class="dstat"><div class="ds-lbl">XP Points</div><div class="ds-val" style="color:var(--gd)" id="dashXP">0 &#9889;</div><div class="ds-sub" id="dashLvl">Level 1 &mdash; Beginner</div></div>
+    </div>
+
+    <!-- Sector Allocation Chart -->
+    <div class="dash-row">
+      <div class="dash-card chart-card">
+        <div class="dc-hd">&#128200; Sector Allocation</div>
+        <div class="chart-wrap">
+          <canvas id="sectorCanvas"></canvas>
+          <div id="sectorLegend" class="slg"></div>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-hd">&#128338; Recent Activity</div>
+        <div id="activityList" class="act-list"></div>
+      </div>
+    </div>
+
+    <div class="sechd">
+      <div class="sect">Your Holdings</div>
+      <button class="sea" onclick="navTo('market',document.querySelector('.tn-link[data-page=market]'))">View Market &#8594;</button>
+    </div>
+    <div class="htable">
+      <div class="hr hhead"><div>Stock</div><div>Price</div><div>Value</div><div>P&amp;L</div></div>
+      <div id="holdingsBody"></div>
+    </div>
+  </div>
+
+  <!-- ════ MARKET ════ -->
+  <div class="page" id="page-market">
+    <div class="msrch">
+      <span style="opacity:.5;font-size:14px">&#128269;</span>
+      <input type="text" placeholder="Search stocks, sectors&#8230;" id="mktQ">
+      <span id="mktClr" style="cursor:pointer;opacity:.5;display:none;font-size:12px" onclick="clearMkt()">&#10005;</span>
+    </div>
+    <div class="ixstrip" id="ixstrip"></div>
+    <div class="mtabs">
+      <button class="mtab on" onclick="setTab('All',this)">All</button>
+      <button class="mtab" onclick="setTab('IT',this)">IT</button>
+      <button class="mtab" onclick="setTab('Banking',this)">Banking</button>
+      <button class="mtab" onclick="setTab('Energy',this)">Energy</button>
+      <button class="mtab" onclick="setTab('Auto',this)">Auto</button>
+      <button class="mtab" onclick="setTab('FMCG',this)">FMCG</button>
+      <button class="mtab" onclick="setTab('Pharma',this)">Pharma</button>
+      <button class="mtab" onclick="setTab('Metals',this)">Metals</button>
+      <button class="mtab" onclick="setTab('Infra',this)">Infra</button>
+      <button class="mtab" onclick="setTab('Telecom',this)">Telecom</button>
+      <button class="mtab" onclick="setTab('Chemicals',this)">Chemicals</button>
+      <button class="mtab" onclick="setTab('Realty',this)">Realty</button>
+    </div>
+    <div class="mgrid" id="mgrid"></div>
+  </div>
+
+  <!-- ════ LEARN ════ -->
+  <div class="page" id="page-learn">
+    <div class="lhero">
+      <div class="ltag">&#9889; AI-Powered Learning</div>
+      <h1>Level Up Your Money IQ &#129504;</h1>
+      <p>Bite-sized lessons, quizzes &amp; real XP. Correct answers earn bonus XP!</p>
+      <div class="lstats">
+        <div><div class="lsv" id="lsComp">0</div><div class="lsl">Completed</div></div>
+        <div><div class="lsv">15</div><div class="lsl">Total Lessons</div></div>
+        <div><div class="lsv" id="lsXp">0</div><div class="lsl">XP Earned</div></div>
+      </div>
+    </div>
+    <div class="lxprow">
+      <div class="lxpic">&#127885;</div>
+      <div class="lxpinf">
+        <div class="lxpt" id="lLv">Level 1 &mdash; Beginner</div>
+        <div class="lxps">Complete lessons to reach <b>Level 2 &mdash; Learner</b></div>
+        <div class="xp2t"><div class="xp2f" id="lFill" style="width:0%"></div></div>
+        <div class="lxpsb" id="lSub">0 / 200 XP to next level</div>
+      </div>
+      <div class="lxpbg">&#128293; <span class="streak-count">1</span>-day streak</div>
+    </div>
+    <div class="lcats">
+      <button class="lcat on" onclick="filterCat('all',this)">&#11088; All</button>
+      <button class="lcat" onclick="filterCat('basics',this)">&#128214; App Basics</button>
+      <button class="lcat" onclick="filterCat('stocks',this)">&#128200; Stocks</button>
+      <button class="lcat" onclick="filterCat('risk',this)">&#128737; Risk</button>
+      <button class="lcat" onclick="filterCat('strategy',this)">&#9822; Strategy</button>
+      <button class="lcat" onclick="filterCat('advanced',this)">&#128640; Advanced</button>
+    </div>
+    <div class="lgrid" id="lgrid"></div>
+  </div>
+
+  <!-- ════ LEADERBOARD ════ -->
+  <div class="page" id="page-leaderboard">
+    <div class="lbhero">
+      <div style="font-size:11px;color:var(--mu);margin-bottom:4px">&#127942; Weekly Challenge &middot; <span id="lbTimer">Resets in 6d 14h</span></div>
+      <div style="font-family:var(--fh);font-size:21px;font-weight:800">Top Investors</div>
+      <div class="podium" id="podium"></div>
+    </div>
+    <div class="lb-rank-summary" id="lbRankSummary"></div>
+    <div class="sechd" style="margin-bottom:9px"><div class="sect">Full Rankings</div><div style="font-size:11px;color:var(--mu)">This week</div></div>
+    <div class="lblist" id="lblist"></div>
+  </div>
+
+  <!-- ════ COMMUNITY ════ -->
+  <div class="page" id="page-community">
+    <div class="comhero">
+      <h1>&#128101; Investor Community</h1>
+      <p>Learn together, grow together. Join a room based on your experience level.</p>
+      <div class="comstats">
+        <div><div class="cosv">2,841</div><div class="cosl">Members</div></div>
+        <div><div class="cosv">128</div><div class="cosl">Online Now</div></div>
+        <div><div class="cosv">3</div><div class="cosl">Weekly Challenges</div></div>
+      </div>
+    </div>
+    <div class="sechd"><div class="sect">&#127968; Choose Your Room</div></div>
+    <div class="roomgrid">
+      <div class="roomcard rbeg" onclick="joinRoom('beginner')">
+        <div class="rbdge">&#127331; Beginner Friendly</div>
+        <div class="rico">&#127807;</div>
+        <div class="rnm">Beginner Investors</div>
+        <div class="rdesc">Just starting out? Ask basic questions freely, learn together, and get guided by community mentors. No question is too simple.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;">
+          <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gr)">&#128214; Daily Q&amp;A</span>
+          <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gr)">+1,924 members</span>
+        </div>
+        <button class="rjoin">Join Beginner Room &#8594;</button>
+      </div>
+      <div class="roomcard rint" onclick="joinRoom('intermediate')">
+        <div class="rbdge" style="background:rgba(155,109,255,.15);color:var(--pu)">&#127775; Intermediate</div>
+        <div class="rico">&#9822;</div>
+        <div class="rnm">Intermediate Traders</div>
+        <div class="rdesc">Discuss sector analysis, portfolio strategies, earnings calls, and technical setups with experienced investors.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;">
+          <span style="background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--pu)">&#128202; Sector Analysis</span>
+          <span style="background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--pu)">+917 members</span>
+        </div>
+        <button class="rjoin">Join Intermediate Room &#8594;</button>
+      </div>
+    </div>
+    <div class="sechd"><div class="sect">&#127942; Weekly Challenges</div><div style="font-size:11px;color:var(--mu)">Resets Sunday midnight</div></div>
+    <div class="chcard"><div class="chic">&#128202;</div><div class="chinf"><div class="chtt">Diversification Challenge</div><div class="chds">Add 1 stock from Banking or FMCG to your portfolio.</div></div><div class="chrew"><div class="chxp">+200 XP</div><div class="chbl">Reward</div><button class="chbtn" data-challenge="diversify" onclick="participateChallenge('diversify',200,'Diversification Challenge! +200 XP')">Participate</button></div></div>
+    <div class="chcard"><div class="chic">&#129504;</div><div class="chinf"><div class="chtt">Quiz Master</div><div class="chds">Complete 5 lessons with all quiz answers correct.</div></div><div class="chrew"><div class="chxp">+150 XP</div><div class="chbl">Reward</div><button class="chbtn" data-challenge="quizmaster" onclick="participateChallenge('quizmaster',150,'Quiz Master! +150 XP')">Participate</button></div></div>
+    <div class="chcard"><div class="chic">&#128221;</div><div class="chinf"><div class="chtt">First Post</div><div class="chds">Introduce yourself with your investing goal.</div></div><div class="chrew"><div class="chxp">+75 XP</div><div class="chbl">Reward</div><button class="chbtn" data-challenge="firstpost" onclick="participateChallenge('firstpost',75,'First Post! +75 XP')">Participate</button></div></div>
+  </div>
+
+  <!-- ════ RESOURCES ════ -->
+  <div class="page" id="page-resources">
+    <div class="reshero">
+      <div class="reshic">&#128218;</div>
+      <div><h1>Learning Resources</h1><p>Official SEBI documents, calculators, glossary, and trusted investing resources — all in one place.</p></div>
+    </div>
+
+    <!-- SIP Calculator -->
+    <div class="sechd"><div class="sect">&#128178; SIP Calculator</div></div>
+    <div class="calc-card">
+      <div class="calc-row">
+        <div class="calc-field">
+          <label>Monthly Investment (&#8377;)</label>
+          <input type="number" id="sipAmount" value="5000" min="100" class="calc-input" oninput="calcSIP()">
+        </div>
+        <div class="calc-field">
+          <label>Expected Return (%/yr)</label>
+          <input type="number" id="sipRate" value="12" min="1" max="50" class="calc-input" oninput="calcSIP()">
+        </div>
+        <div class="calc-field">
+          <label>Time Period (years)</label>
+          <input type="number" id="sipYears" value="10" min="1" max="50" class="calc-input" oninput="calcSIP()">
+        </div>
+      </div>
+      <div id="sipBar" class="calc-bar"></div>
+      <div class="calc-results">
+        <div class="calc-res"><div class="calc-res-lbl">Invested</div><div class="calc-res-val" id="sipInvested" style="color:var(--bl)">&#8377;0</div></div>
+        <div class="calc-res"><div class="calc-res-lbl">Est. Returns</div><div class="calc-res-val" id="sipReturns" style="color:var(--gr)">&#8377;0</div></div>
+        <div class="calc-res"><div class="calc-res-lbl">Total Value</div><div class="calc-res-val" id="sipTotal" style="color:var(--gd)">&#8377;0</div></div>
+      </div>
+    </div>
+
+    <!-- Lumpsum Calculator -->
+    <div class="sechd"><div class="sect">&#128176; Lumpsum Calculator</div></div>
+    <div class="calc-card">
+      <div class="calc-row">
+        <div class="calc-field">
+          <label>Investment Amount (&#8377;)</label>
+          <input type="number" id="lsAmount" value="100000" min="1000" class="calc-input" oninput="calcLumpsum()">
+        </div>
+        <div class="calc-field">
+          <label>Expected Return (%/yr)</label>
+          <input type="number" id="lsRate" value="12" min="1" max="50" class="calc-input" oninput="calcLumpsum()">
+        </div>
+        <div class="calc-field">
+          <label>Time Period (years)</label>
+          <input type="number" id="lsYears" value="10" min="1" max="50" class="calc-input" oninput="calcLumpsum()">
+        </div>
+      </div>
+      <div class="calc-results">
+        <div class="calc-res"><div class="calc-res-lbl">Invested</div><div class="calc-res-val" id="lsInvested" style="color:var(--bl)">&#8377;0</div></div>
+        <div class="calc-res"><div class="calc-res-lbl">Est. Returns</div><div class="calc-res-val" id="lsReturns" style="color:var(--gr)">&#8377;0</div></div>
+        <div class="calc-res"><div class="calc-res-lbl">Total Value</div><div class="calc-res-val" id="lsTotal" style="color:var(--gd)">&#8377;0</div></div>
+      </div>
+    </div>
+
+    <!-- Glossary -->
+    <div class="sechd"><div class="sect">&#128214; Investment Glossary</div></div>
+    <div class="gloss-card">
+      <div class="gloss-search">
+        <span style="opacity:.5;font-size:14px">&#128269;</span>
+        <input type="text" id="glossarySearch" placeholder="Search terms..." class="gloss-inp">
+      </div>
+      <div id="glossaryList" class="gloss-list"></div>
+    </div>
+
+    <!-- SEBI Booklet -->
+    <div class="sechd"><div class="sect">&#128196; SEBI Securities Market Booklet</div></div>
+    <div style="background:var(--bg2);border:1px solid var(--br);border-radius:13px;overflow:hidden;margin-bottom:20px;">
+      <div style="padding:13px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;">
+        <div style="display:flex;align-items:center;gap:8px;font-family:var(--fh);font-size:13px;font-weight:700;">
+          <span>&#128196;</span> SEBI &mdash; Understanding Securities Market
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+          <span style="background:rgba(77,159,255,.12);border:1px solid rgba(77,159,255,.2);border-radius:11px;padding:2px 8px;font-size:10px;color:var(--bl)">Official SEBI</span>
+          <span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:11px;padding:2px 8px;font-size:10px;color:var(--gr)">37 Pages</span>
+          <a href="https://www.sebi.gov.in/sebi_data/attachdocs/1591871327372.pdf" target="_blank"
+             style="background:linear-gradient(135deg,var(--bl),#2563eb);color:#fff;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;">&#11015; Download</a>
+        </div>
+      </div>
+      <div style="display:flex;gap:5px;padding:11px 14px;border-bottom:1px solid var(--br);overflow-x:auto;">
+        <button class="stab on" onclick="showSC(0,this)">Intro</button>
+        <button class="stab" onclick="showSC(1,this)">1. Regulatory</button>
+        <button class="stab" onclick="showSC(2,this)">2. Securities</button>
+        <button class="stab" onclick="showSC(3,this)">3. Markets</button>
+        <button class="stab" onclick="showSC(4,this)">4. Institutions</button>
+        <button class="stab" onclick="showSC(5,this)">5. Risks</button>
+        <button class="stab" onclick="showSC(6,this)">6. KYC &amp; Accounts</button>
+        <button class="stab" onclick="showSC(7,this)">7. How to Invest</button>
+        <button class="stab" onclick="showSC(8,this)">8. Mutual Funds</button>
+        <button class="stab" onclick="showSC(9,this)">9. Grievance</button>
+        <button class="stab" onclick="showSC(10,this)">10. Do's &amp; Don'ts</button>
+      </div>
+      <div id="sc"></div>
+    </div>
+
+    <!-- Recommended Resources -->
+    <div class="sechd"><div class="sect">&#128218; Recommended Resources</div></div>
+    <div class="resgrid">
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#1f36c7,#4d9fff)"></div><div class="restag" style="background:rgba(77,159,255,.15);color:var(--bl)">&#128202; Official Regulator</div><div class="resic">&#127983;</div><div class="restt">SEBI Investor Education Portal</div><div class="resds">India's official securities regulator. File complaints (SCORES), verify brokers, access all market regulations.</div><a href="https://investor.sebi.gov.in" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--bl),#2563eb);color:#fff;">&#128279; Visit Portal</a></div>
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#00e5a0,#00a87a)"></div><div class="restag" style="background:rgba(0,229,160,.15);color:var(--gr)">&#127891; Free Learning</div><div class="resic">&#127891;</div><div class="restt">Varsity by Zerodha</div><div class="resds">India's best free investing education. 15+ modules: equities, F&amp;O, technical analysis, trading psychology.</div><a href="https://zerodha.com/varsity" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--gr),#00a87a);color:#060912;">&#128279; Visit Varsity</a></div>
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#9b6dff,#6d28d9)"></div><div class="restag" style="background:rgba(155,109,255,.15);color:var(--pu)">&#127793; Mutual Funds</div><div class="resic">&#127793;</div><div class="restt">AMFI &mdash; Mutual Fund Guide</div><div class="resds">Check NAVs, compare fund performance, verify distributor credentials from the Association of Mutual Funds in India.</div><a href="https://www.amfiindia.com" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--pu),var(--bl));color:#fff;">&#128279; Visit AMFI</a></div>
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#4d9fff,#2563eb)"></div><div class="restag" style="background:rgba(77,159,255,.15);color:var(--bl)">&#127897; Video Lectures</div><div class="resic">&#127897;</div><div class="restt">Prof. Damodaran (YouTube)</div><div class="resds">NYU's Dean of Valuation. Free world-class lectures on DCF, valuation and corporate finance used in top MBA programs.</div><a href="https://www.youtube.com/@AswathDamodaran" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--bl),#2563eb);color:#fff;">&#128279; Watch Now</a></div>
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#ff4d6a,#c41b3a)"></div><div class="restag" style="background:rgba(255,77,106,.15);color:var(--rd)">&#128228; File a Complaint</div><div class="resic">&#128228;</div><div class="restt">SCORES &mdash; SEBI Complaint Portal</div><div class="resds">File, track and follow up on complaints against brokers or market intermediaries. Toll-free: 1800 22 7575.</div><a href="https://scores.gov.in" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--rd),#c41b3a);color:#fff;">&#128279; Visit SCORES</a></div>
+      <div class="rescard"><div class="resacc" style="background:linear-gradient(90deg,#ffb547,#f59e0b)"></div><div class="restag" style="background:rgba(255,181,71,.15);color:var(--gd)">&#128181; Unclaimed Money</div><div class="resic">&#128181;</div><div class="restt">IEPF &mdash; Unclaimed Dividends</div><div class="resds">Dividends and shares unclaimed for 7+ years are held by IEPF. Claim your rightful money at iepf.gov.in.</div><a href="https://www.iepf.gov.in" target="_blank" class="resbtn" style="background:linear-gradient(135deg,var(--gd),#f59e0b);color:#060912;">&#128279; Claim Now</a></div>
+    </div>
+  </div>
+
+  <!-- ════ PROFILE ════ -->
+  <div class="page" id="page-profile">
+    <div class="prof-hero">
+      <div class="prof-avatar-big" id="profAvatar">&#128100;</div>
+      <div class="prof-name-big" id="profDisplayName">Investor</div>
+      <div class="prof-goal-text" id="profGoalDisplay">Learn investing basics</div>
+      <div class="prof-badges">
+        <span class="prof-badge" id="profLevel">Level 1</span>
+        <span class="prof-badge risk-badge" id="profRiskDisplay">Moderate</span>
+      </div>
+    </div>
+
+    <div class="prof-stats-grid">
+      <div class="prof-stat-card"><div class="psc-val" id="profXP">0</div><div class="psc-lbl">Total XP</div></div>
+      <div class="prof-stat-card"><div class="psc-val" id="profLessons">0/15</div><div class="psc-lbl">Lessons</div></div>
+      <div class="prof-stat-card"><div class="psc-val" id="profTrades">0</div><div class="psc-lbl">Trades</div></div>
+      <div class="prof-stat-card"><div class="psc-val" id="profStreak">1 days</div><div class="psc-lbl">Streak</div></div>
+      <div class="prof-stat-card"><div class="psc-val" id="profHoldings">0 stocks</div><div class="psc-lbl">Holdings</div></div>
+      <div class="prof-stat-card"><div class="psc-val" id="profPortValue">&#8377;0</div><div class="psc-lbl">Portfolio</div></div>
+    </div>
+
+    <div class="sechd"><div class="sect">&#127942; Achievements</div><div style="font-size:11px;color:var(--mu)" id="profJoined">Joined today</div></div>
+    <div id="achievementsList" class="ach-list"></div>
+
+    <div style="margin-top:24px;text-align:center;">
+      <button class="reset-btn" onclick="resetProfile()">&#128465; Reset All Data</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<nav class="bnav">
+  <button class="bni on" id="bn-dashboard"  onclick="navTo('dashboard',null,this)"><span class="bnic">&#127968;</span>Home</button>
+  <button class="bni"    id="bn-market"      onclick="navTo('market',null,this)"><span class="bnic">&#128202;</span>Market</button>
+  <button class="bni"    id="bn-learn"       onclick="navTo('learn',null,this)"><span class="bnic">&#127891;</span>Learn</button>
+  <button class="bni"    id="bn-leaderboard" onclick="navTo('leaderboard',null,this)"><span class="bnic">&#127942;</span>Rank</button>
+  <button class="bni"    id="bn-profile"     onclick="navTo('profile',null,this)"><span class="bnic">&#128100;</span>Profile</button>
+</nav>
+
+<!-- JS — load order matters -->
+<script src="js/data.js"></script>
+<script src="js/market.js"></script>
+<script src="js/learn.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
