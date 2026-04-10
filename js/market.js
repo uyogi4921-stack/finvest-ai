@@ -194,7 +194,7 @@ function renderSectorChart(alloc, total) {
   ctx.clearRect(0, 0, w, h);
 
   var cx = w * 0.35, cy = h / 2, r = Math.min(cx, cy) - 20;
-  var colors = { IT: '#4d9fff', Banking: '#00e5a0', Energy: '#ff7b3a', Auto: '#9b6dff', FMCG: '#ffb547', Pharma: '#ff4d6a', Metals: '#cd7f32', Infra: '#2ecc71', Telecom: '#e74c3c', Chemicals: '#1abc9c', Realty: '#e67e22' };
+  var colors = { IT: '#4d9fff', Banking: '#00e5a0', Energy: '#ff7b3a', Auto: '#9b6dff', FMCG: '#ffb547', Pharma: '#ff4d6a', Metals: '#cd7f32', Infra: '#2ecc71', Telecom: '#e74c3c', Chemicals: '#1abc9c', Realty: '#e67e22', Insurance: '#ff85c0', Consumer: '#66d9ef', Logistics: '#a0522d' };
   var sectors = Object.keys(alloc);
   if (sectors.length === 0) return;
 
@@ -385,6 +385,63 @@ function tickPrices() {
   if (curPage === 'dashboard') {
     renderHoldingsTable();
     updateDashboardStats();
+  }
+
+  // Update stock detail modal if open
+  updateSDLive();
+}
+
+// ─── LIVE UPDATE STOCK DETAIL ────────────────────────────
+function updateSDLive() {
+  if (!sdCurrentSym) return;
+  var sdov = document.getElementById('sdov');
+  if (!sdov || !sdov.classList.contains('on')) return;
+
+  var sym = sdCurrentSym;
+  var s = ST.find(function(x) { return x.s === sym; });
+  if (!s) return;
+  var p = prices[sym] || s.p;
+  var ch = +((p - s.p) / s.p * 100).toFixed(2);
+  var pos = ch >= 0;
+
+  // Update prices
+  var topPrice = document.getElementById('sdTopPrice');
+  if (topPrice) topPrice.textContent = fINR(p);
+  var sdPrice = document.getElementById('sdPrice');
+  if (sdPrice) sdPrice.textContent = fINR(p);
+  var chEl = document.getElementById('sdChange');
+  if (chEl) {
+    chEl.textContent = (pos ? '\u25B2 +' : '\u25BC ') + Math.abs(ch) + '% today';
+    chEl.className = 'sd-change ' + (pos ? 'sd-up' : 'sd-down');
+  }
+
+  // Update stats (Day High/Low move with price)
+  var stats = getStockStats(sym, p, s);
+  var dhEl = document.getElementById('sdDayHigh');
+  var dlEl = document.getElementById('sdDayLow');
+  if (dhEl) dhEl.textContent = fINR(stats.dayHigh);
+  if (dlEl) dlEl.textContent = fINR(stats.dayLow);
+
+  // Update order card price
+  var orderPrice = document.getElementById('sdOrderPrice');
+  if (orderPrice) orderPrice.textContent = fINR(p);
+
+  // Update order total
+  var qty = parseInt(document.getElementById('sdOrderQty').value) || 0;
+  var orderTotal = document.getElementById('sdOrderTotal');
+  if (orderTotal) orderTotal.textContent = fINR(qty * p);
+
+  // Update holdings info
+  var hold = HOLDS.find(function(h) { return h.sym === sym; });
+  var holdInfo = document.getElementById('sdHoldInfo');
+  if (holdInfo && hold) {
+    var holdVal = hold.qty * p;
+    var pnl = (p - hold.avgPrice) * hold.qty;
+    holdInfo.innerHTML = '<div class="sd-hold-title">Your Holdings</div>'
+      + '<div class="sd-hold-row"><span>Shares</span><span>' + hold.qty + '</span></div>'
+      + '<div class="sd-hold-row"><span>Avg Price</span><span>' + fINR(hold.avgPrice) + '</span></div>'
+      + '<div class="sd-hold-row"><span>Current Value</span><span>' + fINR(holdVal) + '</span></div>'
+      + '<div class="sd-hold-row"><span>P&L</span><span class="' + (pnl >= 0 ? 'pos' : 'neg') + '">' + (pnl >= 0 ? '+' : '') + fINR(pnl) + '</span></div>';
   }
 }
 
@@ -590,6 +647,70 @@ var TV_MAP = {
 var sdCurrentSym = '';
 var sdCurrentTab = 'buy';
 
+// ─── DETERMINISTIC STOCK STATS (not random on each open) ─
+function hashSym(sym) {
+  var h = 0;
+  for (var i = 0; i < sym.length; i++) {
+    h = ((h << 5) - h) + sym.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+// Sector-specific P/E ranges (realistic)
+var SECTOR_PE = {
+  IT: [22, 38], Banking: [10, 22], Energy: [8, 18], Auto: [15, 35],
+  FMCG: [40, 75], Pharma: [20, 40], Metals: [6, 15], Infra: [18, 35],
+  Telecom: [25, 60], Chemicals: [25, 50], Realty: [12, 30],
+  Insurance: [50, 90], Consumer: [100, 300], Logistics: [40, 80]
+};
+
+function getStockStats(sym, currentPrice, stk) {
+  var h = hashSym(sym);
+  var sec = stk.sec;
+  var baseP = stk.p;
+
+  // P/E — sector-specific, fixed per stock
+  var peRange = SECTOR_PE[sec] || [15, 35];
+  var pe = peRange[0] + (h % 100) / 100 * (peRange[1] - peRange[0]);
+
+  // Volume — inversely proportional to price (cheaper stocks trade more), fixed per stock
+  var volBase = Math.max(2, 80 - (baseP / 200));
+  var vol = volBase + (h % 50) * 0.4;
+
+  // Day High/Low — based on current price with a fixed spread per stock
+  var spread = 0.005 + (h % 30) / 3000; // 0.5% to 1.5% spread
+  var dayHigh = Math.round(currentPrice * (1 + spread));
+  var dayLow = Math.round(currentPrice * (1 - spread * 0.8));
+
+  // 52-week High/Low — based on base price with stock-specific offsets
+  var highMult = 1.08 + (h % 40) / 100;  // 8% to 48% above base
+  var lowMult = 0.55 + (h % 35) / 100;   // 55% to 90% of base
+  var w52High = Math.round(baseP * highMult);
+  var w52Low = Math.round(baseP * lowMult);
+
+  // Market Cap (approx, in Cr)
+  var mcap = Math.round(baseP * (500 + (h % 5000)) / 10);
+
+  return {
+    dayHigh: dayHigh, dayLow: dayLow,
+    volume: vol.toFixed(1), pe: pe.toFixed(1),
+    w52High: w52High, w52Low: w52Low, mcap: mcap
+  };
+}
+
+function renderSDStats(stats, stk) {
+  document.getElementById('sdStats').innerHTML =
+    '<div class="sd-stat"><div class="sd-stat-lbl">Day High</div><div class="sd-stat-val" id="sdDayHigh">' + fINR(stats.dayHigh) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Day Low</div><div class="sd-stat-val" id="sdDayLow">' + fINR(stats.dayLow) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Volume</div><div class="sd-stat-val">' + stats.volume + ' L</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">P/E Ratio</div><div class="sd-stat-val">' + stats.pe + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Sector</div><div class="sd-stat-val">' + stk.sec + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">52W High</div><div class="sd-stat-val">' + fINR(stats.w52High) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">52W Low</div><div class="sd-stat-val">' + fINR(stats.w52Low) + '</div></div>'
+    + '<div class="sd-stat"><div class="sd-stat-lbl">Mkt Cap</div><div class="sd-stat-val">' + fINR(stats.mcap) + ' Cr</div></div>';
+}
+
 function openStockDetail(sym) {
   var s = ST.find(function(x) { return x.s === sym; });
   if (!s) return;
@@ -623,24 +744,13 @@ function openStockDetail(sym) {
     wlBtn.className = 'sd-wl-btn' + (watchlist.indexOf(sym) !== -1 ? ' active' : '');
   }
 
-  // Stats grid
+  // Stats grid — deterministic per stock using symbol hash
   var hold = HOLDS.find(function(h) { return h.sym === sym; });
   var holdQty = hold ? hold.qty : 0;
   var holdVal = hold ? hold.qty * p : 0;
-  var dayHigh = (p * (1 + Math.random() * 0.02)).toFixed(0);
-  var dayLow = (p * (1 - Math.random() * 0.02)).toFixed(0);
-  var vol = (Math.random() * 50 + 5).toFixed(1);
-  var pe = (15 + Math.random() * 30).toFixed(1);
+  var stats = getStockStats(sym, p, s);
 
-  document.getElementById('sdStats').innerHTML =
-    '<div class="sd-stat"><div class="sd-stat-lbl">Day High</div><div class="sd-stat-val">' + fINR(dayHigh) + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Day Low</div><div class="sd-stat-val">' + fINR(dayLow) + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Volume</div><div class="sd-stat-val">' + vol + ' L</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">P/E Ratio</div><div class="sd-stat-val">' + pe + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Sector</div><div class="sd-stat-val">' + s.sec + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">52W High</div><div class="sd-stat-val">' + fINR(Math.round(s.p * 1.25)) + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">52W Low</div><div class="sd-stat-val">' + fINR(Math.round(s.p * 0.7)) + '</div></div>'
-    + '<div class="sd-stat"><div class="sd-stat-lbl">Base Price</div><div class="sd-stat-val">' + fINR(s.p) + '</div></div>';
+  renderSDStats(stats, s);
 
   // Order card
   document.getElementById('sdOrderPrice').textContent = fINR(p);

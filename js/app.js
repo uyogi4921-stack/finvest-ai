@@ -70,6 +70,49 @@ function initApp() {
   setInterval(function() {
     if (curPage === 'leaderboard') renderLB();
   }, 60000);
+
+  // Sync user data to backend (every 30 seconds + on key actions)
+  syncToServer();
+  setInterval(syncToServer, 30000);
+}
+
+// ─── BACKEND SYNC ────────────────────────────────────────
+// Sends user profile, stats, holdings, trades to server for admin visibility
+var _syncUserId = Store.get('userId', null);
+
+function syncToServer() {
+  if (!userProfile) return;
+  var port = calcPortfolio();
+  var payload = {
+    userId: _syncUserId,
+    profile: userProfile,
+    xp: totalXP,
+    level: getLv(totalXP).l,
+    streak: streakData.count,
+    lessonsCompleted: completedL.size,
+    totalTrades: tradeHistory.length,
+    holdingsCount: HOLDS.length,
+    portfolioValue: port.totalValue,
+    walletBalance: wallet.balance,
+    holdings: HOLDS,
+    recentTrades: tradeHistory.slice(-20)
+  };
+
+  fetch('/api/users/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success && data.userId) {
+      _syncUserId = data.userId;
+      Store.set('userId', _syncUserId);
+    }
+  })
+  .catch(function() {
+    // Server not available — that's fine, app works offline
+  });
 }
 
 function updateChallengeButtons() {

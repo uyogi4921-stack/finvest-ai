@@ -8,7 +8,7 @@
 
 var aiStarted = false;
 var aiTyping  = false;
-var chatHistory = []; // track conversation to avoid repeating
+var chatHistory = Store.get('chatHistory', []); // persist conversation memory across sessions
 
 // ─── DYNAMIC PORTFOLIO CONTEXT ──────────────────────────
 function getPortfolioSummary() {
@@ -271,6 +271,132 @@ var AI_BANK = {
     function() { return '😄 Here\'s an investing joke:<br><br><i>"The stock market is the only place where things go on sale and everyone runs out of the store screaming."</i> — Unknown<br><br>But seriously — buying quality stocks when they dip is one of the best strategies. Be greedy when others are fearful!'; },
     function() { return '😄 Investing humor:<br><br><i>"Rule No. 1: Never lose money. Rule No. 2: Never forget Rule No. 1."</i> — Warren Buffett<br><br>Translation: Protect your capital first. Only invest in companies you understand.'; }
   ],
+  // ─── FINANCIAL CONCEPTS ──────────────────────────────────
+  pe_ratio: [
+    function() {
+      return '<b>What is P/E Ratio?</b><br><br>'
+        + '<b>Price-to-Earnings Ratio</b> = Current Stock Price / Earnings Per Share (EPS)<br><br>'
+        + '<b>What it tells you:</b> How much investors are willing to pay for each rupee of earnings.<br><br>'
+        + '<b>Example:</b> If TCS stock is ₹3,800 and EPS is ₹120, P/E = 31.7x<br>'
+        + 'This means investors pay ₹31.7 for every ₹1 TCS earns.<br><br>'
+        + '<b>General guidelines:</b><ul>'
+        + '<li>< 15: Potentially undervalued (or low growth)</li>'
+        + '<li>15-25: Fairly valued</li>'
+        + '<li>25-40: Growth stock / premium valuation</li>'
+        + '<li>> 40: Expensive — needs strong growth to justify</li></ul>'
+        + '<b>Sector matters:</b> IT stocks (25-35 P/E) are naturally higher than Banking (10-20 P/E). Always compare within the same sector.';
+    }
+  ],
+  dividend: [
+    function() {
+      return '<b>What is a Dividend?</b><br><br>'
+        + 'A <b>dividend</b> is a portion of a company\'s profits distributed to shareholders — like getting rent from your investments.<br><br>'
+        + '<b>Dividend Yield</b> = Annual Dividend per Share / Stock Price × 100<br><br>'
+        + '<b>Top dividend stocks in India:</b><ul>'
+        + '<li><b>ITC:</b> ~3.5% yield — consistent for decades</li>'
+        + '<li><b>Coal India:</b> ~7% yield — high but cyclical</li>'
+        + '<li><b>Power Grid:</b> ~4.5% yield — stable utility</li>'
+        + '<li><b>ONGC:</b> ~4% yield — energy sector</li></ul>'
+        + '<b>Key dates:</b><ul>'
+        + '<li><b>Record Date:</b> You must own shares before this date to receive dividend</li>'
+        + '<li><b>Ex-Dividend Date:</b> Share price adjusts down by dividend amount on this date</li></ul>'
+        + '<b>Tax:</b> Dividends are taxed at your income tax slab rate. TDS of 10% if annual dividend exceeds ₹5,000.';
+    }
+  ],
+  market_cap: [
+    function() {
+      return '<b>What is Market Capitalization?</b><br><br>'
+        + '<b>Market Cap</b> = Current Stock Price × Total Outstanding Shares<br><br>'
+        + 'It represents the total market value of a company.<br><br>'
+        + '<b>SEBI Classification:</b><ul>'
+        + '<li><b>Large Cap:</b> Top 100 companies (Reliance, TCS, HDFC Bank) — safest, most liquid</li>'
+        + '<li><b>Mid Cap:</b> 101st to 250th (AU Bank, Persistent, Coforge) — growth + moderate risk</li>'
+        + '<li><b>Small Cap:</b> 251st onwards — highest growth potential but also highest risk</li></ul>'
+        + '<b>India\'s top 5 by market cap:</b><br>'
+        + '1. Reliance Industries (~₹18L Cr)<br>'
+        + '2. TCS (~₹14L Cr)<br>'
+        + '3. HDFC Bank (~₹12L Cr)<br>'
+        + '4. Infosys (~₹6L Cr)<br>'
+        + '5. Bharti Airtel (~₹5L Cr)';
+    }
+  ],
+  nifty: [
+    function() {
+      return '<b>What is NIFTY 50?</b><br><br>'
+        + 'NIFTY 50 is an index of the <b>50 largest companies</b> listed on the National Stock Exchange (NSE).<br><br>'
+        + '<b>Why it matters:</b> It\'s the benchmark of the Indian stock market — when people say "the market went up," they usually mean NIFTY went up.<br><br>'
+        + '<b>Key facts:</b><ul>'
+        + '<li>Managed by NSE Indices (formerly India Index Services)</li>'
+        + '<li>Represents ~65% of free-float market cap of NSE stocks</li>'
+        + '<li>Reviewed every 6 months — underperformers are replaced</li>'
+        + '<li>Base date: Nov 3, 1995 with a base value of 1,000</li></ul>'
+        + '<b>Other important indices:</b><br>'
+        + '• SENSEX (BSE, 30 stocks) • BANK NIFTY (12 banking stocks)<br>'
+        + '• NIFTY IT • NIFTY Midcap 100 • NIFTY Smallcap 250';
+    }
+  ],
+  intraday: [
+    function() {
+      return '<b>Intraday vs Delivery Trading</b><br><br>'
+        + '<b>Intraday:</b> Buy and sell the same stock on the same day. Position is squared off before market close (3:30 PM).<ul>'
+        + '<li>Requires less capital (margin trading)</li>'
+        + '<li>Higher risk — no time to recover from drops</li>'
+        + '<li>Taxed as business income (your slab rate)</li>'
+        + '<li>Brokerage is typically lower</li></ul>'
+        + '<b>Delivery:</b> Buy and hold — shares are delivered to your Demat account.<ul>'
+        + '<li>Lower risk — you can wait for recovery</li>'
+        + '<li>STCG (15%) if sold within 1 year, LTCG (10% above ₹1L) if held longer</li>'
+        + '<li>Better for beginners</li></ul>'
+        + '<hr><b>Recommendation for beginners:</b> Avoid intraday completely. Focus on delivery trades with quality stocks for long-term wealth building.';
+    }
+  ],
+  demat: [
+    function() {
+      return '<b>What is a Demat Account?</b><br><br>'
+        + 'A <b>Demat (Dematerialized) Account</b> holds your shares in electronic form — like a digital locker for your investments.<br><br>'
+        + '<b>How it works:</b><ul>'
+        + '<li>Physical share certificates → Converted to electronic records</li>'
+        + '<li>Managed by depositories: <b>NSDL</b> and <b>CDSL</b></li>'
+        + '<li>You access it through a Depository Participant (DP) — your broker</li></ul>'
+        + '<b>What you need to open one:</b><ul>'
+        + '<li>PAN Card (mandatory)</li>'
+        + '<li>Aadhaar Card (for e-KYC)</li>'
+        + '<li>Bank account details</li>'
+        + '<li>Address proof</li></ul>'
+        + '<b>Popular brokers:</b> Zerodha, Groww, Angel One, Upstox, ICICI Direct<br><br>'
+        + '<b>Tip:</b> Most brokers now offer free Demat account opening with zero AMC for the first year.';
+    }
+  ],
+  bluechip: [
+    function() {
+      return '<b>What are Blue-Chip Stocks?</b><br><br>'
+        + 'Blue-chip stocks are shares of <b>large, well-established, financially stable companies</b> with a history of consistent performance.<br><br>'
+        + '<b>Characteristics:</b><ul>'
+        + '<li>Large market cap (usually top 50-100 companies)</li>'
+        + '<li>Strong brand recognition</li>'
+        + '<li>Consistent dividend payments</li>'
+        + '<li>Lower volatility compared to small/mid caps</li></ul>'
+        + '<b>Indian Blue-Chips:</b><br>'
+        + 'Reliance, TCS, Infosys, HDFC Bank, HUL, ITC, Bharti Airtel, L&T, Asian Paints, Titan<br><br>'
+        + '<b>Why beginners should start here:</b> Blue-chips are less volatile, more liquid, and have proven track records. They\'re the safest entry point into direct stock investing.'
+        + '<hr><b>Strategy:</b> Build a core portfolio of 5-7 blue-chips, then gradually add mid-caps for growth.';
+    }
+  ],
+  stop_loss: [
+    function() {
+      return '<b>What is a Stop Loss?</b><br><br>'
+        + 'A <b>stop loss</b> is a pre-set order to sell a stock if it falls below a certain price — it protects you from heavy losses.<br><br>'
+        + '<b>Example:</b> You buy TCS at ₹3,800. You set a stop loss at ₹3,600.<br>'
+        + 'If TCS drops to ₹3,600, your shares are automatically sold — limiting your loss to ₹200/share (5.3%).<br><br>'
+        + '<b>How to set a good stop loss:</b><ul>'
+        + '<li><b>Percentage-based:</b> 5-10% below buy price for delivery trades</li>'
+        + '<li><b>Support-based:</b> Just below a key technical support level</li>'
+        + '<li><b>ATR-based:</b> 2× Average True Range for volatility-adjusted stops</li></ul>'
+        + '<b>Trailing Stop Loss:</b> Moves up as stock price rises, locking in profits while limiting downside.<br><br>'
+        + '<b>Golden rule:</b> Always use a stop loss. The biggest mistake beginners make is holding onto losing stocks hoping they\'ll recover.';
+    }
+  ],
+
   specific_stock: function(sym) {
     var stk = ST.find(function(s) { return s.s === sym; });
     if (!stk) return null;
@@ -321,6 +447,14 @@ function getReply(msg) {
   else if (q.match(/mutual fund|mf|etf|index fund|fund/)) topic = 'mutual_funds';
   else if (q.match(/tax|stcg|ltcg|capital gain|80c|elss/)) topic = 'tax';
   else if (q.match(/ipo|list|initial public/)) topic = 'ipo';
+  else if (q.match(/p[\/ ]?e|price.*(to|\/)\s*earn|earning.*ratio|valuation/)) topic = 'pe_ratio';
+  else if (q.match(/dividend|yield|payout|dps/)) topic = 'dividend';
+  else if (q.match(/market\s*cap|capitali[sz]ation|large.?cap|mid.?cap|small.?cap/)) topic = 'market_cap';
+  else if (q.match(/nifty|sensex|index|benchmark/)) topic = 'nifty';
+  else if (q.match(/intraday|day.*trad|swing.*trad|delivery.*trad|short.*term.*trad/)) topic = 'intraday';
+  else if (q.match(/demat|account|kyc|broker|open.*account/)) topic = 'demat';
+  else if (q.match(/blue.?chip|safe.*stock|stable.*stock|reliable/)) topic = 'bluechip';
+  else if (q.match(/stop.?loss|trailing|protect.*loss|limit.*loss/)) topic = 'stop_loss';
 
   if (!topic) {
     // Fallback — cycle through helpful topics based on chat count
@@ -346,6 +480,9 @@ function getReply(msg) {
   }
 
   chatHistory.push({ topic: topic, variant: varIdx, time: Date.now() });
+  // Keep only last 50 entries and persist
+  if (chatHistory.length > 50) chatHistory = chatHistory.slice(-50);
+  Store.set('chatHistory', chatHistory);
 
   var fn = variants[varIdx];
   return typeof fn === 'function' ? fn(p) : fn;

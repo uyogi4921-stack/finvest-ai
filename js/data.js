@@ -52,8 +52,8 @@ window.ST = [
   { s:'AUFI',   n:'AU Small Finance',    sec:'Banking', p:678,   c:'#8b2252', d:'aubank.in' },
   { s:'BAFL',   n:'Bajaj Finance',       sec:'Banking', p:7234,  c:'#003a7d', d:'bajajfinserv.in' },
   { s:'BAFN',   n:'Bajaj Finserv',       sec:'Banking', p:1678,  c:'#003a7d', d:'bajajfinserv.in' },
-  { s:'SBIN',   n:'SBI Life Insurance',  sec:'Banking', p:1534,  c:'#1a4e8a', d:'sbilife.co.in' },
-  { s:'HDFL',   n:'HDFC Life Ins.',      sec:'Banking', p:645,   c:'#004c8f', d:'hdfclife.com' },
+  { s:'SBIN',   n:'SBI Life Insurance',  sec:'Insurance', p:1534, c:'#1a4e8a', d:'sbilife.co.in' },
+  { s:'HDFL',   n:'HDFC Life Ins.',      sec:'Insurance', p:645,  c:'#004c8f', d:'hdfclife.com' },
 
   // ── MORE ENERGY ──
   { s:'NTPC',   n:'NTPC Limited',        sec:'Energy',  p:356,   c:'#1b4f72', d:'ntpc.co.in' },
@@ -83,6 +83,7 @@ window.ST = [
   { s:'MRCO',   n:'Marico Ltd.',         sec:'FMCG',    p:567,   c:'#003366', d:'marico.com' },
   { s:'COLP',   n:'Colgate-Palmolive',   sec:'FMCG',    p:2890,  c:'#d42a2a', d:'colgatepalmolive.co.in' },
   { s:'PGHH',   n:'P&G Hygiene',         sec:'FMCG',    p:15670, c:'#003399', d:'pg.com' },
+  { s:'APNT',   n:'Asian Paints',        sec:'FMCG',    p:3234,  c:'#e8530e', d:'asianpaints.com' },
   { s:'TITN',   n:'Titan Company',       sec:'FMCG',    p:3456,  c:'#003f72', d:'titan.co.in' },
   { s:'UNSP',   n:'United Spirits',      sec:'FMCG',    p:1234,  c:'#1a2b3c', d:'diageo.com' },
 
@@ -105,7 +106,6 @@ window.ST = [
   { s:'NMDC',   n:'NMDC Ltd.',           sec:'Metals',  p:234,   c:'#1a4e8a', d:'nmdc.co.in' },
   { s:'SAIL',   n:'Steel Auth. India',   sec:'Metals',  p:112,   c:'#003882', d:'sail.co.in' },
   { s:'NACL',   n:'Natl. Aluminium',     sec:'Metals',  p:178,   c:'#c0392b', d:'nalcoindia.com' },
-  { s:'APNT',   n:'Asian Paints',        sec:'Metals',  p:3234,  c:'#e8530e', d:'asianpaints.com' },
 
   // ── INFRASTRUCTURE & CONSTRUCTION ──
   { s:'LART',   n:'Larsen & Toubro',     sec:'Infra',   p:3567,  c:'#003f72', d:'larsentoubro.com' },
@@ -139,16 +139,16 @@ window.ST = [
   { s:'ADNE2',  n:'Adani Enterprises',   sec:'Infra',   p:2890,  c:'#003b5c', d:'adani.com' },
 
   // ── INSURANCE ──
-  { s:'ICIL',   n:'ICICI Lombard',       sec:'Banking', p:1567,  c:'#e07b39', d:'icicilombard.com' },
-  { s:'LICI',   n:'LIC of India',        sec:'Banking', p:897,   c:'#003882', d:'licindia.in' },
+  { s:'ICIL',   n:'ICICI Lombard',       sec:'Insurance', p:1567, c:'#e07b39', d:'icicilombard.com' },
+  { s:'LICI',   n:'LIC of India',        sec:'Insurance', p:897,  c:'#003882', d:'licindia.in' },
 
   // ── IT SERVICES / DIGITAL ──
   { s:'INFO',   n:'Info Edge (Naukri)',   sec:'IT',      p:5234,  c:'#003f72', d:'infoedge.in' },
-  { s:'ZOMM',   n:'Zomato Ltd.',         sec:'IT',      p:189,   c:'#e23744', d:'zomato.com' },
+  { s:'ZOMM',   n:'Zomato Ltd.',         sec:'Consumer', p:189,  c:'#e23744', d:'zomato.com' },
   { s:'PAYT',   n:'Paytm (One97)',       sec:'IT',      p:567,   c:'#00baf2', d:'paytm.com' },
   { s:'PLCY',   n:'PolicyBazaar',        sec:'IT',      p:1345,  c:'#e8530e', d:'policybazaar.com' },
-  { s:'NYKA',   n:'Nykaa (FSN)',         sec:'IT',      p:178,   c:'#fc2779', d:'nykaa.com' },
-  { s:'DMRT',   n:'Delhivery Ltd.',      sec:'IT',      p:412,   c:'#d42a2a', d:'delhivery.com' },
+  { s:'NYKA',   n:'Nykaa (FSN)',         sec:'Consumer', p:178,  c:'#fc2779', d:'nykaa.com' },
+  { s:'DMRT',   n:'Delhivery Ltd.',      sec:'Logistics', p:412, c:'#d42a2a', d:'delhivery.com' },
 ];
 
 // ─── INDEX DATA ───────────────────────────────────────────
@@ -236,8 +236,8 @@ function checkStreak() {
 window.completedChallenges = Store.get('challenges', {});
 
 // ─── WALLET ─────────────────────────────────────────────
-// New users start with ₹1,000 to invest
-window.wallet = Store.get('wallet', { balance: 1000, transactions: [] });
+// New users start with ₹10,000 to invest
+window.wallet = Store.get('wallet', { balance: 10000, transactions: [] });
 
 function walletDeposit(amount) {
   if (amount <= 0) return false;

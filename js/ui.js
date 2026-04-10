@@ -534,14 +534,22 @@ function setWalletAmt(amt) {
 }
 
 function confirmWalletAction() {
-  var amt = parseInt(document.getElementById('walletAmtInp').value) || 0;
-  if (amt <= 0) { showToast('Enter a valid amount'); return; }
+  var inp = document.getElementById('walletAmtInp');
+  var raw = inp.value.trim();
+
+  // Input validation
+  if (!raw || raw === '') { showToast('Please enter an amount'); return; }
+  var amt = parseInt(raw);
+  if (isNaN(amt) || amt <= 0) { showToast('Enter a valid positive amount'); inp.value = ''; return; }
+  if (amt < 100) { showToast('Minimum amount is \u20B9100'); return; }
+  if (amt > 10000000) { showToast('Maximum amount is \u20B91,00,00,000'); return; }
+  if (raw.includes('.') || raw.includes('-') || raw.includes('e')) { showToast('Enter a whole number without decimals'); inp.value = Math.abs(Math.floor(amt)); return; }
 
   if (walletAction === 'deposit') {
     walletDeposit(amt);
     showToast('&#128994; ' + fINR(amt) + ' added to wallet!');
   } else {
-    if (amt > wallet.balance) { showToast('Insufficient balance!'); return; }
+    if (amt > wallet.balance) { showToast('Insufficient balance! You have ' + fINR(wallet.balance)); return; }
     walletWithdraw(amt);
     showToast('&#128308; ' + fINR(amt) + ' withdrawn from wallet');
   }
