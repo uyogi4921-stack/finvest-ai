@@ -151,7 +151,7 @@ window.ST = [
   { s:'DMRT',   n:'Delhivery Ltd.',      sec:'Logistics', p:412, c:'#d42a2a', d:'delhivery.com' },
 ];
 
-// ─── INDEX DATA ───────────────────────────────────────────
+// ─── INDEX DATA (India) ──────────────────────────────────
 window.IDX = [
   { n:'NIFTY 50',   b:22450 },
   { n:'SENSEX',     b:73810 },
@@ -159,6 +159,80 @@ window.IDX = [
   { n:'NIFTY IT',   b:36120 },
   { n:'MIDCAP',     b:43560 },
 ];
+
+// ═══════════════════════════════════════════════════════════
+//  US MARKET
+// ═══════════════════════════════════════════════════════════
+window.US_ST = [
+  { s:'AAPL',  n:'Apple Inc.',        sec:'Technology', p:230.10, c:'#0b0b0d', d:'apple.com' },
+  { s:'MSFT',  n:'Microsoft',         sec:'Technology', p:435.30, c:'#0067b8', d:'microsoft.com' },
+  { s:'NVDA',  n:'NVIDIA',            sec:'Technology', p:146.75, c:'#76b900', d:'nvidia.com' },
+  { s:'GOOGL', n:'Alphabet',          sec:'Technology', p:179.60, c:'#4285f4', d:'abc.xyz' },
+  { s:'META',  n:'Meta Platforms',    sec:'Technology', p:578.32, c:'#0866ff', d:'meta.com' },
+  { s:'AMZN',  n:'Amazon',            sec:'Consumer',   p:193.39, c:'#ff9900', d:'amazon.com' },
+  { s:'TSLA',  n:'Tesla',             sec:'Automotive', p:262.18, c:'#e82127', d:'tesla.com' },
+  { s:'JPM',   n:'JPMorgan Chase',    sec:'Financials', p:230.60, c:'#117aca', d:'jpmorganchase.com' },
+  { s:'BRK.B', n:'Berkshire Hath.',   sec:'Financials', p:473.45, c:'#1b4f8a', d:'berkshirehathaway.com' },
+  { s:'V',     n:'Visa Inc.',         sec:'Financials', p:312.40, c:'#1a1f71', d:'visa.com' },
+  { s:'XOM',   n:'Exxon Mobil',       sec:'Energy',     p:119.16, c:'#ee1c25', d:'exxonmobil.com' },
+  { s:'CVX',   n:'Chevron',           sec:'Energy',     p:158.22, c:'#0066b2', d:'chevron.com' },
+  { s:'DIS',   n:'Walt Disney',       sec:'Media',      p:97.31,  c:'#113ccf', d:'thewaltdisneycompany.com' },
+  { s:'NFLX',  n:'Netflix',           sec:'Media',      p:734.14, c:'#e50914', d:'netflix.com' },
+  { s:'AMD',   n:'AMD',               sec:'Technology', p:163.55, c:'#ed1c24', d:'amd.com' },
+  { s:'INTC',  n:'Intel',             sec:'Technology', p:30.18,  c:'#0071c5', d:'intel.com' },
+  { s:'KO',    n:'Coca-Cola',         sec:'Consumer',   p:62.84,  c:'#f40009', d:'coca-cola.com' },
+  { s:'NKE',   n:'Nike',              sec:'Consumer',   p:78.55,  c:'#111111', d:'nike.com' },
+  { s:'F',     n:'Ford Motor',        sec:'Automotive', p:11.02,  c:'#003478', d:'ford.com' },
+  { s:'GM',    n:'General Motors',    sec:'Automotive', p:46.30,  c:'#0170ce', d:'gm.com' },
+];
+window.US_IDX = [
+  { n:'S&P 500',    b:5565 },
+  { n:'NASDAQ 100', b:20886 },
+  { n:'DOW JONES',  b:44704 },
+  { n:'RUSSELL 2K', b:2284 },
+  { n:'VIX',        b:16 },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  CRYPTO MARKET (paper, USD)
+// ═══════════════════════════════════════════════════════════
+window.CR_ST = [
+  { s:'BTC',  n:'Bitcoin',      sec:'Layer 1', p:64210,  c:'#f7931a', d:'bitcoin.org' },
+  { s:'ETH',  n:'Ethereum',     sec:'Layer 1', p:2418,   c:'#627eea', d:'ethereum.org' },
+  { s:'SOL',  n:'Solana',       sec:'Layer 1', p:146.30, c:'#14f195', d:'solana.com' },
+  { s:'BNB',  n:'BNB',          sec:'Layer 1', p:592.10, c:'#f3ba2f', d:'bnbchain.org' },
+  { s:'XRP',  n:'XRP',          sec:'Payments',p:0.52,   c:'#23292f', d:'ripple.com' },
+  { s:'ADA',  n:'Cardano',      sec:'Layer 1', p:0.38,   c:'#0033ad', d:'cardano.org' },
+  { s:'AVAX', n:'Avalanche',    sec:'Layer 1', p:27.84,  c:'#e84142', d:'avax.network' },
+  { s:'DOGE', n:'Dogecoin',     sec:'Meme',    p:0.122,  c:'#c2a633', d:'dogecoin.com' },
+  { s:'SHIB', n:'Shiba Inu',    sec:'Meme',    p:0.000018,c:'#ffa409', d:'shibatoken.com' },
+  { s:'LINK', n:'Chainlink',    sec:'DeFi',    p:14.05,  c:'#2a5ada', d:'chain.link' },
+  { s:'UNI',  n:'Uniswap',      sec:'DeFi',    p:7.65,   c:'#ff007a', d:'uniswap.org' },
+  { s:'AAVE', n:'Aave',         sec:'DeFi',    p:152.40, c:'#b6509e', d:'aave.com' },
+  { s:'MATIC',n:'Polygon',      sec:'Layer 1', p:0.55,   c:'#8247e5', d:'polygon.technology' },
+  { s:'DOT',  n:'Polkadot',     sec:'Layer 1', p:4.28,   c:'#e6007a', d:'polkadot.network' },
+  { s:'USDC', n:'USD Coin',     sec:'Stable',  p:1.00,   c:'#2775ca', d:'circle.com' },
+];
+window.CR_IDX = [
+  { n:'TOTAL MCAP', b:2350 },
+  { n:'BTC DOM %',  b:54 },
+  { n:'ALT MCAP',   b:1080 },
+  { n:'FEAR&GREED', b:62 },
+];
+
+// ─── DEFAULT HOLDINGS PER MARKET ─────────────────────────
+window.DEFAULT_HOLDS_US = [
+  { sym:'AAPL', name:'Apple Inc.', qty:4, avgPrice:204.20 },
+  { sym:'MSFT', name:'Microsoft',  qty:3, avgPrice:398.79 },
+  { sym:'NVDA', name:'NVIDIA',     qty:6, avgPrice:132.34 },
+];
+window.DEFAULT_HOLDS_CR = [
+  { sym:'BTC', name:'Bitcoin',  qty:0.4, avgPrice:52000 },
+  { sym:'ETH', name:'Ethereum', qty:5,   avgPrice:2100 },
+];
+
+// NOTE: MARKETS registry + applyMarket() are defined lower, after Store
+// and DEFAULT_HOLDS exist (they depend on both).
 
 // ─── DEFAULT HOLDINGS ────────────────────────────────────
 window.DEFAULT_HOLDS = [
@@ -200,18 +274,52 @@ window.Store = {
 // ─── USER PROFILE ───────────────────────────────────────
 window.userProfile = Store.get('profile', null);
 
-// ─── HOLDINGS (loaded from storage or defaults) ─────────
-window.HOLDS = Store.get('holdings', DEFAULT_HOLDS);
+// ─── MARKET REGISTRY (after Store + DEFAULT_HOLDS exist) ─
+window.MARKETS = {
+  US:     { id:'US',     label:'US',     flag:'🇺🇸', cur:'$', locale:'en-US', startCash:100000,  stocks:US_ST, indices:US_IDX, cats:['All','Technology','Automotive','Consumer','Financials','Energy','Media'], def:DEFAULT_HOLDS_US },
+  IN:     { id:'IN',     label:'IN',     flag:'🇮🇳', cur:'₹', locale:'en-IN', startCash:1000000, stocks:ST,    indices:IDX,    cats:['All','IT','Banking','Energy','Auto','FMCG','Pharma','Metals','Infra','Telecom','Chemicals','Realty','Insurance','Consumer'], def:DEFAULT_HOLDS },
+  CRYPTO: { id:'CRYPTO', label:'Crypto', flag:'🌐', cur:'$', locale:'en-US', startCash:50000,   stocks:CR_ST, indices:CR_IDX, cats:['All','Layer 1','DeFi','Meme','Payments','Stable'], def:DEFAULT_HOLDS_CR },
+};
+
+window.currentMarket = Store.get('market', 'IN');
+if (!MARKETS[currentMarket]) currentMarket = 'IN';
+
+// One-time migration: legacy India portfolio → holds_IN / wallet_IN
+(function migrateLegacy() {
+  if (Store.get('migrated_v2', false)) return;
+  var legacyHolds = Store.get('holdings', null);
+  if (legacyHolds && legacyHolds.length) Store.set('holds_IN', legacyHolds);
+  var legacyWallet = Store.get('wallet', null);
+  if (legacyWallet) Store.set('wallet_IN', legacyWallet);
+  var legacyWl = Store.get('watchlist', null);
+  if (legacyWl) Store.set('wl_IN', legacyWl);
+  Store.set('migrated_v2', true);
+})();
+
+// Apply a market: swaps active dataset + portfolio + wallet + watchlist + currency
+window.applyMarket = function() {
+  var m = MARKETS[currentMarket];
+  window.MKT = m;
+  window.ST = m.stocks;
+  window.IDX = m.indices;
+  window.HOLDS = Store.get('holds_' + currentMarket, m.def.slice());
+  if (!window.HOLDS) window.HOLDS = m.def.slice();
+  window.wallet = Store.get('wallet_' + currentMarket, { balance: m.startCash, transactions: [] });
+  window.watchlist = Store.get('wl_' + currentMarket, []);
+  window.prices = {};
+  window.idxP = {};
+  window.tabSec = 'All';
+};
+
+// ─── HOLDINGS / WALLET / WATCHLIST (per active market) ──
+applyMarket();
 if (!HOLDS || HOLDS.length === 0) {
-  HOLDS = DEFAULT_HOLDS.slice();
-  Store.set('holdings', HOLDS);
+  HOLDS = MKT.def.slice();
+  Store.set('holds_' + currentMarket, HOLDS);
 }
 
-// ─── TRADE HISTORY ──────────────────────────────────────
+// ─── TRADE HISTORY (shared across markets) ──────────────
 window.tradeHistory = Store.get('trades', []);
-
-// ─── WATCHLIST ──────────────────────────────────────────
-window.watchlist = Store.get('watchlist', ['HDFC', 'ITC', 'SUN']);
 
 // ─── STREAK ─────────────────────────────────────────────
 window.streakData = Store.get('streak', { count: 1, lastDate: new Date().toDateString() });
@@ -235,15 +343,14 @@ function checkStreak() {
 // ─── CHALLENGES TRACKING ────────────────────────────────
 window.completedChallenges = Store.get('challenges', {});
 
-// ─── WALLET ─────────────────────────────────────────────
-// New users start with ₹10,000 to invest
-window.wallet = Store.get('wallet', { balance: 10000, transactions: [] });
+// ─── WALLET (per active market; set by applyMarket) ─────
+function saveWallet() { Store.set('wallet_' + currentMarket, wallet); }
 
 function walletDeposit(amount) {
   if (amount <= 0) return false;
   wallet.balance += amount;
   wallet.transactions.unshift({ type: 'deposit', amount: amount, time: Date.now(), desc: 'Added funds' });
-  Store.set('wallet', wallet);
+  saveWallet();
   return true;
 }
 
@@ -251,7 +358,7 @@ function walletWithdraw(amount) {
   if (amount <= 0 || amount > wallet.balance) return false;
   wallet.balance -= amount;
   wallet.transactions.unshift({ type: 'withdraw', amount: amount, time: Date.now(), desc: 'Withdrawn funds' });
-  Store.set('wallet', wallet);
+  saveWallet();
   return true;
 }
 
@@ -266,7 +373,7 @@ function walletTrade(type, sym, amount) {
   }
   // Keep only last 50 transactions
   if (wallet.transactions.length > 50) wallet.transactions = wallet.transactions.slice(0, 50);
-  Store.set('wallet', wallet);
+  saveWallet();
   return true;
 }
 

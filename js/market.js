@@ -13,7 +13,14 @@ window.curPage = 'dashboard';
 
 // ─── HELPERS ─────────────────────────────────────────────
 function rw(p) { return +(p + p * (Math.random() * .006 - .003)).toFixed(2); }
-function fINR(n) { return '\u20B9' + Math.round(n).toLocaleString('en-IN'); }
+function fINR(n) {
+  var m = window.MKT || MARKETS[currentMarket];
+  // Sub-unit crypto prices need decimals; everything else rounds.
+  var abs = Math.abs(n);
+  if (abs > 0 && abs < 1) return m.cur + (+n).toLocaleString(m.locale, { maximumFractionDigits: 6 });
+  if (abs < 100 && abs % 1 !== 0) return m.cur + (+n).toLocaleString(m.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return m.cur + Math.round(n).toLocaleString(m.locale);
+}
 
 // ─── STOCK LOGO ───────────────────────────────────────────
 function mkLogo(sym, sz) {
@@ -34,7 +41,7 @@ function mkLogo(sym, sz) {
   ].join(';');
 
   var fb = document.createElement('div');
-  fb.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:9px;font-family:Syne,sans-serif;color:#fff;';
+  fb.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:9px;font-family:Inter,sans-serif;color:#fff;';
   fb.textContent = sym.slice(0, 4);
   w.appendChild(fb);
 
@@ -194,7 +201,16 @@ function renderSectorChart(alloc, total) {
   ctx.clearRect(0, 0, w, h);
 
   var cx = w * 0.35, cy = h / 2, r = Math.min(cx, cy) - 20;
-  var colors = { IT: '#2fe3a4', Banking: '#5cf0b8', Energy: '#1f9d72', Auto: '#4fd6c4', FMCG: '#7ef0c4', Pharma: '#13b886', Metals: '#0f9d6e', Infra: '#36c9a0', Telecom: '#65e0b0', Chemicals: '#1abc9c', Realty: '#2bbd92', Insurance: '#88f0cc', Consumer: '#3fd1aa', Logistics: '#0e8a63' };
+  // Canvas hidden (e.g. dashboard not visible) → no size, skip to avoid negative radius
+  if (r <= 0 || w === 0) return;
+  var colors = {
+    // India sectors
+    IT: '#2fe3a4', Banking: '#5cf0b8', Energy: '#1f9d72', Auto: '#4fd6c4', FMCG: '#7ef0c4', Pharma: '#13b886', Metals: '#0f9d6e', Infra: '#36c9a0', Telecom: '#65e0b0', Chemicals: '#1abc9c', Realty: '#2bbd92', Insurance: '#88f0cc', Consumer: '#3fd1aa', Logistics: '#0e8a63',
+    // US sectors
+    Technology: '#2fe3a4', Automotive: '#4fd6c4', Financials: '#5cf0b8', Media: '#13b886',
+    // Crypto sectors
+    'Layer 1': '#2fe3a4', DeFi: '#4fd6c4', Meme: '#7ef0c4', Payments: '#36c9a0', Stable: '#88f0cc'
+  };
   var sectors = Object.keys(alloc);
   if (sectors.length === 0) return;
 
@@ -275,14 +291,72 @@ function renderIdx() {
   var el = document.getElementById('ixstrip');
   if (!el) return;
   el.innerHTML = IDX.map(function(x) {
-    var v = idxP[x.n], ch = ((v - x.b) / x.b * 100).toFixed(2), pos = ch >= 0;
+    var v = idxP[x.n] || x.b, ch = ((v - x.b) / x.b * 100).toFixed(2), pos = ch >= 0;
     return '<div class="ixchip">'
       + '<div class="ixnm">' + x.n + '</div>'
       + '<div class="ixv" style="color:' + (pos ? 'var(--gr)' : 'var(--rd)') + '">'
-      + v.toLocaleString('en-IN', { maximumFractionDigits: 0 }) + '</div>'
+      + v.toLocaleString(MKT.locale, { maximumFractionDigits: 0 }) + '</div>'
       + '<div class="ixc ' + (pos ? 'pos' : 'neg') + '">' + (pos ? '&#9650;' : '&#9660;') + ' ' + Math.abs(ch) + '%</div>'
       + '</div>';
   }).join('');
+}
+
+// ─── MARKET SWITCHING ────────────────────────────────────
+// Renders the category filter chips for the active market.
+function renderMarketTabs() {
+  var el = document.getElementById('mtabs');
+  if (!el) return;
+  el.innerHTML = MKT.cats.map(function(c) {
+    var on = (c === tabSec) || (tabSec === 'All' && c === 'All');
+    return '<button class="mtab' + (on ? ' on' : '') + '" onclick="setTab(\'' + c + '\',this)">' + c + '</button>';
+  }).join('');
+}
+
+// Renders the top market selector (US / India / Crypto).
+function renderMarketSelector() {
+  var el = document.getElementById('mktSel');
+  if (!el) return;
+  el.innerHTML = Object.keys(MARKETS).map(function(id) {
+    var m = MARKETS[id];
+    var on = id === currentMarket;
+    var name = id === 'IN' ? 'India' : (id === 'US' ? 'US Markets' : 'Crypto');
+    return '<button class="mksel-btn' + (on ? ' on' : '') + '" onclick="setMarket(\'' + id + '\')">' + m.flag + ' ' + name + '</button>';
+  }).join('');
+}
+
+// Switches the active market: swaps data, portfolio, currency, re-renders.
+function setMarket(mk) {
+  if (!MARKETS[mk] || mk === currentMarket) {
+    if (mk === currentMarket) return;
+  }
+  if (!MARKETS[mk]) return;
+  currentMarket = mk;
+  Store.set('market', mk);
+  applyMarket();
+  // Seed live prices from base prices of the new market
+  ST.forEach(function(s) { prices[s.s] = s.p; });
+  IDX.forEach(function(x) { idxP[x.n] = x.b; });
+  tabSec = 'All';
+  // Re-render everything market-dependent
+  renderMarketSelector();
+  renderMarketTabs();
+  renderIdx();
+  renderMkt(document.getElementById('mktQ') ? document.getElementById('mktQ').value : '');
+  renderHoldingsTable();
+  updateDashboardStats();
+  if (typeof renderWallet === 'function') renderWallet();
+  if (typeof renderRecentActivity === 'function') renderRecentActivity();
+  syncMarketUI();
+  showToast(MKT.flag + ' Switched to ' + (mk === 'IN' ? 'India' : mk === 'US' ? 'US' : 'Crypto') + ' market');
+}
+
+// Reflects the active market across nav + dashboard labels.
+function syncMarketUI() {
+  document.querySelectorAll('.seg-btn').forEach(function(b) {
+    b.classList.toggle('on', b.getAttribute('data-mk') === currentMarket);
+  });
+  var lbl = document.querySelector('#page-dashboard .h-lbl');
+  if (lbl) lbl.textContent = 'Total Net Worth (' + MKT.label + ')';
 }
 
 // ─── MARKET GRID ─────────────────────────────────────────
@@ -568,8 +642,8 @@ function confirmBS() {
     }
   }
 
-  // Save holdings
-  Store.set('holdings', HOLDS);
+  // Save holdings (per active market)
+  Store.set('holds_' + currentMarket, HOLDS);
 
   // Record trade
   tradeHistory.push({
@@ -607,7 +681,7 @@ function toggleWatchlist(sym) {
     watchlist.push(sym);
     showToast(sym + ' added to watchlist');
   }
-  Store.set('watchlist', watchlist);
+  Store.set('wl_' + currentMarket, watchlist);
   renderMkt(document.getElementById('mktQ') ? document.getElementById('mktQ').value : '');
 }
 

@@ -273,12 +273,12 @@
 
     <div class="tn-right">
       <div class="tn-seg" role="group" aria-label="Market">
-        <button class="seg-btn on" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127482;&#127480; US</button>
-        <button class="seg-btn" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127470;&#127475; IN</button>
-        <button class="seg-btn" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127760; Crypto</button>
+        <button class="seg-btn" data-mk="US" onclick="setMarket('US')">&#127482;&#127480; US</button>
+        <button class="seg-btn" data-mk="IN" onclick="setMarket('IN')">&#127470;&#127475; IN</button>
+        <button class="seg-btn" data-mk="CRYPTO" onclick="setMarket('CRYPTO')">&#127760; Crypto</button>
       </div>
       <button class="tn-theme" aria-label="Toggle theme" title="Toggle theme"
-        onclick="document.documentElement.classList.toggle('light');this.textContent=document.documentElement.classList.contains('light')?'☾':'☀'">&#9728;</button>
+        onclick="setTheme(document.documentElement.classList.contains('light')?'dark':'light')">&#9728;</button>
       <div class="tn-meta">
         <span class="tn-flame" onclick="navTo('profile',null)"><span>&#128293;</span> <span id="streakText">1 Day Streak</span></span>
         <span class="tn-dot">&middot;</span>
@@ -361,74 +361,60 @@
 
   <!-- ════ MARKET ════ -->
   <div class="page" id="page-market">
+    <div class="page-head">
+      <h1 class="page-title">Market</h1>
+      <p class="page-sub">Trade across global markets with virtual money.</p>
+    </div>
     <div class="msrch">
       <span style="opacity:.5;font-size:14px">&#128269;</span>
       <input type="text" placeholder="Search stocks, sectors&#8230;" id="mktQ">
       <span id="mktClr" style="cursor:pointer;opacity:.5;display:none;font-size:12px" onclick="clearMkt()">&#10005;</span>
     </div>
+    <div class="mksel" id="mktSel"></div>
     <div class="ixstrip" id="ixstrip"></div>
-    <div class="mtabs">
-      <button class="mtab on" onclick="setTab('All',this)">All</button>
-      <button class="mtab" onclick="setTab('IT',this)">IT</button>
-      <button class="mtab" onclick="setTab('Banking',this)">Banking</button>
-      <button class="mtab" onclick="setTab('Energy',this)">Energy</button>
-      <button class="mtab" onclick="setTab('Auto',this)">Auto</button>
-      <button class="mtab" onclick="setTab('FMCG',this)">FMCG</button>
-      <button class="mtab" onclick="setTab('Pharma',this)">Pharma</button>
-      <button class="mtab" onclick="setTab('Metals',this)">Metals</button>
-      <button class="mtab" onclick="setTab('Infra',this)">Infra</button>
-      <button class="mtab" onclick="setTab('Telecom',this)">Telecom</button>
-      <button class="mtab" onclick="setTab('Chemicals',this)">Chemicals</button>
-      <button class="mtab" onclick="setTab('Realty',this)">Realty</button>
-      <button class="mtab" onclick="setTab('Insurance',this)">Insurance</button>
-      <button class="mtab" onclick="setTab('Consumer',this)">Consumer</button>
-    </div>
+    <div class="mtabs" id="mtabs"></div>
     <div class="mgrid" id="mgrid"></div>
   </div>
 
   <!-- ════ LEARN ════ -->
   <div class="page" id="page-learn">
-    <div class="lhero">
-      <div class="ltag">&#9889; AI-Powered Learning</div>
-      <h1>Level Up Your Money IQ &#129504;</h1>
-      <p>Bite-sized lessons, quizzes &amp; real XP. Correct answers earn bonus XP!</p>
-      <div class="lstats">
-        <div><div class="lsv" id="lsComp">0</div><div class="lsl">Completed</div></div>
-        <div><div class="lsv">15</div><div class="lsl">Total Lessons</div></div>
-        <div><div class="lsv" id="lsXp">0</div><div class="lsl">XP Earned</div></div>
+    <div class="page-head learn-head">
+      <div>
+        <h1 class="page-title">Learn</h1>
+        <p class="page-sub">Bite-sized lessons. Answer the quiz correctly to earn bonus XP.</p>
+      </div>
+      <div class="learn-badges">
+        <div class="lbadge"><div class="lbadge-l">LEVEL</div><div class="lbadge-v" id="lLvBadge">Lv 1</div></div>
+        <div class="lbadge"><div class="lbadge-l">XP</div><div class="lbadge-v" id="lXpBadge">0</div></div>
+        <div class="lbadge"><div class="lbadge-l">STREAK</div><div class="lbadge-v">&#128293; <span class="streak-count">1</span></div></div>
       </div>
     </div>
-    <div class="lxprow">
-      <div class="lxpic">&#127885;</div>
-      <div class="lxpinf">
-        <div class="lxpt" id="lLv">Level 1 &mdash; Beginner</div>
-        <div class="lxps">Complete lessons to reach <b>Level 2 &mdash; Learner</b></div>
-        <div class="xp2t"><div class="xp2f" id="lFill" style="width:0%"></div></div>
-        <div class="lxpsb" id="lSub">0 / 200 XP to next level</div>
-      </div>
-      <div class="lxpbg">&#128293; <span class="streak-count">1</span>-day streak</div>
+    <div class="course-prog">
+      <div class="course-prog-top"><span>Course progress</span><span id="courseProgTxt">0/15</span></div>
+      <div class="course-track"><div class="course-fill" id="courseFill" style="width:0%"></div></div>
     </div>
-    <div class="lcats">
-      <button class="lcat on" onclick="filterCat('all',this)">&#11088; All</button>
-      <button class="lcat" onclick="filterCat('basics',this)">&#128214; App Basics</button>
-      <button class="lcat" onclick="filterCat('stocks',this)">&#128200; Stocks</button>
-      <button class="lcat" onclick="filterCat('risk',this)">&#128737; Risk</button>
-      <button class="lcat" onclick="filterCat('strategy',this)">&#9822; Strategy</button>
-      <button class="lcat" onclick="filterCat('advanced',this)">&#128640; Advanced</button>
-    </div>
-    <div class="lgrid" id="lgrid"></div>
+    <div id="lgrid"></div>
   </div>
 
   <!-- ════ LEADERBOARD ════ -->
   <div class="page" id="page-leaderboard">
-    <div class="lbhero">
-      <div style="font-size:11px;color:var(--mu);margin-bottom:4px">&#127942; Weekly Challenge &middot; <span id="lbTimer">Resets in 6d 14h</span></div>
-      <div style="font-family:var(--fh);font-size:21px;font-weight:800">Top Investors</div>
-      <div class="podium" id="podium"></div>
+    <div class="page-head lb-head">
+      <div>
+        <h1 class="page-title">Leaderboard</h1>
+        <p class="page-sub">Compete with traders worldwide. Earn XP through trades and completed lessons.</p>
+      </div>
+      <div class="lb-rank-badge" id="lbRankBadge">You're ranked #&mdash;</div>
     </div>
-    <div class="lb-rank-summary" id="lbRankSummary"></div>
-    <div class="sechd" style="margin-bottom:9px"><div class="sect">Full Rankings</div><div style="font-size:11px;color:var(--mu)">This week</div></div>
-    <div class="lblist" id="lblist"></div>
+    <div class="lb-tabs">
+      <button class="lb-tab on" data-tab="week" onclick="setLBTab('week',this)">This Week</button>
+      <button class="lb-tab" data-tab="all" onclick="setLBTab('all',this)">All-Time</button>
+      <button class="lb-tab" data-tab="humans" onclick="setLBTab('humans',this)">Humans Only</button>
+    </div>
+    <div class="lb-podium" id="podium"></div>
+    <div class="lb-table-card">
+      <div class="lb-table-head"><h2 class="lb-table-title">Full ranking</h2><span class="lb-count" id="lbCount"></span></div>
+      <div class="lb-table" id="lblist"></div>
+    </div>
   </div>
 
   <!-- ════ COMMUNITY ════ -->
@@ -583,25 +569,52 @@
 
   <!-- ════ PROFILE ════ -->
   <div class="page" id="page-profile">
-    <div class="prof-hero">
-      <div class="prof-avatar-big" id="profAvatar">&#128100;</div>
-      <div class="prof-name-big" id="profDisplayName">Investor</div>
-      <div class="prof-goal-text" id="profGoalDisplay">Learn investing basics</div>
-      <div class="prof-badges">
-        <span class="prof-badge" id="profLevel">Level 1</span>
-        <span class="prof-badge risk-badge" id="profRiskDisplay">Moderate</span>
-      </div>
-      <button class="prof-edit-btn" onclick="editProfile()">&#9998; Edit Profile</button>
+    <div class="page-head">
+      <h1 class="page-title">Profile</h1>
+      <p class="page-sub">Your trader identity, achievements, and account settings.</p>
     </div>
 
-    <div class="prof-stats-grid">
-      <div class="prof-stat-card"><div class="psc-val" id="profXP">0</div><div class="psc-lbl">Total XP</div></div>
-      <div class="prof-stat-card"><div class="psc-val" id="profLessons">0/15</div><div class="psc-lbl">Lessons</div></div>
-      <div class="prof-stat-card"><div class="psc-val" id="profTrades">0</div><div class="psc-lbl">Trades</div></div>
-      <div class="prof-stat-card"><div class="psc-val" id="profStreak">1 days</div><div class="psc-lbl">Streak</div></div>
-      <div class="prof-stat-card"><div class="psc-val" id="profHoldings">0 stocks</div><div class="psc-lbl">Holdings</div></div>
-      <div class="prof-stat-card"><div class="psc-val" id="profPortValue">&#8377;0</div><div class="psc-lbl">Portfolio</div></div>
+    <div class="prof-grid">
+      <div class="prof-id-card">
+        <div class="prof-id-top">
+          <div class="prof-av-tile" id="profAvatar">U</div>
+          <div class="prof-id-info">
+            <div class="prof-id-name" id="profDisplayName">Investor</div>
+            <div class="prof-chips">
+              <span class="prof-chip" id="profGoalDisplay">Goal</span>
+              <span class="prof-chip" id="profRiskDisplay">Risk</span>
+              <span class="prof-chip" id="profJoined">Member</span>
+            </div>
+          </div>
+          <button class="prof-edit-icon" onclick="editProfile()" title="Edit profile" aria-label="Edit profile">&#9998;</button>
+        </div>
+        <div class="prof-stat-row">
+          <div class="pstat"><div class="pstat-l">LEVEL</div><div class="pstat-v" id="profLevel">Lv 1</div></div>
+          <div class="pstat"><div class="pstat-l">XP</div><div class="pstat-v" id="profXP">0</div></div>
+          <div class="pstat"><div class="pstat-l">STREAK</div><div class="pstat-v" id="profStreak">1d</div></div>
+          <div class="pstat"><div class="pstat-l">TRADES</div><div class="pstat-v" id="profTrades">0</div></div>
+        </div>
+      </div>
+
+      <div class="prof-appearance">
+        <h2 class="prof-app-title">Appearance</h2>
+        <p class="prof-app-sub">Choose how Finvest AI looks on this device.</p>
+        <div class="theme-picker" id="themePicker">
+          <button class="theme-card" data-theme="dark" onclick="setTheme('dark')">
+            <div class="theme-prev theme-prev-dark"></div>
+            <div class="theme-row"><span class="theme-nm">&#9789; Dark</span><span class="theme-active">Active</span></div>
+            <div class="theme-desc">Default &middot; easier on the eyes</div>
+          </button>
+          <button class="theme-card" data-theme="light" onclick="setTheme('light')">
+            <div class="theme-prev theme-prev-light"></div>
+            <div class="theme-row"><span class="theme-nm">&#9728; Light</span><span class="theme-active">Active</span></div>
+            <div class="theme-desc">Bright &middot; daylight use</div>
+          </button>
+        </div>
+      </div>
     </div>
+
+    <input type="hidden" id="profHoldings"><input type="hidden" id="profLessons"><input type="hidden" id="profPortValue">
 
     <!-- WALLET -->
     <div class="sechd"><div class="sect">&#128176; Wallet</div></div>
@@ -642,8 +655,8 @@
       </div>
     </div>
 
-    <div class="sechd"><div class="sect">&#127942; Achievements</div><div style="font-size:11px;color:var(--mu)" id="profJoined">Joined today</div></div>
-    <div id="achievementsList" class="ach-list"></div>
+    <div class="sechd ach-head"><div class="sect">Achievements</div><div class="ach-count" id="achCount">0/7 unlocked</div></div>
+    <div id="achievementsList" class="ach-grid"></div>
 
     <div style="margin-top:24px;text-align:center;">
       <button class="reset-btn" onclick="resetProfile()">&#128465; Reset All Data</button>

@@ -183,22 +183,75 @@ function filterCat(cat, btn) {
   renderLessons();
 }
 
+// Lesson sections — group categories into progression tracks
+window.LESSON_SECTIONS = [
+  { name: 'Foundations',      cats: ['basics'] },
+  { name: 'Stocks & Markets', cats: ['stocks'] },
+  { name: 'Risk & Strategy',  cats: ['risk', 'strategy'] },
+  { name: 'Advanced',         cats: ['advanced'] },
+];
+
+// Sequential unlock: a lesson unlocks once all earlier lessons are completed.
+function firstIncompleteIndex() {
+  for (var i = 0; i < LESSONS.length; i++) {
+    if (!completedL.has(LESSONS[i].id)) return i;
+  }
+  return LESSONS.length; // all done
+}
+
+function isLessonLocked(id) {
+  var idx = LESSONS.findIndex(function(l) { return l.id === id; });
+  if (idx === -1) return false;
+  if (completedL.has(id)) return false;
+  return idx > firstIncompleteIndex();
+}
+
 function renderLessons() {
   var g = document.getElementById('lgrid');
   if (!g) return;
-  var list = curCat === 'all' ? LESSONS : LESSONS.filter(function(l) { return l.cat === curCat; });
-  g.innerHTML = list.map(function(l) {
-    var done = completedL.has(l.id);
-    return '<div class="lcard ' + l.col + '" onclick="openLesson(' + l.id + ')">'
-      + (done ? '<div class="dchk">&#10003;</div>' : '')
-      + '<div class="lci"><div class="lt">' + l.tag + '</div>'
-      + '<div class="lic">' + l.icon + '</div>'
-      + '<div class="ltt">' + l.title + '</div>'
-      + '<div class="ld">' + l.desc + '</div></div>'
-      + '<div class="lft"><div class="lmt">'
-      + '<div class="lmi">&#9201; ' + l.time + '</div>'
-      + '<div class="lmi">' + l.level + '</div></div>'
-      + '<div class="lxp">+' + l.xp + ' XP &#9889;</div></div></div>';
+
+  var activeIdx = firstIncompleteIndex();
+  var orderIndex = {};
+  LESSONS.forEach(function(l, i) { orderIndex[l.id] = i; });
+
+  // Course progress + header badges
+  var totalTxt = document.getElementById('courseProgTxt');
+  if (totalTxt) totalTxt.textContent = completedL.size + '/' + LESSONS.length;
+  var fill = document.getElementById('courseFill');
+  if (fill) fill.style.width = Math.round(completedL.size / LESSONS.length * 100) + '%';
+  var lv = getLv(totalXP);
+  var lvB = document.getElementById('lLvBadge'); if (lvB) lvB.textContent = 'Lv ' + lv.num;
+  var xpB = document.getElementById('lXpBadge'); if (xpB) xpB.textContent = totalXP;
+
+  g.innerHTML = LESSON_SECTIONS.map(function(sec) {
+    var lessons = LESSONS.filter(function(l) { return sec.cats.indexOf(l.cat) !== -1; });
+    if (!lessons.length) return '';
+    var doneCount = lessons.filter(function(l) { return completedL.has(l.id); }).length;
+
+    var cards = lessons.map(function(l) {
+      var done = completedL.has(l.id);
+      var i = orderIndex[l.id];
+      var locked = !done && i > activeIdx;
+      var active = !done && i === activeIdx;
+      var state = done ? 'done' : (active ? 'active' : (locked ? 'locked' : ''));
+      var status = done
+        ? '<div class="lrow-status done">&#10003;</div>'
+        : active
+          ? '<div class="lrow-status active">&#10024;</div>'
+          : '<div class="lrow-status locked">&#128274;</div>';
+      return '<div class="lrow ' + state + '" onclick="openLesson(' + l.id + ')">'
+        + '<div class="lrow-ic">' + l.icon + '</div>'
+        + '<div class="lrow-main">'
+        + '<div class="lrow-meta">' + l.level + ' &middot; ' + l.time + '</div>'
+        + '<div class="lrow-title">' + l.title + '</div>'
+        + '<div class="lrow-xp">+' + l.xp + ' XP &middot; +' + l.qxp + ' bonus on correct quiz</div>'
+        + '</div>' + status + '</div>';
+    }).join('');
+
+    return '<div class="lsec">'
+      + '<div class="lsec-head"><h2 class="lsec-title">' + sec.name + '</h2>'
+      + '<span class="lsec-count">' + doneCount + '/' + lessons.length + ' complete</span></div>'
+      + '<div class="lsec-grid">' + cards + '</div></div>';
   }).join('');
 }
 
@@ -206,6 +259,10 @@ function renderLessons() {
 function openLesson(id) {
   var l = LESSONS.find(function(x) { return x.id === id; });
   if (!l) return;
+  if (isLessonLocked(id)) {
+    showToast('🔒 Complete the earlier lessons first');
+    return;
+  }
   curLesson = l;
   quizDone = false;
 

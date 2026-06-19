@@ -6,6 +6,9 @@
 'use strict';
 
 function initApp() {
+  // Apply saved theme before first paint of dynamic content
+  if (Store.get('theme', 'dark') === 'light') document.documentElement.classList.add('light');
+
   // Seed live prices from base prices in data.js
   ST.forEach(function(s) { prices[s.s] = s.p; });
   IDX.forEach(function(x) { idxP[x.n] = x.b; });
@@ -14,8 +17,11 @@ function initApp() {
   checkStreak();
 
   // Render all dynamic sections
+  renderMarketSelector();
+  renderMarketTabs();
   renderIdx();
   renderMkt('');
+  syncMarketUI();
   initHoldings();
   renderLessons();
   renderLB();

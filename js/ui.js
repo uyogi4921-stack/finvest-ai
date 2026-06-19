@@ -148,53 +148,41 @@ function renderProfile() {
   if (!userProfile) return;
 
   var el = document.getElementById('profAvatar');
-  if (el) el.textContent = userProfile.avatar || '\u{1F464}';
+  if (el) el.textContent = (userProfile.name || 'U').charAt(0).toUpperCase();
 
   el = document.getElementById('profDisplayName');
   if (el) el.textContent = userProfile.name;
 
   el = document.getElementById('profGoalDisplay');
-  if (el) el.textContent = userProfile.goal || 'Learn investing basics';
+  if (el) {
+    var goal = (userProfile.goal || 'Learn basics').replace(/^(Build long-term |Generate passive |Save for a big |Learn investing )/i, '');
+    el.textContent = 'Goal: ' + goal.toLowerCase();
+  }
 
   el = document.getElementById('profRiskDisplay');
-  if (el) {
-    var riskLabels = { low: 'Conservative', moderate: 'Moderate', high: 'Aggressive' };
-    el.textContent = riskLabels[userProfile.risk] || 'Moderate';
-  }
+  if (el) el.textContent = 'Risk: ' + (userProfile.risk || 'moderate');
 
   var lv = getLv(totalXP);
   el = document.getElementById('profLevel');
-  if (el) el.textContent = lv.l;
+  if (el) el.textContent = 'Lv ' + lv.num;
 
   el = document.getElementById('profXP');
   if (el) el.textContent = totalXP;
-
-  el = document.getElementById('profLessons');
-  if (el) el.textContent = completedL.size + '/15';
 
   el = document.getElementById('profTrades');
   if (el) el.textContent = tradeHistory.length;
 
   el = document.getElementById('profStreak');
-  if (el) el.textContent = streakData.count + ' days';
-
-  el = document.getElementById('profHoldings');
-  if (el) el.textContent = HOLDS.length + ' stocks';
-
-  var port = calcPortfolio();
-  el = document.getElementById('profPortValue');
-  if (el) el.textContent = fINR(port.totalValue);
+  if (el) el.textContent = streakData.count + 'd';
 
   el = document.getElementById('profJoined');
   if (el) {
-    var d = new Date(userProfile.createdAt);
-    el.textContent = d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+    var d = new Date(userProfile.createdAt || Date.now());
+    el.textContent = 'Member since ' + d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   }
 
-  // Achievements
+  updateThemeUI();
   renderAchievements();
-
-  // Wallet
   renderWallet();
 }
 
@@ -202,24 +190,46 @@ function renderAchievements() {
   var el = document.getElementById('achievementsList');
   if (!el) return;
 
+  var port = calcPortfolio();
   var achievements = [
-    { id: 'first_trade', icon: '&#128176;', title: 'First Trade', desc: 'Complete your first buy or sell', done: tradeHistory.length > 0 },
-    { id: 'five_lessons', icon: '&#128218;', title: 'Knowledge Seeker', desc: 'Complete 5 lessons', done: completedL.size >= 5 },
-    { id: 'all_lessons', icon: '&#127942;', title: 'Scholar', desc: 'Complete all 15 lessons', done: completedL.size >= 15 },
-    { id: 'diversified', icon: '&#127919;', title: 'Diversified', desc: 'Hold stocks from 3+ sectors', done: calcPortfolio().sectorCount >= 3 },
-    { id: 'ten_trades', icon: '&#128202;', title: 'Active Trader', desc: 'Complete 10 trades', done: tradeHistory.length >= 10 },
-    { id: 'level4', icon: '&#9889;', title: 'Trader Rank', desc: 'Reach Level 4', done: getLv(totalXP).num >= 4 },
-    { id: 'streak7', icon: '&#128293;', title: 'On Fire', desc: '7-day login streak', done: streakData.count >= 7 },
-    { id: 'legend', icon: '&#128081;', title: 'Legend', desc: 'Reach Level 7 \u2014 Legend', done: getLv(totalXP).num >= 7 },
+    { icon: '&#128200;', title: 'First Trade',      desc: 'Place a buy or sell order',  done: tradeHistory.length > 0 },
+    { icon: '&#127942;', title: 'Active Trader',    desc: 'Complete 5 trades',          done: tradeHistory.length >= 5 },
+    { icon: '&#127891;', title: 'Curious Mind',     desc: 'Finish your first lesson',   done: completedL.size >= 1 },
+    { icon: '&#128218;', title: 'Knowledge Seeker', desc: 'Finish 3 lessons',           done: completedL.size >= 3 },
+    { icon: '&#128293;', title: 'On a Roll',        desc: '3-day learning streak',      done: streakData.count >= 3 },
+    { icon: '&#128737;', title: 'Level 3 Investor', desc: 'Reach Level 3',              done: getLv(totalXP).num >= 3 },
+    { icon: '&#127919;', title: 'Diversified',      desc: 'Hold 4+ different assets',   done: HOLDS.length >= 4 },
   ];
+
+  var unlocked = achievements.filter(function(a) { return a.done; }).length;
+  var countEl = document.getElementById('achCount');
+  if (countEl) countEl.textContent = unlocked + '/' + achievements.length + ' unlocked';
 
   el.innerHTML = achievements.map(function(a) {
     return '<div class="ach-card ' + (a.done ? 'ach-done' : 'ach-locked') + '">'
       + '<div class="ach-icon">' + a.icon + '</div>'
-      + '<div class="ach-info"><div class="ach-title">' + a.title + '</div><div class="ach-desc">' + a.desc + '</div></div>'
-      + (a.done ? '<div class="ach-check">&#10003;</div>' : '<div class="ach-lock">&#128274;</div>')
+      + '<div class="ach-title">' + a.title + '</div>'
+      + '<div class="ach-desc">' + a.desc + '</div>'
       + '</div>';
   }).join('');
+}
+
+// \u2500\u2500\u2500 THEME \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function setTheme(t) {
+  document.documentElement.classList.toggle('light', t === 'light');
+  Store.set('theme', t);
+  updateThemeUI();
+}
+
+function updateThemeUI() {
+  var light = document.documentElement.classList.contains('light');
+  document.querySelectorAll('.theme-card').forEach(function(c) {
+    c.classList.toggle('on', c.getAttribute('data-theme') === (light ? 'light' : 'dark'));
+  });
+  var navBtn = document.querySelector('.tn-theme');
+  if (navBtn) navBtn.textContent = light ? '\u263e' : '\u2600';
+  // Re-tint sector donut for the active theme
+  if (typeof updateDashboardStats === 'function' && curPage === 'dashboard') updateDashboardStats();
 }
 
 function editProfile() {
@@ -265,103 +275,118 @@ function resetProfile() {
 }
 
 // ─── LEADERBOARD ─────────────────────────────────────────
+// Leaderboard roster \u2014 global traders with trades / win-rate / P&L
+window.LB_PLAYERS = [
+  { f:'\uD83C\uDDEE\uD83C\uDDF3', nm:'Aarav Mehta',   trades:142, win:71, pnl:38.4, xp:4820, bot:false },
+  { f:'\uD83C\uDDEE\uD83C\uDDF9', nm:'Sofia Rossi',   trades:118, win:68, pnl:31.2, xp:4310, bot:false },
+  { f:'\uD83C\uDDF8\uD83C\uDDEC', nm:'Marcus Chen',   trades:99,  win:65, pnl:27.0, xp:3940, bot:false },
+  { f:'\uD83C\uDDEE\uD83C\uDDF3', nm:'Priya Sharma',  trades:87,  win:64, pnl:22.8, xp:3510, bot:false },
+  { f:'\uD83C\uDDE6\uD83C\uDDFA', nm:'Quant_Quokka',  trades:220, win:58, pnl:19.4, xp:3210, bot:true  },
+  { f:'\uD83C\uDDFA\uD83C\uDDF8', nm:'Jordan Bailey', trades:76,  win:62, pnl:17.6, xp:2980, bot:false },
+  { f:'\uD83C\uDDEE\uD83C\uDDEA', nm:"Liam O'Connor", trades:65,  win:60, pnl:14.9, xp:2710, bot:false },
+  { f:'\uD83C\uDDEF\uD83C\uDDF5', nm:'Yuki Tanaka',   trades:58,  win:59, pnl:12.1, xp:2440, bot:false },
+  { f:'\uD83C\uDDE9\uD83C\uDDEA', nm:'Mia Schmidt',   trades:51,  win:57, pnl:10.3, xp:2180, bot:false },
+  { f:'\uD83C\uDDFA\uD83C\uDDF8', nm:'AlphaBot_3000', trades:310, win:55, pnl:8.7,  xp:1950, bot:true  },
+  { f:'\uD83C\uDDEB\uD83C\uDDF7', nm:'Chlo\u00E9 Martin',  trades:47,  win:56, pnl:7.2,  xp:1720, bot:false },
+  { f:'\uD83C\uDDEC\uD83C\uDDE7', nm:'Noah Williams', trades:42,  win:54, pnl:5.9,  xp:1510, bot:false },
+  { f:'\uD83C\uDDEA\uD83C\uDDF8', nm:'Luc\u00EDa Garc\u00EDa',  trades:33,  win:53, pnl:4.8,  xp:1290, bot:false },
+  { f:'\uD83C\uDDE6\uD83C\uDDEA', nm:'Omar Haddad',   trades:28,  win:52, pnl:3.5,  xp:980,  bot:false },
+  { f:'\uD83C\uDDE7\uD83C\uDDF7', nm:'Lucas Silva',   trades:21,  win:51, pnl:2.1,  xp:640,  bot:false },
+];
+
+window.lbTab = 'week';
+
+function setLBTab(tab, btn) {
+  lbTab = tab;
+  document.querySelectorAll('.lb-tab').forEach(function(b) { b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderLB();
+}
+
 function renderLB() {
   var userName = userProfile ? userProfile.name : 'You';
   var userAvatar = userProfile ? userProfile.avatar : '&#128100;';
 
-  // Bot players with semi-random but consistent scores
-  var bots = [
-    { e:'&#128081;', nm:'Arjun K.',  lv:'Level 7 \u00B7 Legend',       basePts:4920 },
-    { e:'&#129489;', nm:'Priya M.',  lv:'Level 6 \u00B7 Fund Manager', basePts:3840 },
-    { e:'&#128105;', nm:'Sneha R.',  lv:'Level 5 \u00B7 Sr. Trader',   basePts:3410 },
-    { e:'&#129474;', nm:'Rahul V.',  lv:'Level 4 \u00B7 Trader',       basePts:2980 },
-    { e:'&#128105;', nm:'Divya S.',  lv:'Level 3 \u00B7 Analyst',      basePts:380 },
-    { e:'&#128102;', nm:'Karan M.',  lv:'Level 2 \u00B7 Learner',      basePts:290 },
-    { e:'&#128102;', nm:'Aditya P.', lv:'Level 2 \u00B7 Learner',      basePts:210 },
-  ];
+  // All-Time scales scores up; This Week uses base; Humans Only drops bots
+  var scale = lbTab === 'all' ? 7.4 : 1;
+  var roster = LB_PLAYERS.filter(function(p) { return lbTab === 'humans' ? !p.bot : true; });
 
-  // Build full list including user
-  var all = bots.map(function(b) {
-    return { e: b.e, nm: b.nm, lv: b.lv, pts: b.basePts, you: false };
+  var all = roster.map(function(p) {
+    return {
+      e: p.f, nm: p.nm, bot: p.bot, you: false,
+      trades: Math.round(p.trades * (lbTab === 'all' ? 4.2 : 1)),
+      win: p.win,
+      pnl: +(p.pnl * (lbTab === 'all' ? 1.6 : 1)).toFixed(1),
+      pts: Math.round(p.xp * scale)
+    };
   });
 
+  // Estimate the user's win-rate / P&L from their portfolio
+  var port = (typeof calcPortfolio === 'function') ? calcPortfolio() : { gainPct: 0 };
   all.push({
-    e: userAvatar,
-    nm: userName,
-    lv: getLv(totalXP).l,
-    pts: totalXP,
-    you: true
+    e: userAvatar, nm: userName, bot: false, you: true,
+    trades: tradeHistory.length,
+    win: tradeHistory.length ? Math.min(95, 50 + Math.round(port.gainPct)) : 0,
+    pnl: +(port.gainPct || 0).toFixed(1),
+    pts: totalXP
   });
 
-  // Sort by points descending
   all.sort(function(a, b) { return b.pts - a.pts; });
-
-  // Assign ranks
   all.forEach(function(u, i) { u.r = i + 1; });
 
-  var rankColors = ['var(--gd)', '#aaa', '#cd7f32'];
+  var maxPnl = Math.max.apply(null, all.map(function(u) { return Math.abs(u.pnl); }).concat([1]));
 
-  // Update podium
+  // \u2500\u2500 Rank badge \u2500\u2500
+  var userEntry = all.find(function(u) { return u.you; });
+  var badge = document.getElementById('lbRankBadge');
+  if (badge && userEntry) {
+    badge.innerHTML = "You're ranked <b>#" + userEntry.r + "</b> &middot; " + userEntry.pts.toLocaleString() + ' XP';
+  }
+  var countEl = document.getElementById('lbCount');
+  if (countEl) countEl.textContent = all.length + ' traders';
+
+  // \u2500\u2500 Podium (2nd \u00B7 1st \u00B7 3rd) \u2500\u2500
   var top3 = all.slice(0, 3);
-  // Podium order: 2nd, 1st, 3rd
   var podOrder = [1, 0, 2];
-  var podClasses = ['p2', 'p1', 'p3'];
+  var medals = ['&#129352;', '&#128081;', '&#129353;']; // silver wreath, crown, bronze
   var podiumEl = document.getElementById('podium');
   if (podiumEl) {
-    podiumEl.innerHTML = podOrder.map(function(idx, pi) {
-      var u = top3[idx];
+    podiumEl.innerHTML = podOrder.map(function(oi) {
+      var u = top3[oi];
       if (!u) return '';
-      var isYou = u.you;
-      var avStyle = idx === 0 ? 'background:rgba(255,181,71,.15);border:2px solid var(--gd)' : (idx === 1 ? 'background:rgba(200,200,200,.1)' : 'background:rgba(205,127,50,.15)');
-      return '<div class="pod ' + podClasses[pi] + (isYou ? ' pod-you' : '') + '">'
-        + '<div class="pav" style="' + avStyle + '">' + u.e + '</div>'
-        + '<div class="pnm">' + u.nm + (isYou ? ' <span style="color:var(--gr);font-size:9px">(You)</span>' : '') + '</div>'
-        + '<div class="ppts">' + u.pts.toLocaleString() + ' pts</div>'
-        + '<div class="pblk">' + u.r + '</div></div>';
+      var barW = Math.min(100, Math.round(Math.abs(u.pnl) / maxPnl * 100));
+      return '<div class="lb-pod' + (u.r === 1 ? ' lb-pod-1' : '') + (u.you ? ' you' : '') + '">'
+        + '<div class="lb-pod-rank">' + medals[oi] + ' RANK #' + u.r + '</div>'
+        + '<div class="lb-pod-user"><span class="lb-pod-av">' + u.e + '</span>'
+        + '<div><div class="lb-pod-nm">' + u.nm + (u.you ? ' <span class="lb-you">(You)</span>' : '') + '</div>'
+        + '<div class="lb-pod-sub">' + u.trades + ' trades &middot; ' + u.win + '% win</div></div></div>'
+        + '<div class="lb-pod-xp">' + u.pts.toLocaleString() + ' XP</div>'
+        + '<div class="lb-pod-pnl">' + (u.pnl >= 0 ? '+' : '') + u.pnl + '% P&L</div>'
+        + '<div class="lb-pod-bar"><div style="width:' + barW + '%"></div></div>'
+        + '</div>';
     }).join('');
   }
 
-  // Update challenge timer
-  var timerEl = document.getElementById('lbTimer');
-  if (timerEl) {
-    var now = new Date();
-    var sun = new Date(now);
-    sun.setDate(sun.getDate() + (7 - sun.getDay()) % 7);
-    sun.setHours(23, 59, 59, 999);
-    var diff = sun - now;
-    var days = Math.floor(diff / 86400000);
-    var hours = Math.floor((diff % 86400000) / 3600000);
-    timerEl.textContent = 'Resets in ' + days + 'd ' + hours + 'h';
-  }
-
-  // Full rankings list
+  // \u2500\u2500 Full ranking table \u2500\u2500
   var el = document.getElementById('lblist');
   if (!el) return;
-
-  el.innerHTML = all.map(function(u, i) {
-    return '<div class="lbi' + (u.you ? ' you' : '') + '">'
-      + '<div class="lbrk" style="color:' + (i < 3 ? rankColors[i] : 'var(--mu)') + '">' + u.r + '</div>'
-      + '<div class="lbav">' + u.e + '</div>'
-      + '<div class="lbu">'
-      + '<div class="lbnm">' + u.nm + (u.you ? ' <span style="color:var(--gr);font-size:10px">\u2190 You</span>' : '') + '</div>'
-      + '<div class="lblv">' + u.lv + '</div>'
-      + '</div>'
-      + '<div><div class="lbpts">' + u.pts.toLocaleString() + '</div><div class="lbpl">pts</div></div>'
+  var header = '<div class="lb-row lb-row-head">'
+    + '<span class="lb-c-rank">#</span><span class="lb-c-name">TRADER</span>'
+    + '<span class="lb-c-num">TRADES</span><span class="lb-c-num">WIN RATE</span>'
+    + '<span class="lb-c-num">P&L</span><span class="lb-c-num">XP</span></div>';
+  el.innerHTML = header + all.map(function(u) {
+    return '<div class="lb-row' + (u.you ? ' you' : '') + '">'
+      + '<span class="lb-c-rank">#' + u.r + '</span>'
+      + '<span class="lb-c-name"><span class="lb-flag">' + u.e + '</span>'
+      + '<span class="lb-tname">' + u.nm + '</span>'
+      + (u.bot ? '<span class="lb-bot">&#129302; bot</span>' : '')
+      + (u.you ? '<span class="lb-you">You</span>' : '') + '</span>'
+      + '<span class="lb-c-num">' + u.trades + '</span>'
+      + '<span class="lb-c-num">' + u.win + '%</span>'
+      + '<span class="lb-c-num ' + (u.pnl >= 0 ? 'pos' : 'neg') + '">' + (u.pnl >= 0 ? '&#8599; +' : '&#8600; ') + u.pnl + '%</span>'
+      + '<span class="lb-c-num lb-xp">' + u.pts.toLocaleString() + '</span>'
       + '</div>';
   }).join('');
-
-  // Show user rank summary
-  var userEntry = all.find(function(u) { return u.you; });
-  var rankSummary = document.getElementById('lbRankSummary');
-  if (rankSummary && userEntry) {
-    var nextUser = all[userEntry.r - 2]; // person above
-    if (nextUser && !nextUser.you) {
-      var gap = nextUser.pts - userEntry.pts;
-      rankSummary.innerHTML = 'You\'re <b>#' + userEntry.r + '</b> &mdash; <span style="color:var(--gd)">' + gap + ' XP</span> to overtake ' + nextUser.nm;
-    } else {
-      rankSummary.innerHTML = 'You\'re <b>#' + userEntry.r + '</b> &mdash; <span style="color:var(--gr)">Top of the board!</span>';
-    }
-  }
 }
 
 // ─── COMMUNITY ────────────────────────────────────────────
