@@ -436,7 +436,7 @@ function calcSIP() {
   var pct = invested / futureValue * 100;
   var bar = document.getElementById('sipBar');
   if (bar) {
-    bar.innerHTML = '<div style="width:' + pct + '%;background:var(--bl);height:100%;border-radius:4px;transition:width .5s"></div>'
+    bar.innerHTML = '<div style="width:' + pct + '%;background:var(--teal);height:100%;border-radius:4px;transition:width .5s"></div>'
       + '<div style="width:' + (100 - pct) + '%;background:var(--gr);height:100%;border-radius:0 4px 4px 0;transition:width .5s"></div>';
   }
 }

@@ -982,3 +982,89 @@ select.prof-input { cursor: pointer; appearance: auto; }
   .sd-interval-row { overflow-x: auto; }
   .sd-hero-name { font-size: 17px; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   NEW DESIGN — mint/teal cohesion overrides
+═══════════════════════════════════════════════════════════ */
+
+/* Glassy card base + larger radius across surfaces */
+.dstat, .dash-card, .htable, .scard, .ixchip, .calc-card, .gloss-card,
+.rescard, .prof-stat-card, .ach-card, .lbi, .chcard, .lxprow {
+  background: color-mix(in oklab, var(--bg2) 80%, transparent);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+}
+.dstat, .dash-card { border-radius: 18px; }
+
+/* Hero — clean near-black green glass */
+.hero {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--bg2) 88%, transparent), rgba(47,227,164,.05));
+  border-radius: 22px; padding: 26px;
+}
+.h-bal { font-size: 42px; letter-spacing: -.03em; }
+.h-chg { background: var(--grd); border-color: var(--grg); }
+
+/* Dashboard XP value → mint (was gold) */
+#dashXP { color: var(--mint) !important; }
+
+/* Section headers a touch larger */
+.sect { font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.sea  { color: var(--mint); }
+
+/* Heroes: drop purple/blue identity, adopt mint/teal */
+.lhero, .lbhero, .comhero, .prof-hero, .reshero {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--bg2) 90%, transparent), rgba(47,227,164,.05));
+  border: 1px solid var(--br);
+  border-radius: 22px;
+}
+.lhero::before, .lbhero::before, .comhero::before, .prof-hero::before {
+  background: radial-gradient(circle, rgba(47,227,164,.16), transparent 70%) !important;
+}
+.ltag { background: var(--grd); border-color: var(--grg); color: var(--mint); }
+.lsv, .cosv { color: var(--mint); }
+.prof-badge { background: var(--grd); color: var(--mint); border-color: var(--grg); }
+
+/* Learn XP progress bar + streak pill → mint/teal */
+.xp2f, .xpfill { background: var(--grad); }
+.lxpbg { background: var(--grad); color: #05100c; }
+
+/* Pills / tabs active → unified subtle solid */
+.mtab.on, .lcat.on { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.16); color: var(--tx); }
+.mtab, .lcat { border-radius: 12px; }
+
+/* Stock card price emphasis */
+.scp { font-size: 16px; }
+.scard { border-radius: 16px; }
+
+/* Glossary + SEBI accents → teal */
+.gloss-term { color: var(--teal); }
+.stab.on { background: var(--grd); border-color: var(--grg); color: var(--mint); }
+
+/* Calculator result emphasis */
+.calc-res { border-radius: 12px; }
+.calc-res-val { letter-spacing: -.01em; }
+.calc-bar { background: var(--grd); }
+#sipInvested, #lsInvested { color: var(--teal) !important; }
+#sipReturns, #lsReturns { color: var(--mint) !important; }
+#sipTotal, #lsTotal { color: var(--tx) !important; }
+
+/* Leaderboard mint highlight */
+.lbpts { color: var(--mint); }
+.lbi.you { border-color: var(--grg); background: var(--grd); }
+
+/* Wallet balance → mint */
+.wallet-bal { color: var(--mint); }
+
+/* AI panel header/avatar/send → mint family */
+.aihd { background: linear-gradient(135deg, rgba(47,227,164,.08), rgba(79,214,196,.04)); }
+.aiav, .aimav { background: var(--grad); color: #05100c; }
+.aisend { background: var(--grad); color: #05100c; }
+.qpchip:hover { border-color: var(--teal); color: var(--teal); }
+
+/* Buttons that were gradient-green keep working with new mint */
+.prof-save, .wallet-confirm-btn, .bdone, .sd-order-btn.buy,
+.rbeg .rjoin, .wallet-btn.deposit { background: var(--grad) !important; color: #05100c !important; }
+
+/* Bottom nav + mobile sidebar active → mint */
+.bni.on, .sb-mobile .ni.on, .tn-link.on .ico { color: var(--mint); }
+.sb-mobile .ni.on { background: var(--grd); }

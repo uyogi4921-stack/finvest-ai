@@ -194,7 +194,7 @@ function renderSectorChart(alloc, total) {
   ctx.clearRect(0, 0, w, h);
 
   var cx = w * 0.35, cy = h / 2, r = Math.min(cx, cy) - 20;
-  var colors = { IT: '#4d9fff', Banking: '#00e5a0', Energy: '#ff7b3a', Auto: '#9b6dff', FMCG: '#ffb547', Pharma: '#ff4d6a', Metals: '#cd7f32', Infra: '#2ecc71', Telecom: '#e74c3c', Chemicals: '#1abc9c', Realty: '#e67e22', Insurance: '#ff85c0', Consumer: '#66d9ef', Logistics: '#a0522d' };
+  var colors = { IT: '#2fe3a4', Banking: '#5cf0b8', Energy: '#1f9d72', Auto: '#4fd6c4', FMCG: '#7ef0c4', Pharma: '#13b886', Metals: '#0f9d6e', Infra: '#36c9a0', Telecom: '#65e0b0', Chemicals: '#1abc9c', Realty: '#2bbd92', Insurance: '#88f0cc', Consumer: '#3fd1aa', Logistics: '#0e8a63' };
   var sectors = Object.keys(alloc);
   if (sectors.length === 0) return;
 
@@ -214,16 +214,16 @@ function renderSectorChart(alloc, total) {
   // Donut hole
   ctx.beginPath();
   ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
-  ctx.fillStyle = '#0d1221';
+  ctx.fillStyle = document.documentElement.classList.contains('light') ? '#f3f7f4' : '#0c1814';
   ctx.fill();
 
   // Center text
-  ctx.fillStyle = '#f0f4ff';
-  ctx.font = 'bold ' + (r * 0.22) + 'px Syne, sans-serif';
+  ctx.fillStyle = document.documentElement.classList.contains('light') ? '#122019' : '#eafff6';
+  ctx.font = '800 ' + (r * 0.22) + 'px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(sectors.length + ' Sectors', cx, cy - 5);
-  ctx.font = (r * 0.15) + 'px DM Sans, sans-serif';
-  ctx.fillStyle = '#6b7a99';
+  ctx.font = (r * 0.15) + 'px Inter, sans-serif';
+  ctx.fillStyle = '#7f9a90';
   ctx.fillText(HOLDS.length + ' Stocks', cx, cy + r * 0.2);
 
   // Legend

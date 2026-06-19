@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Finvest AI — Gamified Investing for Gen Z</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/animations.css">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/components.css">
@@ -239,27 +241,27 @@
 <nav class="topnav">
   <div class="topnav-inner">
     <div class="tn-logo" onclick="navTo('dashboard',null)">
-      <div class="tn-logo-ic">&#128200;</div>
-      Finvest<span class="tn-ai"> AI</span>
+      <div class="tn-logo-ic">&#10024;</div>
+      <span class="tn-ai">Finvest</span> AI
     </div>
 
     <button class="hbg" onclick="toggleSB()">&#9776;</button>
 
     <div class="tn-links">
       <button class="tn-link on" data-page="dashboard" onclick="navTo('dashboard',this)">
-        <span class="ico">&#127968;</span><span>Dashboard</span>
+        <span class="ico">&#9783;</span><span>Dashboard</span>
       </button>
       <button class="tn-link" data-page="market" onclick="navTo('market',this)">
-        <span class="ico">&#128202;</span><span>Market</span>
+        <span class="ico">&#128200;</span><span>Market</span>
       </button>
       <button class="tn-link" data-page="learn" onclick="navTo('learn',this)">
-        <span class="ico">&#127891;</span><span>Learn</span><span class="tn-badge tn-badge-gr">15</span>
+        <span class="ico">&#127891;</span><span>Learn</span>
       </button>
       <button class="tn-link" data-page="leaderboard" onclick="navTo('leaderboard',this)">
         <span class="ico">&#127942;</span><span>Leaderboard</span>
       </button>
       <button class="tn-link" data-page="community" onclick="navTo('community',this)">
-        <span class="ico">&#128101;</span><span>Community</span><span class="tn-badge tn-badge-nw">NEW</span>
+        <span class="ico">&#128101;</span><span>Community</span>
       </button>
       <button class="tn-link" data-page="resources" onclick="navTo('resources',this)">
         <span class="ico">&#128218;</span><span>Resources</span>
@@ -270,8 +272,19 @@
     </div>
 
     <div class="tn-right">
-      <div class="tn-xp" id="tnXp">&#9889; 0 XP</div>
-      <div class="streak" onclick="navTo('profile',null)"><span>&#128293;</span> <span id="streakText">1 Day Streak</span></div>
+      <div class="tn-seg" role="group" aria-label="Market">
+        <button class="seg-btn on" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127482;&#127480; US</button>
+        <button class="seg-btn" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127470;&#127475; IN</button>
+        <button class="seg-btn" onclick="this.parentNode.querySelectorAll('.seg-btn').forEach(function(b){b.classList.remove('on')});this.classList.add('on')">&#127760; Crypto</button>
+      </div>
+      <button class="tn-theme" aria-label="Toggle theme" title="Toggle theme"
+        onclick="document.documentElement.classList.toggle('light');this.textContent=document.documentElement.classList.contains('light')?'☾':'☀'">&#9728;</button>
+      <div class="tn-meta">
+        <span class="tn-flame" onclick="navTo('profile',null)"><span>&#128293;</span> <span id="streakText">1 Day Streak</span></span>
+        <span class="tn-dot">&middot;</span>
+        <span class="tn-xp" id="tnXp">&#9889; 0 XP</span>
+      </div>
+      <button class="tn-ask" onclick="openAI()"><span>&#10024;</span> Ask Fin</button>
       <div class="avi" id="topAvi" onclick="navTo('profile',null)" style="cursor:pointer">U</div>
     </div>
   </div>
