@@ -12,7 +12,6 @@ var PAGE_TITLES = {
   market:      'Live Market',
   learn:       'Learn & Earn',
   leaderboard: 'Leaderboard',
-  community:   'Community',
   resources:   'Resources',
   profile:     'My Profile',
 };
@@ -389,55 +388,6 @@ function renderLB() {
   }).join('');
 }
 
-// ─── COMMUNITY ────────────────────────────────────────────
-var joinedRooms = Store.get('joinedRooms', {});
-
-function joinRoom(type) {
-  if (!userProfile) { showProfilePrompt(); return; }
-  if (joinedRooms[type]) {
-    showToast('\u2705 Already in ' + (type === 'beginner' ? 'Beginner' : 'Intermediate') + ' Room!');
-    return;
-  }
-  joinedRooms[type] = true;
-  Store.set('joinedRooms', joinedRooms);
-  addXP(50, '\uD83C\uDF89 Joined ' + (type === 'beginner' ? 'Beginner' : 'Intermediate') + ' Room! +50 XP');
-  updateRoomUI();
-}
-
-function updateRoomUI() {
-  ['beginner', 'intermediate'].forEach(function(type) {
-    var btnId = type === 'beginner' ? 'joinBegBtn' : 'joinIntBtn';
-    var btn = document.getElementById(btnId);
-    var card = document.getElementById('room-' + type);
-    if (joinedRooms[type]) {
-      if (btn) {
-        btn.textContent = '\u2705 Joined';
-        btn.classList.add('joined');
-        btn.disabled = true;
-      }
-      if (card) card.classList.add('room-joined');
-    }
-  });
-}
-
-function participateChallenge(id, xp, msg) {
-  if (!userProfile) { showProfilePrompt(); return; }
-  if (completedChallenges[id]) {
-    showToast('Already completed this challenge!');
-    return;
-  }
-  completedChallenges[id] = true;
-  Store.set('challenges', completedChallenges);
-  addXP(xp, msg);
-
-  // Disable the button
-  var btn = document.querySelector('[data-challenge="' + id + '"]');
-  if (btn) {
-    btn.textContent = 'Done \u2713';
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-  }
-}
 
 // ─── SIP CALCULATOR ──────────────────────────────────────
 function calcSIP() {

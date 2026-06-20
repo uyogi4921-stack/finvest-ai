@@ -340,9 +340,6 @@ function checkStreak() {
   }
 }
 
-// ─── CHALLENGES TRACKING ────────────────────────────────
-window.completedChallenges = Store.get('challenges', {});
-
 // ─── WALLET (per active market; set by applyMarket) ─────
 function saveWallet() { Store.set('wallet_' + currentMarket, wallet); }
 

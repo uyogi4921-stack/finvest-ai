@@ -63,12 +63,6 @@ function initApp() {
     updateProfileUI();
   }
 
-  // Update challenge button states
-  updateChallengeButtons();
-
-  // Update community room UI
-  updateRoomUI();
-
   // Price simulation — tick every 8 seconds
   setInterval(tickPrices, 8000);
 
@@ -118,19 +112,6 @@ function syncToServer() {
   })
   .catch(function() {
     // Server not available — that's fine, app works offline
-  });
-}
-
-function updateChallengeButtons() {
-  Object.keys(completedChallenges).forEach(function(id) {
-    if (completedChallenges[id]) {
-      var btn = document.querySelector('[data-challenge="' + id + '"]');
-      if (btn) {
-        btn.textContent = 'Done \u2713';
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-      }
-    }
   });
 }
 
