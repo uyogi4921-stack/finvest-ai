@@ -244,6 +244,231 @@ app.post('/api/admin/change-password', adminAuth, function(req, res) {
   res.json({ success: true, message: 'Password changed. Restart server to apply.' });
 });
 
+// ═══════════════════════════════════════════════════════════
+//  MARKET DATA PROXY  — real OHLC for US/IN stocks + crypto
+//  Binance (crypto) + Yahoo Finance (stocks). No API key.
+//  Server-side fetch sidesteps browser CORS.
+// ═══════════════════════════════════════════════════════════
+
+// App symbol → Yahoo NSE ticker (India). Unmapped → synthetic fallback on client.
+const IN_YF = {
+  TCS:'TCS.NS', INFY:'INFY.NS', WIPRO:'WIPRO.NS', HCLT:'HCLTECH.NS', TECHM:'TECHM.NS',
+  HDFC:'HDFCBANK.NS', ICICI:'ICICIBANK.NS', SBI:'SBIN.NS', AXIS:'AXISBANK.NS', KOTAK:'KOTAKBANK.NS',
+  RELI:'RELIANCE.NS', ONGC:'ONGC.NS', BPCL:'BPCL.NS', IOC:'IOC.NS',
+  TATAM:'TATAMOTORS.NS', MM:'M&M.NS', MARUTI:'MARUTI.NS', BAJAJ:'BAJAJ-AUTO.NS', HERO:'HEROMOTOCO.NS', EICH:'EICHERMOT.NS', TVSL:'TVSMOTOR.NS',
+  HUL:'HINDUNILVR.NS', ITC:'ITC.NS', NEST:'NESTLEIND.NS', DABR:'DABUR.NS', BRIT:'BRITANNIA.NS', TITN:'TITAN.NS', APNT:'ASIANPAINT.NS',
+  SUN:'SUNPHARMA.NS', DRL:'DRREDDY.NS', CIPLA:'CIPLA.NS', DIVI:'DIVISLAB.NS', APLS:'APOLLOHOSP.NS',
+  BRTI:'BHARTIARTL.NS', IDEA:'IDEA.NS', TCOM:'TATACOMM.NS',
+  LART:'LT.NS', ULTC:'ULTRACEMCO.NS', GRAS:'GRASIM.NS', ADNP:'ADANIPORTS.NS', ADNE2:'ADANIENT.NS', DLFC:'DLF.NS',
+  TATA:'TATASTEEL.NS', JSWL:'JSWSTEEL.NS', HNDL:'HINDALCO.NS', VEDL:'VEDL.NS', COAL:'COALINDIA.NS',
+  NTPC:'NTPC.NS', PWGR:'POWERGRID.NS', TPOW:'TATAPOWER.NS', GAIL:'GAIL.NS',
+  BAFL:'BAJFINANCE.NS', BAFN:'BAJAJFINSV.NS', INDB:'INDUSINDBK.NS', BOB:'BANKBARODA.NS', PNB:'PNB.NS',
+  ZOMM:'ZOMATO.NS', NYKA:'NYKAA.NS', PAYT:'PAYTM.NS', LICI:'LICI.NS', SICC:'SIEMENS.NS'
+};
+
+// US: app symbols are real tickers; only dotted classes need a tweak
+const US_YF = { 'BRK.B':'BRK-B' };
+
+// timeframe token → { binance:[interval,limit], yahoo:[interval,range] }
+const TF = {
+  '1D':  { bin:['5m', 78],   yf:['5m','1d'] },
+  '1W':  { bin:['30m', 240], yf:['30m','5d'] },
+  '1M':  { bin:['1d', 31],   yf:['1d','1mo'] },
+  '3M':  { bin:['1d', 92],   yf:['1d','3mo'] },
+  '1Y':  { bin:['1d', 365],  yf:['1d','1y'] },
+  '5Y':  { bin:['1w', 260],  yf:['1wk','5y'] }
+};
+
+const _candleCache = new Map(); // key -> { t, data }
+const CACHE_MS = 30000;
+
+async function fetchBinance(symbol, tf) {
+  const m = TF[tf] || TF['1D'];
+  const pair = symbol.toUpperCase() + 'USDT';
+  const url = 'https://api.binance.com/api/v3/klines?symbol=' + pair +
+    '&interval=' + m.bin[0] + '&limit=' + m.bin[1];
+  const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+  if (!r.ok) throw new Error('binance ' + r.status);
+  const rows = await r.json();
+  return rows.map(function(k) {
+    return { t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] };
+  });
+}
+
+async function fetchYahoo(ticker, tf) {
+  const m = TF[tf] || TF['1D'];
+  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' +
+    encodeURIComponent(ticker) + '?interval=' + m.yf[0] + '&range=' + m.yf[1];
+  const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' } });
+  if (!r.ok) throw new Error('yahoo ' + r.status);
+  const j = await r.json();
+  const res = j && j.chart && j.chart.result && j.chart.result[0];
+  if (!res || !res.timestamp) throw new Error('yahoo empty');
+  const q = res.indicators.quote[0];
+  const out = [];
+  for (let i = 0; i < res.timestamp.length; i++) {
+    if (q.close[i] == null || q.open[i] == null) continue;
+    out.push({ t: res.timestamp[i], o: +q.open[i], h: +q.high[i], l: +q.low[i], c: +q.close[i], v: +(q.volume[i] || 0) });
+  }
+  return out;
+}
+
+app.get('/api/candles', async function(req, res) {
+  const market = (req.query.market || 'US').toUpperCase();
+  const symbol = (req.query.symbol || '').toUpperCase();
+  const tf = TF[req.query.tf] ? req.query.tf : '1D';
+  if (!symbol) return res.status(400).json({ ok: false, error: 'symbol required' });
+
+  const key = market + ':' + symbol + ':' + tf;
+  const hit = _candleCache.get(key);
+  if (hit && Date.now() - hit.t < CACHE_MS) {
+    return res.json({ ok: true, source: hit.source, cached: true, candles: hit.data });
+  }
+
+  try {
+    let data, source;
+    if (market === 'CRYPTO') {
+      data = await fetchBinance(symbol, tf); source = 'binance';
+    } else {
+      const ticker = market === 'IN'
+        ? (IN_YF[symbol] || (symbol + '.NS'))
+        : (US_YF[symbol] || symbol);
+      data = await fetchYahoo(ticker, tf); source = 'yahoo';
+    }
+    if (!data || !data.length) throw new Error('no data');
+    _candleCache.set(key, { t: Date.now(), data: data, source: source });
+    res.json({ ok: true, source: source, candles: data });
+  } catch (e) {
+    // Client falls back to synthetic candles seeded from base price.
+    res.json({ ok: false, error: String(e.message || e) });
+  }
+});
+
+function ynTicker(market, sym) {
+  if (market === 'IN') return IN_YF[sym] || (sym + '.NS');
+  return US_YF[sym] || sym;
+}
+
+// ─── API: BATCH QUOTES (keep prices nearby) ──────────────
+const _quoteCache = new Map();
+app.get('/api/quotes', async function(req, res) {
+  const market = (req.query.market || 'US').toUpperCase();
+  const syms = (req.query.symbols || '').split(',').map(function(s){return s.trim().toUpperCase();}).filter(Boolean);
+  if (!syms.length) return res.json({ ok: true, quotes: {} });
+  const key = market + ':' + syms.join(',');
+  const hit = _quoteCache.get(key);
+  if (hit && Date.now() - hit.t < 30000) return res.json({ ok: true, cached: true, quotes: hit.data });
+
+  try {
+    const quotes = {};
+    if (market === 'CRYPTO') {
+      const pairs = syms.map(function(s){ return '"' + s + 'USDT"'; }).join(',');
+      const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=[' + encodeURIComponent(pairs) + ']', { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const arr = await r.json();
+      (Array.isArray(arr) ? arr : []).forEach(function(d){
+        const s = String(d.symbol).replace('USDT','');
+        quotes[s] = { p: +d.lastPrice, chg: +d.priceChangePercent };
+      });
+    } else {
+      const map = {}; // ticker -> appSym
+      const tickers = syms.map(function(s){ const t = ynTicker(market, s); map[t] = s; return t; });
+      const url = 'https://query1.finance.yahoo.com/v8/finance/spark?symbols=' + encodeURIComponent(tickers.join(',')) + '&range=1d&interval=15m';
+      const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' } });
+      const j = await r.json();
+      Object.keys(j || {}).forEach(function(tk){
+        const d = j[tk]; if (!d || !d.close) return;
+        const closes = d.close.filter(function(x){ return x != null; });
+        if (!closes.length) return;
+        const last = closes[closes.length - 1];
+        const base = d.chartPreviousClose || d.previousClose || closes[0];
+        quotes[map[tk] || tk] = { p: +last, chg: +(((last - base) / base) * 100) };
+      });
+    }
+    _quoteCache.set(key, { t: Date.now(), data: quotes });
+    res.json({ ok: true, quotes: quotes });
+  } catch (e) {
+    res.json({ ok: false, error: String(e.message || e) });
+  }
+});
+
+// ─── API: MARKET INDICES (ticker tape) ───────────────────
+const INDEX_DEFS = [
+  { name: 'NIFTY 50',   yf: '^NSEI' },
+  { name: 'SENSEX',     yf: '^BSESN' },
+  { name: 'BANKNIFTY',  yf: '^NSEBANK' },
+  { name: 'FINNIFTY',   yf: 'NIFTY_FIN_SERVICE.NS' },
+  { name: 'MIDCPNIFTY', yf: '^NSEMDCP50' },
+  { name: 'NASDAQ',     yf: '^IXIC' },
+  { name: 'S&P 500',    yf: '^GSPC' },
+  { name: 'DOW',        yf: '^DJI' },
+];
+let _indexCache = null;
+app.get('/api/indices', async function(req, res) {
+  if (_indexCache && Date.now() - _indexCache.t < 45000) return res.json({ ok: true, cached: true, indices: _indexCache.data });
+  const out = [];
+  try {
+    const tickers = INDEX_DEFS.map(function(d){ return d.yf; }).join(',');
+    const r = await fetch('https://query1.finance.yahoo.com/v8/finance/spark?symbols=' + encodeURIComponent(tickers) + '&range=1d&interval=15m', { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' } });
+    const j = await r.json();
+    INDEX_DEFS.forEach(function(d){
+      const q = j && j[d.yf];
+      if (q && q.close) {
+        const closes = q.close.filter(function(x){ return x != null; });
+        const last = closes[closes.length - 1];
+        const base = q.chartPreviousClose || q.previousClose || closes[0];
+        out.push({ name: d.name, value: last, chg: +(((last - base) / base) * 100).toFixed(2), cur: d.name.indexOf('S&P') === 0 || d.name === 'NASDAQ' ? '' : '' });
+      }
+    });
+  } catch (e) {}
+  try {
+    const b = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const bj = await b.json();
+    if (bj && bj.lastPrice) out.push({ name: 'BTC', value: +bj.lastPrice, chg: +(+bj.priceChangePercent).toFixed(2), cur: '$' });
+  } catch (e) {}
+  if (out.length) _indexCache = { t: Date.now(), data: out };
+  res.json({ ok: out.length > 0, indices: out });
+});
+
+// ─── API: NEWS (Bloomberg markets RSS) ───────────────────
+let _newsCache = null;
+function rssItems(xml, limit) {
+  const items = [];
+  const re = /<item>([\s\S]*?)<\/item>/g;
+  let m;
+  const pick = function(block, tag) {
+    const r = new RegExp('<' + tag + '>([\\s\\S]*?)<\\/' + tag + '>').exec(block);
+    if (!r) return '';
+    return r[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim();
+  };
+  while ((m = re.exec(xml)) && items.length < limit) {
+    const b = m[1];
+    items.push({
+      title: pick(b, 'title'),
+      link: (/<link>([\s\S]*?)<\/link>/.exec(b) || [, ''])[1].trim(),
+      time: pick(b, 'pubDate'),
+      summary: pick(b, 'description').slice(0, 180)
+    });
+  }
+  return items;
+}
+app.get('/api/news', async function(req, res) {
+  if (_newsCache && Date.now() - _newsCache.t < 300000) return res.json({ ok: true, cached: true, news: _newsCache.data });
+  const feeds = [
+    { src: 'Bloomberg', url: 'https://feeds.bloomberg.com/markets/news.rss' },
+    { src: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' }
+  ];
+  for (const f of feeds) {
+    try {
+      const r = await fetch(f.url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      if (!r.ok) continue;
+      const xml = await r.text();
+      const items = rssItems(xml, 12).map(function(it){ it.src = f.src; return it; }).filter(function(it){ return it.title; });
+      if (items.length) { _newsCache = { t: Date.now(), data: items }; return res.json({ ok: true, news: items }); }
+    } catch (e) {}
+  }
+  res.json({ ok: false, news: [] });
+});
+
 // ─── SERVE ADMIN PAGE ────────────────────────────────────
 app.get('/admin', function(req, res) {
   res.sendFile(path.join(__dirname, 'admin.html'));

@@ -255,6 +255,56 @@ function renderLessons() {
   }).join('');
 }
 
+// ─── DYNAMIC QUIZ ENGINE ─────────────────────────────────
+// Pool of questions per lesson category. A random one is drawn and its
+// options shuffled each time a lesson opens, so quizzes are never static.
+window.QUIZ_BANK = [
+  // Foundations / basics
+  { cat:'basics', q:'What do the green B and red S buttons on a stock card do?', correct:'Open a Buy or Sell order', wrong:['Bookmark the stock','Show the company news'] },
+  { cat:'basics', q:'Invested ₹10,000, portfolio now ₹11,500 — your gain is?', correct:'₹1,500 (15%)', wrong:['₹1,000 (10%)','₹500 (5%)'] },
+  { cat:'basics', q:'What does "Total Portfolio Value" represent?', correct:'All holdings valued at current prices', wrong:['Only the cash in your wallet','The money you originally invested'] },
+  { cat:'basics', q:'On a stock card, what does the percentage under the price show?', correct:'How much the price moved today', wrong:['The dividend yield','The broker commission'] },
+  { cat:'basics', q:'Short-term red (losses) in a portfolio usually means?', correct:'Normal market movement — stay patient', wrong:['You must sell immediately','The app has a bug'] },
+  // Stocks & markets
+  { cat:'stocks', q:'You own 10 of 1,000 total shares. What % do you own?', correct:'1%', wrong:['0.1%','10%'] },
+  { cat:'stocks', q:'Which index tracks India’s top 50 NSE companies?', correct:'NIFTY 50', wrong:['SENSEX','BANK NIFTY'] },
+  { cat:'stocks', q:'A high P/E ratio versus peers generally signals the stock is?', correct:'Expensive / potentially overvalued', wrong:['A guaranteed bargain','Paying high dividends'] },
+  { cat:'stocks', q:'Buying a share makes you a?', correct:'Part-owner of the company', wrong:['Lender to the company','Employee of the company'] },
+  { cat:'stocks', q:'Two main ways a stock makes you money are capital appreciation and?', correct:'Dividends', wrong:['Interest coupons','Loyalty points'] },
+  { cat:'stocks', q:'Market capitalisation is calculated as?', correct:'Share price × total shares', wrong:['Price ÷ earnings','Revenue − costs'] },
+  // Risk & strategy
+  { cat:'risk', q:'Which risk affects ALL stocks at once?', correct:'Market risk', wrong:['Company risk','Liquidity risk'] },
+  { cat:'risk', q:'The most proven way to reduce risk for retail investors is?', correct:'Diversification across sectors', wrong:['Putting everything in one hot stock','Borrowing to invest more'] },
+  { cat:'risk', q:'Higher potential returns usually come with?', correct:'Higher risk', wrong:['Zero risk','Guaranteed profit'] },
+  { cat:'risk', q:'Inflation risk means?', correct:'Returns may not beat rising prices', wrong:['Your broker raises fees','The market closes early'] },
+  { cat:'strategy', q:'A SIP (Systematic Investment Plan) means you?', correct:'Invest a fixed amount at regular intervals', wrong:['Sell everything each month','Trade options weekly'] },
+  { cat:'strategy', q:'Rupee/dollar-cost averaging automatically buys more units when prices?', correct:'Fall', wrong:['Rise','Stay flat'] },
+  { cat:'strategy', q:'Long-term investing tends to win because of?', correct:'Compounding over time', wrong:['Daily market timing','Frequent trading fees'] },
+  { cat:'strategy', q:'Checking prices every hour usually leads to?', correct:'Emotional panic decisions', wrong:['Better returns','Lower taxes'] },
+  // Advanced
+  { cat:'advanced', q:'An ETF is best described as?', correct:'A basket of assets traded like a stock', wrong:['A single company’s bond','A type of savings account'] },
+  { cat:'advanced', q:'Futures and options are mainly?', correct:'High-risk instruments, not for beginners', wrong:['Safe guaranteed-return products','Government savings bonds'] },
+  { cat:'advanced', q:'Crypto differs from stocks mainly because it?', correct:'Trades 24/7 and is highly volatile', wrong:['Pays fixed dividends','Is risk-free'] }
+];
+
+function pickQuiz(cat) {
+  var pool = QUIZ_BANK.filter(function(q) { return q.cat === cat; });
+  if (!pool.length) pool = QUIZ_BANK;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function renderDynamicQuiz(lesson) {
+  var q = pickQuiz(lesson.cat);
+  var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function(w) { return { t: w, c: false }; }));
+  for (var i = opts.length - 1; i > 0; i--) { // Fisher–Yates shuffle
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+  }
+  return '<div class="qsec"><div class="qq">' + q.q + '</div><div class="qopts">'
+    + opts.map(function(o) { return '<button class="qo" onclick="ansQ(this,' + (o.c ? 'true' : 'false') + ')">' + o.t + '</button>'; }).join('')
+    + '</div><div class="qfb"></div><div class="xppop"></div></div>';
+}
+
 // ─── LESSON MODAL ────────────────────────────────────────
 function openLesson(id) {
   var l = LESSONS.find(function(x) { return x.id === id; });
@@ -274,7 +324,9 @@ function openLesson(id) {
     + '<span class="mmi">&#127775; +' + l.qxp + ' quiz bonus</span>'
     + (completedL.has(id) ? '<span class="mmi" style="color:var(--gr)">&#10003; Done</span>' : '');
 
-  document.getElementById('mBody').innerHTML = l.body;
+  // Strip the lesson's static quiz and inject a fresh randomized one
+  var bodyHtml = l.body.replace(/<div class="qsec">[\s\S]*$/, '');
+  document.getElementById('mBody').innerHTML = bodyHtml + renderDynamicQuiz(l);
   document.getElementById('mXpL').textContent = 'Earn +' + l.xp + ' XP';
 
   var btn  = document.getElementById('btnDone');

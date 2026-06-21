@@ -40,7 +40,7 @@ function initApp() {
     mktInput.addEventListener('input', function() {
       var clr = document.getElementById('mktClr');
       if (clr) clr.style.display = this.value ? 'inline' : 'none';
-      renderMkt(this.value);
+      if (typeof renderWatch === 'function') renderWatch(this.value);
     });
   }
 
@@ -63,6 +63,11 @@ function initApp() {
   } else {
     updateProfileUI();
   }
+
+  // Live market data — keep prices nearby, ticker + news
+  if (typeof refreshQuotes === 'function') { refreshQuotes(); setInterval(refreshQuotes, 60000); }
+  if (typeof renderTicker === 'function') { renderTicker(); setInterval(renderTicker, 60000); }
+  if (typeof renderNews === 'function') renderNews();
 
   // Price simulation — tick every 8 seconds
   setInterval(tickPrices, 8000);

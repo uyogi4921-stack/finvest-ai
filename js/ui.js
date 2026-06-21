@@ -50,9 +50,12 @@ function navTo(id, tnBtn, mbBtn) {
   if (id === 'dashboard') {
     renderHoldingsTable();
     updateDashboardStats();
+    if (typeof renderTicker === 'function') renderTicker();
+    if (typeof renderNews === 'function') renderNews();
   }
   if (id === 'leaderboard') renderLB();
   if (id === 'profile') renderProfile();
+  if (id === 'market' && typeof termEnsure === 'function') termEnsure();
 }
 
 function toggleSB() {
@@ -229,6 +232,8 @@ function updateThemeUI() {
   if (navBtn) navBtn.textContent = light ? '\u263e' : '\u2600';
   // Re-tint sector donut for the active theme
   if (typeof updateDashboardStats === 'function' && curPage === 'dashboard') updateDashboardStats();
+  // Recolor chart workspace
+  if (typeof termApplyTheme === 'function') termApplyTheme();
 }
 
 function editProfile() {

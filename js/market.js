@@ -189,6 +189,9 @@ function updateDashboardStats() {
 
   // Render recent activity
   renderRecentActivity();
+
+  // "Your investments" sidebar card
+  if (typeof renderInvestCard === 'function') renderInvestCard();
 }
 
 // ─── SECTOR CHART (Canvas) ──────────────────────────────
@@ -346,6 +349,8 @@ function setMarket(mk) {
   updateDashboardStats();
   if (typeof renderWallet === 'function') renderWallet();
   if (typeof renderRecentActivity === 'function') renderRecentActivity();
+  if (typeof termOnMarketChange === 'function') termOnMarketChange();
+  if (typeof refreshQuotes === 'function') refreshQuotes();
   syncMarketUI();
   showToast(MKT.flag + ' Switched to ' + (mk === 'IN' ? 'India' : mk === 'US' ? 'US' : 'Crypto') + ' market');
 }
@@ -442,7 +447,7 @@ function setTab(sec, btn) {
 function clearMkt() {
   document.getElementById('mktQ').value = '';
   document.getElementById('mktClr').style.display = 'none';
-  renderMkt('');
+  if (typeof renderWatch === 'function') renderWatch('');
 }
 
 // ─── PRICE SIMULATION ────────────────────────────────────

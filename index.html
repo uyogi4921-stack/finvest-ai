@@ -319,39 +319,54 @@
 
   <!-- ════ DASHBOARD ════ -->
   <div class="page on" id="page-dashboard">
-    <div class="hero">
-      <div class="h-lbl">Total Portfolio Value</div>
-      <div class="h-bal" id="dashBal">&#8377;0</div>
-      <div class="h-chg" id="dashChg">Loading...</div>
-    </div>
-    <div class="dgrid">
-      <div class="dstat"><div class="ds-lbl">Invested</div><div class="ds-val" id="dashInvested">&#8377;0</div><div class="ds-sub" id="dashInvSub">Across 0 stocks</div></div>
-      <div class="dstat"><div class="ds-lbl">Total Gain</div><div class="ds-val pos" id="dashGain">&#8377;0</div><div class="ds-sub pos" id="dashGainSub">0% all-time</div></div>
-      <div class="dstat"><div class="ds-lbl">XP Points</div><div class="ds-val" style="color:var(--gd)" id="dashXP">0 &#9889;</div><div class="ds-sub" id="dashLvl">Level 1 &mdash; Beginner</div></div>
-    </div>
+    <div class="ticker" id="ticker"></div>
 
-    <!-- Sector Allocation Chart -->
-    <div class="dash-row">
-      <div class="dash-card chart-card">
-        <div class="dc-hd">&#128200; Sector Allocation</div>
-        <div class="chart-wrap">
-          <canvas id="sectorCanvas"></canvas>
-          <div id="sectorLegend" class="slg"></div>
+    <div class="dash-grid2">
+      <!-- Main column -->
+      <div class="dash-main">
+        <div class="hero">
+          <div class="h-lbl">Total Portfolio Value</div>
+          <div class="h-bal" id="dashBal">&#8377;0</div>
+          <div class="h-chg" id="dashChg">Loading...</div>
+        </div>
+        <div class="dgrid">
+          <div class="dstat"><div class="ds-lbl">Invested</div><div class="ds-val" id="dashInvested">&#8377;0</div><div class="ds-sub" id="dashInvSub">Across 0 stocks</div></div>
+          <div class="dstat"><div class="ds-lbl">Total Gain</div><div class="ds-val pos" id="dashGain">&#8377;0</div><div class="ds-sub pos" id="dashGainSub">0% all-time</div></div>
+          <div class="dstat"><div class="ds-lbl">XP Points</div><div class="ds-val" style="color:var(--gd)" id="dashXP">0 &#9889;</div><div class="ds-sub" id="dashLvl">Level 1 &mdash; Beginner</div></div>
+        </div>
+
+        <div class="dash-card chart-card">
+          <div class="dc-hd">&#128200; Sector Allocation</div>
+          <div class="chart-wrap">
+            <canvas id="sectorCanvas"></canvas>
+            <div id="sectorLegend" class="slg"></div>
+          </div>
+        </div>
+
+        <div class="sechd">
+          <div class="sect">Your Holdings</div>
+          <button class="sea" onclick="navTo('market',document.querySelector('.tn-link[data-page=market]'))">View Market &#8594;</button>
+        </div>
+        <div class="htable">
+          <div class="hr hhead"><div>Stock</div><div>Price</div><div>Value</div><div>P&amp;L</div></div>
+          <div id="holdingsBody"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dc-hd">&#128338; Recent Activity</div>
+          <div id="activityList" class="act-list"></div>
         </div>
       </div>
-      <div class="dash-card">
-        <div class="dc-hd">&#128338; Recent Activity</div>
-        <div id="activityList" class="act-list"></div>
-      </div>
-    </div>
 
-    <div class="sechd">
-      <div class="sect">Your Holdings</div>
-      <button class="sea" onclick="navTo('market',document.querySelector('.tn-link[data-page=market]'))">View Market &#8594;</button>
-    </div>
-    <div class="htable">
-      <div class="hr hhead"><div>Stock</div><div>Price</div><div>Value</div><div>P&amp;L</div></div>
-      <div id="holdingsBody"></div>
+      <!-- Sidebar -->
+      <aside class="dash-side">
+        <div class="invest-card" id="investCard"></div>
+
+        <div class="news-card">
+          <div class="news-hd"><span class="news-hd-t">&#128240; Market News</span><span class="news-hd-src">Bloomberg &middot; live</span></div>
+          <div id="newsList" class="news-list"></div>
+        </div>
+      </aside>
     </div>
   </div>
 
@@ -361,15 +376,48 @@
       <h1 class="page-title">Market</h1>
       <p class="page-sub">Trade across global markets with virtual money.</p>
     </div>
-    <div class="msrch">
-      <span style="opacity:.5;font-size:14px">&#128269;</span>
-      <input type="text" placeholder="Search stocks, sectors&#8230;" id="mktQ">
-      <span id="mktClr" style="cursor:pointer;opacity:.5;display:none;font-size:12px" onclick="clearMkt()">&#10005;</span>
-    </div>
     <div class="mksel" id="mktSel"></div>
-    <div class="ixstrip" id="ixstrip"></div>
-    <div class="mtabs" id="mtabs"></div>
-    <div class="mgrid" id="mgrid"></div>
+
+    <div class="terminal">
+      <!-- Watchlist sidebar -->
+      <aside class="term-side">
+        <div class="msrch">
+          <span style="opacity:.5;font-size:13px">&#128269;</span>
+          <input type="text" placeholder="Search&#8230;" id="mktQ">
+          <span id="mktClr" style="cursor:pointer;opacity:.5;display:none;font-size:12px" onclick="clearMkt()">&#10005;</span>
+        </div>
+        <div class="term-watch" id="termWatch"></div>
+      </aside>
+
+      <!-- Chart workspace -->
+      <section class="term-main">
+        <div class="term-head">
+          <div class="th-id">
+            <div class="th-logo" id="thLogo"></div>
+            <div>
+              <div class="th-sym" id="thSym">&mdash;</div>
+              <div class="th-name" id="thName"></div>
+            </div>
+          </div>
+          <div class="th-quote">
+            <div class="th-price num" id="thPrice">&mdash;</div>
+            <div class="th-chg num" id="thChg"></div>
+          </div>
+          <div class="th-ohlc num" id="thOHLC"></div>
+          <div class="th-actions">
+            <button class="th-buy" id="thBuy">Buy</button>
+            <button class="th-sell" id="thSell">Sell</button>
+          </div>
+        </div>
+
+        <div class="term-iv" id="termIv"></div>
+
+        <div class="term-source" id="termSource"></div>
+        <div class="chart-pane chart-price"><div id="termChart"></div></div>
+        <div class="ind-pane"><div class="ind-lbl" id="rsiLbl">RSI (14)</div><div id="termRSI"></div></div>
+        <div class="ind-pane"><div class="ind-lbl" id="macdLbl">MACD (12, 26, 9)</div><div id="termMACD"></div></div>
+      </section>
+    </div>
   </div>
 
   <!-- ════ LEARN ════ -->
@@ -628,9 +676,13 @@
   <button class="bni"    id="bn-profile"     onclick="navTo('profile',null,this)"><span class="bnic">&#128100;</span>Profile</button>
 </nav>
 
+<!-- Charting library (TradingView lightweight-charts — renderer only) -->
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+
 <!-- JS — load order matters -->
 <script src="js/data.js"></script>
 <script src="js/market.js"></script>
+<script src="js/chart.js"></script>
 <script src="js/learn.js"></script>
 <script src="js/ai.js"></script>
 <script src="js/ui.js"></script>
