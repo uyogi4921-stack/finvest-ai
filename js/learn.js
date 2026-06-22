@@ -171,7 +171,72 @@ window.LESSONS = [
     tag:'&#128640; Advanced', title:'Macro Economics & Markets',
     desc:'How RBI rates, inflation, and GDP affect your portfolio.',
     time:'8 min', xp:130, qxp:35, level:'Advanced',
-    body:'<div class="ms"><h3>RBI &amp; Interest Rates</h3><ul><li><b>Rate Cut</b> → Cheaper loans → More spending → Stocks rise</li><li><b>Rate Hike</b> → Expensive loans → Less spending → Stocks fall</li></ul></div><div class="ms"><h3>Inflation</h3><p>High inflation → RBI raises rates → corporate margins squeezed → most stocks fall.</p><div class="ib"><b>Safe sectors during high inflation:</b> Energy, FMCG, Pharma</div></div><div class="ms"><h3>GDP</h3><p>India at 7%+ GDP = corporate revenues grow = stocks rise. Markets react to <em>expected</em> data, not past numbers.</p></div><div class="qsec"><div class="qq">When RBI cuts interest rates, stock markets typically...</div><div class="qopts"><button class="qo" onclick="ansQ(this,true)">Rise</button><button class="qo" onclick="ansQ(this,false)">Fall</button><button class="qo" onclick="ansQ(this,false)">Have no reaction</button></div><div class="qfb"></div><div class="xppop"></div></div>'
+    body:'<div class="ms"><h3>RBI &amp; Interest Rates</h3><ul><li><b>Rate Cut</b> → Cheaper loans → More spending → Stocks rise</li><li><b>Rate Hike</b> → Expensive loans → Less spending → Stocks fall</li></ul></div><div class="ms"><h3>Inflation</h3><p>High inflation → RBI raises rates → corporate margins squeezed → most stocks fall.</p><div class="ib"><b>Safe sectors during high inflation:</b> Energy, FMCG, Pharma</div></div><div class="ms"><h3>GDP</h3><p>India at 7%+ GDP = corporate revenues grow = stocks rise. Markets react to <em>expected</em> data, not past numbers.</p></div>'
+  },
+
+  // ── RESEARCHED ADDITIONS ──
+  {
+    id:15, cat:'basics', col:'cg', icon:'&#128176;',
+    tag:'&#128214; App Basics', title:'What Is Investing?',
+    desc:'Putting money to work so it grows faster than inflation.',
+    time:'3 min', xp:50, qxp:15, level:'Beginner',
+    body:'<div class="ms"><h3>Saving vs Investing</h3><p><b>Saving</b> keeps money safe but barely grows. <b>Investing</b> buys assets (stocks, funds) that can grow your wealth over time.</p></div><div class="ms"><h3>Why Invest?</h3><ul><li><b>Beat inflation</b> — prices rise ~5-6%/yr; idle cash loses value</li><li><b>Compounding</b> — returns earn their own returns</li><li><b>Goals</b> — retirement, home, education</li></ul><div class="ib"><b>Rule of 72:</b> Years to double ≈ 72 ÷ return%. At 12%, money doubles in ~6 years.</div></div><div class="wb"><b>Golden rule:</b> Only invest money you won’t need for 3–5 years.</div>'
+  },
+  {
+    id:16, cat:'stocks', col:'cb', icon:'&#129534;',
+    tag:'&#128200; Stocks', title:'Stocks vs Bonds',
+    desc:'Ownership vs lending — the two core building blocks.',
+    time:'4 min', xp:60, qxp:15, level:'Beginner',
+    body:'<div class="ms"><h3>Stocks = Ownership</h3><p>Buy a share and you own a slice of the company. Higher risk, higher long-term return (~10-12% historically).</p></div><div class="ms"><h3>Bonds = Lending</h3><p>You lend money to a company/government and earn fixed interest. Lower risk, lower return.</p><div class="ib"><b>Trade-off:</b> Stocks for growth, bonds for stability. Most portfolios hold both.</div></div>'
+  },
+  {
+    id:17, cat:'stocks', col:'co', icon:'&#129729;',
+    tag:'&#128200; Stocks', title:'What Is an ETF?',
+    desc:'One trade buys a whole basket of stocks.',
+    time:'4 min', xp:65, qxp:20, level:'Beginner',
+    body:'<div class="ms"><h3>Exchange-Traded Fund</h3><p>An <b>ETF</b> holds many stocks (or bonds) in one basket and trades on the exchange like a single stock.</p></div><div class="ms"><h3>Why investors love ETFs</h3><ul><li><b>Instant diversification</b> — one buy = dozens of companies</li><li><b>Low cost</b> — tiny expense ratios</li><li><b>Liquid</b> — buy/sell anytime markets are open</li></ul><div class="ib"><b>Example:</b> A NIFTY 50 ETF gives you all 50 top companies in one share.</div></div>'
+  },
+  {
+    id:18, cat:'risk', col:'cr', icon:'&#128737;',
+    tag:'&#128737; Risk', title:'Build an Emergency Fund First',
+    desc:'Safety net before you ever invest a rupee.',
+    time:'3 min', xp:55, qxp:15, level:'Beginner',
+    body:'<div class="ms"><h3>Why it comes first</h3><p>Investments can drop right when you need cash. An emergency fund stops you from selling at a loss during a crisis.</p></div><div class="ms"><h3>How much?</h3><ul><li><b>3–6 months</b> of expenses</li><li>Keep it in a <b>savings account or liquid fund</b> — instant access</li><li>Only invest money <em>beyond</em> this buffer</li></ul><div class="wb"><b>Order:</b> Emergency fund → clear high-interest debt → then invest.</div></div>'
+  },
+  {
+    id:19, cat:'strategy', col:'cg', icon:'&#128202;',
+    tag:'&#9822; Strategy', title:'Index Funds & Expense Ratio',
+    desc:'Why low-cost passive funds beat most active ones.',
+    time:'5 min', xp:90, qxp:25, level:'Intermediate',
+    body:'<div class="ms"><h3>Index Funds</h3><p>They simply track an index (NIFTY 50, S&amp;P 500) instead of picking stocks. Low cost, low effort, and they beat most active funds over time.</p></div><div class="ms"><h3>Expense Ratio</h3><p>The annual fee a fund charges, as a % of your money. It looks tiny but compounds against you.</p><div class="wb"><b>1% vs 0.1% fee</b> on ₹10L over 30 years can cost <b>lakhs</b> in lost returns. Always check the expense ratio.</div></div>'
+  },
+  {
+    id:20, cat:'risk', col:'cb', icon:'&#9878;',
+    tag:'&#128737; Risk', title:'Asset Allocation 101',
+    desc:'The mix of stocks, bonds & cash that drives most returns.',
+    time:'5 min', xp:95, qxp:25, level:'Intermediate',
+    body:'<div class="ms"><h3>What is it?</h3><p>How you split money across asset classes — <b>stocks</b> (growth), <b>bonds</b> (stability), <b>cash</b> (safety). It matters more than picking individual stocks.</p></div><div class="ms"><h3>By goal &amp; age</h3><ul><li><b>Young / long horizon</b> → more stocks</li><li><b>Near goal / retirement</b> → more bonds &amp; cash</li><li>Rough guide: stock % ≈ <b>110 − your age</b></li></ul><div class="ib"><b>Rebalance</b> once a year to keep your target mix.</div></div>'
+  },
+  {
+    id:21, cat:'risk', col:'co', icon:'&#128201;',
+    tag:'&#128737; Risk', title:'Inflation & Real Returns',
+    desc:'What your money actually earns after prices rise.',
+    time:'4 min', xp:85, qxp:25, level:'Intermediate',
+    body:'<div class="ms"><h3>Nominal vs Real</h3><p><b>Real return = nominal return − inflation.</b> Earn 7% while inflation is 6%? Your real gain is just 1%.</p></div><div class="ms"><h3>Why cash is risky too</h3><p>Money sitting idle <em>loses</em> purchasing power every year. Beating inflation is the whole point of investing.</p><div class="ib"><b>₹100 today</b> buys what ~₹56 will in 10 years at 6% inflation.</div></div>'
+  },
+  {
+    id:22, cat:'advanced', col:'cp', icon:'&#128181;',
+    tag:'&#128640; Advanced', title:'Dividends & Yield',
+    desc:'Getting paid just for holding a stock.',
+    time:'5 min', xp:100, qxp:30, level:'Advanced',
+    body:'<div class="ms"><h3>What’s a dividend?</h3><p>A share of profits a company pays its shareholders, usually quarterly. Not all companies pay them — growth firms often reinvest instead.</p></div><div class="ms"><h3>Dividend Yield</h3><p><b>Yield = annual dividend ÷ share price.</b> A ₹10 dividend on a ₹200 stock = 5% yield.</p><div class="wb"><b>Caution:</b> A very high yield can signal a falling price or an unsustainable payout — check the business first.</div></div><div class="ms"><h3>Reinvesting</h3><p>Reinvesting dividends supercharges compounding over decades.</p></div>'
+  },
+  {
+    id:23, cat:'advanced', col:'cr', icon:'&#129504;',
+    tag:'&#128640; Advanced', title:'Fear, Greed & Your Brain',
+    desc:'The biggest threat to returns is the investor.',
+    time:'5 min', xp:100, qxp:30, level:'Advanced',
+    body:'<div class="ms"><h3>Behavioral traps</h3><ul><li><b>Herd mentality</b> — buying because everyone else is</li><li><b>Loss aversion</b> — panic-selling at the bottom</li><li><b>FOMO</b> — chasing hype after it has run up</li><li><b>Recency bias</b> — assuming the last trend continues</li></ul></div><div class="ms"><h3>How to win</h3><p>Automate investing (SIP), set rules, and ignore the noise. <b>Time in the market beats timing the market.</b></p><div class="ib"><b>Buffett:</b> “Be fearful when others are greedy, and greedy when others are fearful.”</div></div>'
   },
 ];
 
@@ -183,24 +248,33 @@ function filterCat(cat, btn) {
   renderLessons();
 }
 
-// Lesson sections — group categories into progression tracks
-window.LESSON_SECTIONS = [
-  { name: 'Foundations',      cats: ['basics'] },
-  { name: 'Stocks & Markets', cats: ['stocks'] },
-  { name: 'Risk & Strategy',  cats: ['risk', 'strategy'] },
-  { name: 'Advanced',         cats: ['advanced'] },
+// Three difficulty levels form the learning path.
+window.LEVELS = [
+  { name: 'Beginner',     level: 'Beginner' },
+  { name: 'Intermediate', level: 'Intermediate' },
+  { name: 'Advanced',     level: 'Advanced' }
 ];
+var LEVEL_RANK = { Beginner: 0, Intermediate: 1, Advanced: 2 };
 
-// Sequential unlock: a lesson unlocks once all earlier lessons are completed.
+// Lessons ordered Beginner → Intermediate → Advanced (stable by id within).
+function orderedLessons() {
+  return LESSONS.slice().sort(function(a, b) {
+    return (LEVEL_RANK[a.level] - LEVEL_RANK[b.level]) || (a.id - b.id);
+  });
+}
+
+// Sequential unlock along the level-ordered path.
 function firstIncompleteIndex() {
-  for (var i = 0; i < LESSONS.length; i++) {
-    if (!completedL.has(LESSONS[i].id)) return i;
+  var ord = orderedLessons();
+  for (var i = 0; i < ord.length; i++) {
+    if (!completedL.has(ord[i].id)) return i;
   }
-  return LESSONS.length; // all done
+  return ord.length;
 }
 
 function isLessonLocked(id) {
-  var idx = LESSONS.findIndex(function(l) { return l.id === id; });
+  var ord = orderedLessons();
+  var idx = ord.findIndex(function(l) { return l.id === id; });
   if (idx === -1) return false;
   if (completedL.has(id)) return false;
   return idx > firstIncompleteIndex();
@@ -210,9 +284,10 @@ function renderLessons() {
   var g = document.getElementById('lgrid');
   if (!g) return;
 
+  var ord = orderedLessons();
   var activeIdx = firstIncompleteIndex();
   var orderIndex = {};
-  LESSONS.forEach(function(l, i) { orderIndex[l.id] = i; });
+  ord.forEach(function(l, i) { orderIndex[l.id] = i; });
 
   // Course progress + header badges
   var totalTxt = document.getElementById('courseProgTxt');
@@ -230,8 +305,8 @@ function renderLessons() {
   var node = 0;
 
   g.className = 'path';
-  g.innerHTML = LESSON_SECTIONS.map(function(sec, si) {
-    var lessons = LESSONS.filter(function(l) { return sec.cats.indexOf(l.cat) !== -1; });
+  g.innerHTML = LEVELS.map(function(sec, si) {
+    var lessons = ord.filter(function(l) { return l.level === sec.level; });
     if (!lessons.length) return '';
     var doneCount = lessons.filter(function(l) { return completedL.has(l.id); }).length;
 
@@ -305,7 +380,24 @@ window.QUIZ_BANK = [
   { cat:'basics', q:'“Market cap” of a company is?', correct:'Share price × number of shares', wrong:['Yearly profit','Total debt'], why:'Market cap = price × shares outstanding.' },
   { cat:'stocks', q:'A dividend is?', correct:'A share of profits paid to shareholders', wrong:['A loan repayment','A trading fee'], why:'Companies distribute part of profits as dividends.' },
   { cat:'risk', q:'“Volatility” measures?', correct:'How much a price swings up and down', wrong:['Total dividends paid','The broker’s fee'], why:'Higher volatility = larger price swings = more risk.' },
-  { cat:'strategy', q:'Compounding works best with?', correct:'Time — staying invested longer', wrong:['Frequent withdrawals','Daily trading'], why:'Returns earning returns snowball over long periods.' }
+  { cat:'strategy', q:'Compounding works best with?', correct:'Time — staying invested longer', wrong:['Frequent withdrawals','Daily trading'], why:'Returns earning returns snowball over long periods.' },
+
+  // ── Researched additions ──
+  { cat:'basics', q:'The main reason to invest instead of just saving is to?', correct:'Beat inflation and grow wealth', wrong:['Avoid all risk','Keep cash instantly available'], why:'Idle cash loses value to inflation; investing aims to outgrow it.' },
+  { cat:'basics', q:'By the Rule of 72, money at 12% return roughly doubles in?', correct:'About 6 years', wrong:['About 2 years','About 20 years'], why:'72 ÷ 12 ≈ 6 years to double.' },
+  { cat:'basics', type:'tf', q:'Idle cash keeps its purchasing power over many years.', answer:false, why:'Inflation erodes cash’s purchasing power every year.' },
+  { cat:'stocks', q:'A bond represents?', correct:'Lending money for fixed interest', wrong:['Ownership of the company','A type of dividend'], why:'Bonds are loans; stocks are ownership.' },
+  { cat:'stocks', q:'A key advantage of an ETF is?', correct:'Instant diversification at low cost', wrong:['Guaranteed returns','No risk at all'], why:'One ETF holds many securities cheaply.' },
+  { cat:'stocks', type:'tf', q:'An ETF can be bought and sold during market hours like a stock.', answer:true, why:'ETFs trade intraday on the exchange.' },
+  { cat:'risk', q:'Before investing, you should first build?', correct:'An emergency fund of 3–6 months expenses', wrong:['A portfolio of risky stocks','A margin trading account'], why:'A cash buffer prevents selling investments at a loss in a crisis.' },
+  { cat:'risk', q:'“Real return” means?', correct:'Return after subtracting inflation', wrong:['Return before any fees','The highest possible return'], why:'Real return = nominal return − inflation.' },
+  { cat:'risk', q:'A rough guide for stock allocation by age is?', correct:'About 110 minus your age, in %', wrong:['Always 100% stocks','Always 50/50'], why:'Younger investors can hold more stocks; shift to bonds nearer goals.' },
+  { cat:'risk', type:'tf', q:'Asset allocation usually matters more than picking individual stocks.', answer:true, why:'The stock/bond/cash mix drives most of a portfolio’s outcome.' },
+  { cat:'strategy', q:'A fund’s expense ratio is?', correct:'The annual fee charged as a % of your money', wrong:['Its yearly return','A one-time entry charge'], why:'Even small fees compound against you over decades.' },
+  { cat:'strategy', q:'Index funds aim to?', correct:'Track an index at low cost', wrong:['Beat the market by trading fast','Avoid the market entirely'], why:'They mirror an index cheaply and beat most active funds long-term.' },
+  { cat:'advanced', q:'Dividend yield is calculated as?', correct:'Annual dividend ÷ share price', wrong:['Share price ÷ earnings','Profit ÷ total shares'], why:'Yield = annual dividend / price.' },
+  { cat:'advanced', q:'Panic-selling at the bottom is an example of?', correct:'A behavioral bias (loss aversion)', wrong:['Smart risk management','Diversification'], why:'Emotion-driven selling locks in losses — a classic behavioral trap.' },
+  { cat:'advanced', type:'tf', q:'“Time in the market” generally beats “timing the market.”', answer:true, why:'Staying invested long-term tends to outperform trying to jump in and out.' }
 ];
 
 function pickQuiz(cat) {
@@ -349,7 +441,7 @@ function openLesson(id) {
   var bodyHtml = l.body.replace(/<div class="qsec">[\s\S]*$/, '');
   document.getElementById('mBody').innerHTML = bodyHtml
     + '<button class="quiz-cta" onclick="startQuiz(curLesson)">&#127919; Take the quiz'
-    + '<span class="quiz-cta-sub">5 questions &middot; +' + l.qxp + ' bonus XP &middot; &#10084; 5 lives</span></button>';
+    + '<span class="quiz-cta-sub">5 questions &middot; +' + l.qxp + ' bonus XP &middot; &#10084; 3 lives</span></button>';
   document.getElementById('mXpL').textContent = 'Earn +' + l.xp + ' XP';
 
   var btn  = document.getElementById('btnDone');

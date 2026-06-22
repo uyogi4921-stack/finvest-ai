@@ -11,7 +11,8 @@ var QZ = {
   correct: 0, xp: 0, sel: -1, evaluated: false, lesson: null
 };
 var QUIZ_LEN = 5;
-var QUIZ_HEARTS = 5;
+var QUIZ_HEARTS = 3;
+var PRAISE = ['Nice!', 'Boom!', 'Great!', 'On fire!', 'Sharp!', 'Smart!', 'Yes!', 'Crushing it!'];
 
 // ─── SOUND (WebAudio, no assets) ─────────────────────────
 var _ac = null;
@@ -140,7 +141,8 @@ function quizCheck() {
       var gain = 5 + Math.min(5, QZ.combo - 1);
       QZ.xp += gain;
       fb.className = 'qz-fb good on';
-      fb.innerHTML = '<b>&#9989; Nice!</b> +' + gain + ' XP' + (QZ.combo >= 2 ? ' · &#128293; x' + QZ.combo : '');
+      var praise = QZ.combo >= 3 ? 'On fire!' : PRAISE[Math.floor(Math.random() * PRAISE.length)];
+      fb.innerHTML = '<b>&#9989; ' + praise + '</b> +' + gain + ' XP' + (QZ.combo >= 2 ? ' · &#128293; x' + QZ.combo : '');
       qSound(QZ.combo >= 3 ? 'win' : 'good');
     } else {
       QZ.combo = 0; QZ.hearts--;
