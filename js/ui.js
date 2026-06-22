@@ -121,6 +121,11 @@ function saveProfile() {
   if (totalXP === 0) {
     addXP(50, '\uD83C\uDF89 +50 XP Welcome Bonus!');
   }
+
+  // First-time users: run the how-to-use onboarding + placement test
+  if (!userProfile.placement && typeof startOnboarding === 'function') {
+    setTimeout(startOnboarding, 450);
+  }
 }
 
 function selectAvatar(btn) {

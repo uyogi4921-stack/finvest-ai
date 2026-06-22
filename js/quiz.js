@@ -8,7 +8,7 @@
 
 var QZ = {
   on: false, qs: [], idx: 0, hearts: 5, combo: 0, bestCombo: 0,
-  correct: 0, xp: 0, sel: -1, evaluated: false, lesson: null
+  correct: 0, xp: 0, sel: -1, evaluated: false, lesson: null, placement: false
 };
 var QUIZ_LEN = 5;
 var QUIZ_HEARTS = 3;
@@ -83,7 +83,7 @@ function startQuiz(lesson) {
   QZ.lesson = lesson || null;
   QZ.qs = buildQuestions(lesson ? lesson.cat : 'basics', QUIZ_LEN);
   QZ.idx = 0; QZ.hearts = QUIZ_HEARTS; QZ.combo = 0; QZ.bestCombo = 0;
-  QZ.correct = 0; QZ.xp = 0; QZ.sel = -1; QZ.evaluated = false; QZ.on = true;
+  QZ.correct = 0; QZ.xp = 0; QZ.sel = -1; QZ.evaluated = false; QZ.on = true; QZ.placement = false;
   if (typeof closeModal === 'function') closeModal(); // close lesson modal if open
   document.getElementById('quizOv').classList.add('on');
   document.body.style.overflow = 'hidden';
@@ -91,6 +91,7 @@ function startQuiz(lesson) {
 }
 
 function renderHearts() {
+  if (QZ.placement) { document.getElementById('qzHearts').innerHTML = '<span class="qz-place">&#129517; Placement</span>'; return; }
   var h = '';
   for (var i = 0; i < QUIZ_HEARTS; i++) h += '<span class="qz-heart' + (i < QZ.hearts ? '' : ' lost') + '">&#10084;</span>';
   document.getElementById('qzHearts').innerHTML = h;
@@ -166,7 +167,50 @@ function quizCheck() {
   }
 }
 
+// ─── PLACEMENT TEST (onboarding) ─────────────────────────
+function buildPlacement() {
+  var bank = window.QUIZ_BANK || [];
+  var pickFrom = function (cats, n) {
+    return shuffle(bank.filter(function (q) { return cats.indexOf(q.cat) !== -1; }).slice()).slice(0, n);
+  };
+  var chosen = [].concat(pickFrom(['basics'], 2), pickFrom(['stocks', 'risk'], 2), pickFrom(['strategy', 'advanced'], 2));
+  return chosen.map(function (q) {
+    if (q.type === 'tf') return { q: q.q, why: q.why || '', opts: [{ t: 'True', c: !!q.answer }, { t: 'False', c: !q.answer }] };
+    var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function (w) { return { t: w, c: false }; }));
+    return { q: q.q, why: q.why || '', opts: shuffle(opts) };
+  });
+}
+
+function startPlacement() {
+  ensureQuizDom();
+  QZ.lesson = null; QZ.placement = true; QZ.qs = buildPlacement();
+  QZ.idx = 0; QZ.hearts = 99; QZ.combo = 0; QZ.bestCombo = 0;
+  QZ.correct = 0; QZ.xp = 0; QZ.sel = -1; QZ.evaluated = false; QZ.on = true;
+  document.getElementById('quizOv').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  renderQ();
+}
+
+function finishPlacement() {
+  var n = QZ.qs.length;
+  var level = QZ.correct >= 5 ? 'Advanced' : QZ.correct >= 3 ? 'Intermediate' : 'Beginner';
+  var label = level === 'Advanced' ? 'Expert' : level;
+  if (window.userProfile) { userProfile.placement = level; Store.set('profile', userProfile); }
+  if (typeof renderLessons === 'function') renderLessons();
+  qSound('win');
+  document.getElementById('qzFill').style.width = '100%';
+  document.getElementById('qzHearts').innerHTML = '';
+  document.getElementById('qzStage').className = 'quiz-stage';
+  document.getElementById('qzStage').innerHTML =
+    '<div class="qz-result"><div class="qz-result-ic">&#129517;</div>'
+    + '<div class="qz-result-t">You’re ' + label + '!</div>'
+    + '<div class="qz-result-sub">Scored ' + QZ.correct + '/' + n + '. We unlocked the <b>' + label + '</b> track for you — you can still explore everything.</div></div>';
+  document.getElementById('qzFoot').innerHTML =
+    '<button class="qz-check good" onclick="closeQuiz();navTo(\'learn\',document.querySelector(\'.tn-link[data-page=learn]\'))">Start learning &#8594;</button>';
+}
+
 function finishQuiz() {
+  if (QZ.placement) { finishPlacement(); return; }
   document.getElementById('qzFill').style.width = '100%';
   var total = QZ.qs.length;
   var pct = Math.round(QZ.correct / total * 100);

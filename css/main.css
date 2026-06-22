@@ -20,6 +20,7 @@
   --pu:    #9b6dff;
   --or:    #ff7b3a;
   --tx:    #eafff6;
+  --tx-soft: color-mix(in oklab, var(--tx) 84%, transparent);
   --mu:    #7f9a90;
   --br:    rgba(255,255,255,.08);
   --ca:    rgba(255,255,255,.035);

@@ -662,14 +662,14 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .mbdy { padding: 20px; }
 .ms   { margin-bottom: 18px; }
 .ms h3 { font-family: var(--fh); font-size: 13px; font-weight: 700; margin-bottom: 7px; }
-.ms p  { font-size: 12px; line-height: 1.7; color: rgba(240,244,255,.8); }
+.ms p  { font-size: 12px; line-height: 1.7; color: var(--tx-soft); }
 .ms ul { list-style: none; padding: 0; }
-.ms ul li { font-size: 12px; line-height: 1.6; padding: 5px 0; border-bottom: 1px solid var(--br); color: rgba(240,244,255,.8); display: flex; gap: 7px; }
+.ms ul li { font-size: 12px; line-height: 1.6; padding: 5px 0; border-bottom: 1px solid var(--br); color: var(--tx-soft); display: flex; gap: 7px; }
 .ms ul li:last-child { border-bottom: none; }
 .ms ul li::before { content: '\25B8'; color: var(--gr); flex-shrink: 0; }
-.ib  { background: rgba(77,159,255,.08); border: 1px solid rgba(77,159,255,.2); border-radius: 8px; padding: 10px 13px; font-size: 12px; line-height: 1.6; color: rgba(240,244,255,.8); margin-top: 8px; }
+.ib  { background: rgba(77,159,255,.08); border: 1px solid rgba(77,159,255,.2); border-radius: 8px; padding: 10px 13px; font-size: 12px; line-height: 1.6; color: var(--tx-soft); margin-top: 8px; }
 .ib b { color: var(--bl); }
-.wb  { background: rgba(255,181,71,.08); border: 1px solid rgba(255,181,71,.2); border-radius: 8px; padding: 10px 13px; font-size: 12px; line-height: 1.6; color: rgba(240,244,255,.8); margin-top: 8px; }
+.wb  { background: rgba(255,181,71,.08); border: 1px solid rgba(255,181,71,.2); border-radius: 8px; padding: 10px 13px; font-size: 12px; line-height: 1.6; color: var(--tx-soft); margin-top: 8px; }
 .wb b { color: var(--gd); }
 
 /* Quiz */
@@ -828,7 +828,7 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .gloss-item { padding: 10px 0; border-bottom: 1px solid var(--br); }
 .gloss-item:last-child { border-bottom: none; }
 .gloss-term { font-family: var(--fh); font-size: 13px; font-weight: 700; color: var(--bl); margin-bottom: 3px; }
-.gloss-def { font-size: 12px; color: rgba(240,244,255,.75); line-height: 1.6; }
+.gloss-def { font-size: 12px; color: var(--tx-soft); line-height: 1.6; }
 
 /* ═══════════════════════════════════════════════════════════
    RESOURCES — Cards & SEBI
@@ -852,7 +852,7 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .stab { flex-shrink: 0; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--br); background: var(--ca); color: var(--mu); font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
 .stab:hover { color: var(--tx); }
 .stab.on { background: rgba(77,159,255,.15); border-color: rgba(77,159,255,.4); color: var(--bl); }
-#sc { padding: 20px; max-height: 480px; overflow-y: auto; font-size: 13px; line-height: 1.75; color: rgba(240,244,255,.85); }
+#sc { padding: 20px; max-height: 480px; overflow-y: auto; font-size: 13px; line-height: 1.75; color: var(--tx-soft); }
 #sc::-webkit-scrollbar { width: 4px; }
 #sc::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); }
 .sh1 { font-family: var(--fh); font-size: 18px; font-weight: 800; color: var(--tx); margin-bottom: 12px; padding-bottom: 9px; border-bottom: 1px solid var(--br); }
@@ -929,7 +929,7 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .aimsg.user .aimav, .user-av { background: linear-gradient(135deg, var(--gr), #00a87a) !important; color: #060912; font-weight: 700; font-size: 11px; }
 .aiml { max-width: 85%; }
 .user-ml { text-align: right; }
-.aimb { padding: 10px 12px; border-radius: 12px; font-size: 12.5px; line-height: 1.7; word-break: break-word; background: var(--bg3); border: 1px solid var(--br); border-radius: 3px 12px 12px 12px; color: rgba(240,244,255,.9); }
+.aimb { padding: 10px 12px; border-radius: 12px; font-size: 12.5px; line-height: 1.7; word-break: break-word; background: var(--bg3); border: 1px solid var(--br); border-radius: 3px 12px 12px 12px; color: var(--tx-soft); }
 .user-b { background: linear-gradient(135deg,rgba(155,109,255,.2),rgba(77,159,255,.15)) !important; border: 1px solid rgba(155,109,255,.3) !important; border-radius: 12px 3px 12px 12px !important; color: var(--tx) !important; text-align: left !important; }
 .aimt { font-size: 9px; color: var(--mu); margin-top: 3px; padding: 0 4px; }
 .aimb b { color: var(--tx); font-weight: 700; }
@@ -1138,6 +1138,38 @@ select.prof-input { cursor: pointer; appearance: auto; }
 }
 .quiz-cta:hover { transform: translateY(-2px); }
 .quiz-cta-sub { font-size: 11px; font-weight: 600; opacity: .8; }
+
+/* ── ONBOARDING / HOW-TO INTRO ── */
+.intro-ov {
+  position: fixed; inset: 0; z-index: 1300; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+  background: color-mix(in oklab, var(--bg) 80%, transparent); backdrop-filter: blur(18px);
+}
+.intro-ov.on { display: flex; }
+.intro-card {
+  position: relative; width: 100%; max-width: 440px; text-align: center;
+  background: color-mix(in oklab, var(--bg2) 92%, transparent);
+  border: 1px solid var(--br); border-radius: 24px; padding: 40px 28px 24px;
+  box-shadow: var(--shadow); animation: qzUp .3s ease;
+}
+.intro-skip { position: absolute; top: 16px; right: 18px; background: none; border: none; color: var(--mu); font-size: 13px; font-weight: 600; cursor: pointer; }
+.intro-skip:hover { color: var(--tx); }
+.intro-ic {
+  width: 92px; height: 92px; margin: 4px auto 18px; border-radius: 26px;
+  background: var(--grd); border: 1px solid var(--grg);
+  display: flex; align-items: center; justify-content: center; font-size: 46px;
+}
+.intro-t { font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+.intro-d { font-size: 14px; line-height: 1.6; color: var(--tx-soft); margin: 10px auto 22px; max-width: 360px; }
+.intro-d b { color: var(--mint); }
+.intro-dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 22px; }
+.intro-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ch); transition: all .2s; }
+.intro-dot.on { background: var(--mint); width: 22px; border-radius: 6px; }
+.intro-nav { display: flex; gap: 10px; }
+.intro-back { flex: 0 0 auto; padding: 13px 20px; border-radius: 13px; border: 1px solid var(--br); background: var(--ca); color: var(--tx); font-size: 14px; font-weight: 700; cursor: pointer; }
+.intro-next { flex: 1; padding: 13px; border-radius: 13px; border: none; background: var(--grad); color: #05100c; font-size: 15px; font-weight: 800; cursor: pointer; transition: transform .12s; }
+.intro-next:hover { transform: translateY(-1px); }
+.qz-place { font-size: 12px; font-weight: 800; color: var(--mint); letter-spacing: .4px; }
 
 /* ── GAMIFIED QUIZ OVERLAY ── */
 .quiz-ov {

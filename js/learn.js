@@ -272,11 +272,20 @@ function firstIncompleteIndex() {
   return ord.length;
 }
 
+// Placement test unlocks everything up to and including the user's level.
+function placementRank() {
+  if (window.userProfile && userProfile.placement != null && LEVEL_RANK[userProfile.placement] != null) {
+    return LEVEL_RANK[userProfile.placement];
+  }
+  return -1;
+}
+
 function isLessonLocked(id) {
   var ord = orderedLessons();
   var idx = ord.findIndex(function(l) { return l.id === id; });
   if (idx === -1) return false;
   if (completedL.has(id)) return false;
+  if (placementRank() >= LEVEL_RANK[ord[idx].level]) return false;
   return idx > firstIncompleteIndex();
 }
 
@@ -313,7 +322,7 @@ function renderLessons() {
     var nodes = lessons.map(function(l) {
       var done = completedL.has(l.id);
       var i = orderIndex[l.id];
-      var locked = !done && i > activeIdx;
+      var locked = !done && isLessonLocked(l.id);
       var active = !done && i === activeIdx;
       var state = done ? 'done' : (active ? 'active' : (locked ? 'locked' : 'open'));
       var off = WAVE[node % WAVE.length];
@@ -429,7 +438,7 @@ function openLesson(id) {
   curLesson = l;
   quizDone = false;
 
-  document.getElementById('mTag').textContent = l.tag + ' \u00B7 ' + l.level;
+  document.getElementById('mTag').innerHTML = l.tag + ' \u00B7 ' + l.level;
   document.getElementById('mTit').textContent = l.title;
   document.getElementById('mMeta').innerHTML =
     '<span class="mmi">&#9201; ' + l.time + '</span>'
