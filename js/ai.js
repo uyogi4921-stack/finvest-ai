@@ -397,6 +397,21 @@ var AI_BANK = {
     }
   ],
 
+  // ── Expanded finance knowledge ──
+  inflation: [ function() { return '<b>What is Inflation?</b><br><br>Inflation is the rate at which prices rise over time, shrinking what your money can buy.<br><br>• ₹100 today buys less in 10 years (~₹56 at 6% inflation).<br>• <b>Real return = your return − inflation.</b> Earn 7% with 6% inflation → just 1% real gain.<br><br><b>Why it matters:</b> Idle cash <span class="r">loses</span> value every year. Beating inflation is the whole point of investing — stocks and equity funds have historically done so over the long run.'; } ],
+  compounding: [ function() { return '<b>The Power of Compounding</b><br><br>Compounding = your returns earning their own returns. It snowballs over time.<br><br>• <b>Rule of 72:</b> Years to double ≈ 72 ÷ return%. At 12%, money doubles in ~6 years.<br>• ₹10,000/month at 12% for 30 years → ~₹3.5 crore (you invested ₹36 lakh!).<br><br><b>Key:</b> Start early and stay invested. Time matters more than timing.'; } ],
+  etf: [ function() { return '<b>What is an ETF?</b><br><br>An <b>Exchange-Traded Fund</b> holds a basket of stocks/bonds and trades on the exchange like a single stock.<br><br>• <b>Instant diversification</b> — one buy = many companies<br>• <b>Low cost</b> — tiny expense ratios vs active funds<br>• <b>Liquid</b> — buy/sell anytime markets are open<br><br><b>Example:</b> A NIFTY 50 ETF gives you all 50 top companies in one share.'; } ],
+  bonds: [ function() { return '<b>Stocks vs Bonds</b><br><br>• <b>Stocks</b> = ownership in a company. Higher risk, higher long-term return (~10-12%).<br>• <b>Bonds</b> = lending money for fixed interest. Lower risk, lower return.<br><br>Most healthy portfolios hold both: stocks for growth, bonds for stability. Your mix depends on your goal and time horizon.'; } ],
+  allocation: [ function() { return '<b>Asset Allocation 101</b><br><br>How you split money across <b>stocks</b> (growth), <b>bonds</b> (stability) and <b>cash</b> (safety). It drives most of your returns — more than stock picking.<br><br>• Young / long horizon → more stocks<br>• Near a goal → more bonds & cash<br>• Rough guide: stock % ≈ <b>110 − your age</b><br><br><b>Rebalance</b> once a year back to your target mix.'; } ],
+  emergency: [ function() { return '<b>Build an Emergency Fund First</b><br><br>Before investing, keep <b>3–6 months of expenses</b> in a savings account or liquid fund.<br><br>Why? Investments can drop right when you need cash. A buffer stops you from selling at a loss in a crisis.<br><br><b>Order:</b> Emergency fund → clear high-interest debt → then invest.'; } ],
+  volatility: [ function() { return '<b>What is Volatility?</b><br><br>Volatility measures how much a price swings up and down. Higher volatility = bigger swings = more risk (and opportunity).<br><br>• Short-term drops are <b>normal</b> — even great stocks fall 20-30% in bad years.<br>• Volatility ≠ loss unless you sell.<br><br><b>Tip:</b> Don\'t check prices hourly — it triggers panic decisions. Think in years, not days.'; } ],
+  bullbear: [ function() { return '<b>Bull vs Bear Markets</b><br><br>• <b>Bull market</b> 🐂 — prices rising, optimism high (gains of 20%+ from lows).<br>• <b>Bear market</b> 🐻 — prices falling 20%+ from highs, fear high.<br><br>Both are normal parts of the cycle. The best investors stay calm: <i>"Be fearful when others are greedy, greedy when others are fearful."</i> — Buffett.'; } ],
+  ratios: [ function() { return '<b>Key Stock Ratios</b><br><br>• <b>EPS</b> = Earnings ÷ shares. A company\'s profit per share.<br>• <b>P/E</b> = Price ÷ EPS. How expensive vs earnings.<br>• <b>P/B</b> = Price ÷ Book value. Below 1 can mean undervalued (or trouble).<br>• <b>ROE</b> = Net profit ÷ equity. How well it uses shareholder money (15%+ is strong).<br>• <b>Debt-to-Equity</b> = lower is safer.<br><br>Compare ratios <b>within the same sector</b> — they vary a lot across industries.'; } ],
+  expense_ratio: [ function() { return '<b>Expense Ratio</b><br><br>The annual fee a fund charges, as a % of your money. It looks tiny but compounds against you.<br><br><b>1% vs 0.1%</b> on ₹10L over 30 years can cost <span class="r">lakhs</span> in lost returns.<br><br>Index funds & ETFs have very low expense ratios — a big reason they beat most active funds long-term. Always check it before buying a fund.'; } ],
+  gold: [ function() { return '<b>Should You Invest in Gold?</b><br><br>Gold is a <b>hedge</b> — it tends to hold value during crises and high inflation, but it produces no income (no dividends/interest).<br><br>• Useful as 5-10% of a portfolio for diversification.<br>• In India: <b>Sovereign Gold Bonds</b> (pay 2.5% interest + gold price) or Gold ETFs beat physical gold (no making charges/storage).<br><br>Don\'t over-allocate — equities outperform gold over long horizons.'; } ],
+  crypto_ai: [ function() { return '<b>Crypto: What\'s Different</b><br><br>• Trades <b>24/7</b>, extremely <b>volatile</b> (can swing 10%+ in a day).<br>• No company, earnings or dividends — value is driven by demand and adoption.<br>• Bitcoin & Ethereum are the largest; thousands of others are highly speculative.<br><br><b>Rule:</b> Only invest what you can afford to lose, keep it a small slice, and never use leverage as a beginner.'; } ],
+  recession: [ function() { return '<b>Investing in a Downturn</b><br><br>Recessions and crashes are part of investing. What to do:<br><br>• <b>Don\'t panic-sell</b> — you only lock in losses.<br>• Keep your emergency fund so you\'re never forced to sell.<br>• Keep investing via <b>SIP</b> — you buy more units when prices are low.<br>• Markets have recovered from every crash in history.<br><br><i>Time in the market beats timing the market.</i>'; } ],
+
   specific_stock: function(sym) {
     var stk = ST.find(function(s) { return s.s === sym; });
     if (!stk) return null;
@@ -434,8 +449,23 @@ function getReply(msg) {
   // Topic detection with priority
   var topic = null;
   if (q.match(/^(hi|hey|hello|sup|yo|hola|namaste)/)) topic = 'greeting';
-  else if (q.match(/thank|thanks|thx|ty|appreciated/)) topic = 'thanks';
+  else if (q.match(/\b(thanks?|thank you|thx|ty|appreciate[ds]?)\b/)) topic = 'thanks';
   else if (q.match(/joke|funny|humor|laugh/)) topic = 'joke';
+  // Specific finance concepts take priority over generic catch-alls
+  else if (q.match(/market\s*cap|capitali[sz]ation|large.?cap|mid.?cap|small.?cap/)) topic = 'market_cap';
+  else if (q.match(/inflation|cost of living|purchasing power/)) topic = 'inflation';
+  else if (q.match(/compound|rule of 72|snowball/)) topic = 'compounding';
+  else if (q.match(/\betf\b|exchange.?traded/)) topic = 'etf';
+  else if (q.match(/\bbonds?\b|debenture|fixed income|g-?sec/)) topic = 'bonds';
+  else if (q.match(/asset alloc|allocation|stock.*bond.*mix|portfolio mix|how much.*(stock|equity)/)) topic = 'allocation';
+  else if (q.match(/emergency fund|rainy day|safety net/)) topic = 'emergency';
+  else if (q.match(/volatil|fluctuat|ups and downs|price swing/)) topic = 'volatility';
+  else if (q.match(/recession|crash|market fall|downturn|market dip|bear market/)) topic = 'recession';
+  else if (q.match(/\bbull\b|\bbear\b|rally|correction/)) topic = 'bullbear';
+  else if (q.match(/\beps\b|\broe\b|\bp\/?b\b|book value|debt.?to.?equity|return on equity|fundamental/)) topic = 'ratios';
+  else if (q.match(/expense ratio|fund fee|\bter\b/)) topic = 'expense_ratio';
+  else if (q.match(/\bgold\b|sovereign gold|precious metal/)) topic = 'gold';
+  else if (q.match(/crypto|bitcoin|\bbtc\b|ethereum|\beth\b|blockchain/)) topic = 'crypto_ai';
   else if (q.match(/diversif|concentrated|spread|sector.*mix|balanced/)) topic = 'diversification';
   else if (q.match(/missing|sector.*add|which.*sector|what.*sector|gap/)) topic = 'missing';
   else if (q.match(/risk|dangerous|volatile|worst|safe|unsafe/)) topic = 'risk';
@@ -457,9 +487,13 @@ function getReply(msg) {
   else if (q.match(/stop.?loss|trailing|protect.*loss|limit.*loss/)) topic = 'stop_loss';
 
   if (!topic) {
-    // Fallback — cycle through helpful topics based on chat count
-    var fallbacks = ['portfolio', 'diversification', 'suggestions', 'beginner'];
-    topic = fallbacks[chatHistory.length % fallbacks.length];
+    // No confident match — give a helpful menu instead of a random answer.
+    return 'I\'m <b>Fin</b>, your finance tutor. I didn\'t quite catch that — try asking me about:<br><br>'
+      + '<b>Basics:</b> what is a stock, ETF, bond, mutual fund, SIP, dividend, P/E ratio, market cap<br>'
+      + '<b>Concepts:</b> inflation, compounding, volatility, diversification, asset allocation, risk<br>'
+      + '<b>Markets:</b> NIFTY, bull/bear markets, IPOs, crypto, gold, recessions<br>'
+      + '<b>Your money:</b> "how is my portfolio?", "what should I buy?", "am I diversified?"<br><br>'
+      + 'Ask me anything financial — e.g. <i>"What is compounding?"</i> or <i>"Should I buy gold?"</i> 💡';
   }
 
   var bank = AI_BANK[topic];
