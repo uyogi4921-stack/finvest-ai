@@ -59,7 +59,7 @@ body {
   overflow-x: hidden;
 }
 
-button { font-family: var(--fb); cursor: pointer; }
+button { font-family: var(--fb); cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent; }
 a { text-decoration: none; }
 
 body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
@@ -101,6 +101,8 @@ h1, h2, h3, h4 { font-family: var(--fh); letter-spacing: -.022em; font-weight: 8
 .sb-mobile .ni .ico svg { width: 19px; height: 19px; display: block; }
 .bnav .bnic svg { width: 21px; height: 21px; display: block; }
 .tn-link .ico, .sb-mobile .ni .ico { display: inline-flex; align-items: center; justify-content: center; opacity: 1; }
+/* avoid accidental text selection on rapid taps of interactive items */
+.tn-link, .ni, .bni, .watch-row, .iv-row, .lrow, .pnode-btn, .qz-opt, .iv-btn, .mtab, .seg-btn, .mksel-btn { user-select: none; -webkit-user-select: none; }
 .bnav .bnic { display: inline-flex; align-items: center; justify-content: center; }
 .tn-logo-ic {
   width: 36px; height: 36px;

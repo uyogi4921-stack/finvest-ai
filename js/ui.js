@@ -44,6 +44,7 @@ function navTo(id, tnBtn, mbBtn) {
 
   curPage = id;
   closeSB();
+  document.body.style.overflow = ''; // unlock scroll in case an overlay left it locked
   window.scrollTo(0, 0);
 
   // Refresh data when navigating
