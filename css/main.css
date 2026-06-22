@@ -96,6 +96,12 @@ h1, h2, h3, h4 { font-family: var(--fh); letter-spacing: -.022em; font-weight: 8
   letter-spacing: -.02em; margin-right: 22px; flex-shrink: 0; cursor: pointer;
 }
 .tn-logo-ic svg { width: 21px; height: 21px; }
+/* SVG nav icons inherit text colour (muted / active mint) */
+.tn-link .ico svg { width: 18px; height: 18px; display: block; }
+.sb-mobile .ni .ico svg { width: 19px; height: 19px; display: block; }
+.bnav .bnic svg { width: 21px; height: 21px; display: block; }
+.tn-link .ico, .sb-mobile .ni .ico { display: inline-flex; align-items: center; justify-content: center; opacity: 1; }
+.bnav .bnic { display: inline-flex; align-items: center; justify-content: center; }
 .tn-logo-ic {
   width: 36px; height: 36px;
   background: var(--grad);
