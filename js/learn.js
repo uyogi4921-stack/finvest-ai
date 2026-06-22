@@ -223,35 +223,38 @@ function renderLessons() {
   var lvB = document.getElementById('lLvBadge'); if (lvB) lvB.textContent = 'Lv ' + lv.num;
   var xpB = document.getElementById('lXpBadge'); if (xpB) xpB.textContent = totalXP;
 
-  g.innerHTML = LESSON_SECTIONS.map(function(sec) {
+  // ── Duolingo-style learning PATH ──
+  // Gentle left-right wave so nodes snake down the page.
+  var WAVE = [0, 52, 78, 52, 0, -52, -78, -52];
+  var unitTheme = ['u-green', 'u-teal', 'u-amber', 'u-violet'];
+  var node = 0;
+
+  g.className = 'path';
+  g.innerHTML = LESSON_SECTIONS.map(function(sec, si) {
     var lessons = LESSONS.filter(function(l) { return sec.cats.indexOf(l.cat) !== -1; });
     if (!lessons.length) return '';
     var doneCount = lessons.filter(function(l) { return completedL.has(l.id); }).length;
 
-    var cards = lessons.map(function(l) {
+    var nodes = lessons.map(function(l) {
       var done = completedL.has(l.id);
       var i = orderIndex[l.id];
       var locked = !done && i > activeIdx;
       var active = !done && i === activeIdx;
-      var state = done ? 'done' : (active ? 'active' : (locked ? 'locked' : ''));
-      var status = done
-        ? '<div class="lrow-status done">&#10003;</div>'
-        : active
-          ? '<div class="lrow-status active">&#10024;</div>'
-          : '<div class="lrow-status locked">&#128274;</div>';
-      return '<div class="lrow ' + state + '" onclick="openLesson(' + l.id + ')">'
-        + '<div class="lrow-ic">' + l.icon + '</div>'
-        + '<div class="lrow-main">'
-        + '<div class="lrow-meta">' + l.level + ' &middot; ' + l.time + '</div>'
-        + '<div class="lrow-title">' + l.title + '</div>'
-        + '<div class="lrow-xp">+' + l.xp + ' XP &middot; +' + l.qxp + ' bonus on correct quiz</div>'
-        + '</div>' + status + '</div>';
+      var state = done ? 'done' : (active ? 'active' : (locked ? 'locked' : 'open'));
+      var off = WAVE[node % WAVE.length];
+      node++;
+      var inner = done ? '&#10003;' : (locked ? '&#128274;' : l.icon);
+      return '<div class="pnode ' + state + '" style="transform:translateX(' + off + 'px)">'
+        + (active ? '<div class="pnode-start">START</div>' : '')
+        + '<button class="pnode-btn" onclick="openLesson(' + l.id + ')" aria-label="' + l.title + '">' + inner + '</button>'
+        + '<div class="pnode-label">' + l.title + '</div>'
+        + '</div>';
     }).join('');
 
-    return '<div class="lsec">'
-      + '<div class="lsec-head"><h2 class="lsec-title">' + sec.name + '</h2>'
-      + '<span class="lsec-count">' + doneCount + '/' + lessons.length + ' complete</span></div>'
-      + '<div class="lsec-grid">' + cards + '</div></div>';
+    return '<div class="unit-head ' + unitTheme[si % unitTheme.length] + '">'
+      + '<div class="unit-k">Unit ' + (si + 1) + ' &middot; ' + doneCount + '/' + lessons.length + '</div>'
+      + '<div class="unit-t">' + sec.name + '</div></div>'
+      + '<div class="unit-nodes">' + nodes + '</div>';
   }).join('');
 }
 

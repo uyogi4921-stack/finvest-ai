@@ -1074,6 +1074,60 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .page-title { font-size: clamp(2rem, 1.4rem + 2.4vw, 3.2rem); font-weight: 800; letter-spacing: -.03em; line-height: 1; }
 .page-sub { color: var(--mu); font-size: 14px; margin-top: 8px; }
 
+/* ── LEARNING PATH (Duolingo-style) ── */
+.path { max-width: 460px; margin: 0 auto; }
+.unit-head {
+  border-radius: 16px; padding: 14px 18px; margin: 26px 0 8px;
+  color: #05221a; box-shadow: 0 4px 0 rgba(0,0,0,.18);
+}
+.unit-head .unit-k { font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; opacity: .8; }
+.unit-head .unit-t { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.u-green  { background: linear-gradient(135deg, #5cf0b8, #2fe3a4); }
+.u-teal   { background: linear-gradient(135deg, #7fe9df, #4fd6c4); }
+.u-amber  { background: linear-gradient(135deg, #ffe08a, #f5c451); }
+.u-violet { background: linear-gradient(135deg, #c4b0ff, #9b6dff); color: #fff; }
+
+.unit-nodes { position: relative; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 30px 0; }
+.unit-nodes::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 0; border-left: 3px dashed var(--br); transform: translateX(-50%); z-index: 0;
+}
+
+.pnode { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.pnode-btn {
+  width: 76px; height: 76px; border-radius: 50%; cursor: pointer;
+  border: none; font-size: 30px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .12s;
+}
+.pnode-btn:active { transform: translateY(3px); }
+.pnode-label { font-size: 12px; font-weight: 600; color: var(--mu); max-width: 130px; text-align: center; line-height: 1.25; }
+
+/* states */
+.pnode.done .pnode-btn { background: var(--grad); color: #05100c; box-shadow: 0 6px 0 #0f8f63; font-weight: 800; }
+.pnode.done .pnode-label { color: var(--tx); }
+.pnode.open .pnode-btn { background: var(--bg3); border: 2px solid var(--br); box-shadow: 0 6px 0 rgba(0,0,0,.25); }
+.pnode.open .pnode-btn:hover { border-color: var(--grg); }
+.pnode.locked .pnode-btn { background: var(--bg3); color: var(--mu); box-shadow: 0 6px 0 rgba(0,0,0,.22); opacity: .55; font-size: 24px; cursor: not-allowed; }
+.pnode.locked .pnode-label { opacity: .55; }
+.pnode.active .pnode-btn {
+  background: var(--grad); color: #05100c; box-shadow: 0 6px 0 #0f8f63, var(--glow);
+  animation: pnodePulse 1.8s ease-in-out infinite;
+}
+.pnode.active .pnode-label { color: var(--mint); font-weight: 700; }
+@keyframes pnodePulse {
+  0%, 100% { box-shadow: 0 6px 0 #0f8f63, 0 0 0 0 rgba(47,227,164,.45); }
+  50% { box-shadow: 0 6px 0 #0f8f63, 0 0 0 12px rgba(47,227,164,0); }
+}
+.pnode-start {
+  position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+  background: var(--mint); color: #05100c; font-size: 11px; font-weight: 800; letter-spacing: .5px;
+  padding: 4px 12px; border-radius: 20px; box-shadow: 0 3px 0 #0f8f63; white-space: nowrap;
+  animation: bob 1.6s ease-in-out infinite;
+}
+.pnode-start::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--mint); border-bottom: 0; }
+@keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
+
 /* ── QUIZ CTA (in lesson modal) ── */
 .quiz-cta {
   width: 100%; margin-top: 14px; border: none; border-radius: 16px;
