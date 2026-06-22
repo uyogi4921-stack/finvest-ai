@@ -284,7 +284,25 @@ window.QUIZ_BANK = [
   // Advanced
   { cat:'advanced', q:'An ETF is best described as?', correct:'A basket of assets traded like a stock', wrong:['A single company’s bond','A type of savings account'] },
   { cat:'advanced', q:'Futures and options are mainly?', correct:'High-risk instruments, not for beginners', wrong:['Safe guaranteed-return products','Government savings bonds'] },
-  { cat:'advanced', q:'Crypto differs from stocks mainly because it?', correct:'Trades 24/7 and is highly volatile', wrong:['Pays fixed dividends','Is risk-free'] }
+  { cat:'advanced', q:'Crypto differs from stocks mainly because it?', correct:'Trades 24/7 and is highly volatile', wrong:['Pays fixed dividends','Is risk-free'] },
+
+  // ── True / False ──
+  { cat:'basics', type:'tf', q:'A stock’s price always reflects the company’s true value.', answer:false, why:'Prices reflect supply, demand and sentiment — not always fair value.' },
+  { cat:'basics', type:'tf', q:'You can own a fraction of a company by buying one share.', answer:true, why:'A share is a small ownership slice of the company.' },
+  { cat:'stocks', type:'tf', q:'A higher P/E ratio always means a better investment.', answer:false, why:'High P/E can mean overvalued — context and growth matter.' },
+  { cat:'stocks', type:'tf', q:'The NIFTY 50 tracks 50 large companies on the NSE.', answer:true, why:'NIFTY 50 is the NSE’s benchmark of 50 large-caps.' },
+  { cat:'risk', type:'tf', q:'Diversification can reduce company-specific risk.', answer:true, why:'Spreading across sectors cushions a single company’s fall.' },
+  { cat:'risk', type:'tf', q:'A fixed deposit carries more risk than stocks.', answer:false, why:'FDs are low-risk; stocks carry higher risk for higher returns.' },
+  { cat:'strategy', type:'tf', q:'Dollar-cost averaging buys more units when prices fall.', answer:true, why:'Fixed-amount investing buys more when prices are low.' },
+  { cat:'strategy', type:'tf', q:'Timing the market daily reliably beats long-term investing.', answer:false, why:'Time in the market usually beats timing the market.' },
+  { cat:'advanced', type:'tf', q:'An ETF can be bought and sold like a stock during market hours.', answer:true, why:'ETFs trade intraday on exchanges, unlike most mutual funds.' },
+  { cat:'advanced', type:'tf', q:'Options and futures are beginner-friendly, low-risk products.', answer:false, why:'Derivatives are high-risk and not meant for beginners.' },
+
+  // ── More multiple-choice (with explanations) ──
+  { cat:'basics', q:'“Market cap” of a company is?', correct:'Share price × number of shares', wrong:['Yearly profit','Total debt'], why:'Market cap = price × shares outstanding.' },
+  { cat:'stocks', q:'A dividend is?', correct:'A share of profits paid to shareholders', wrong:['A loan repayment','A trading fee'], why:'Companies distribute part of profits as dividends.' },
+  { cat:'risk', q:'“Volatility” measures?', correct:'How much a price swings up and down', wrong:['Total dividends paid','The broker’s fee'], why:'Higher volatility = larger price swings = more risk.' },
+  { cat:'strategy', q:'Compounding works best with?', correct:'Time — staying invested longer', wrong:['Frequent withdrawals','Daily trading'], why:'Returns earning returns snowball over long periods.' }
 ];
 
 function pickQuiz(cat) {
@@ -324,9 +342,11 @@ function openLesson(id) {
     + '<span class="mmi">&#127775; +' + l.qxp + ' quiz bonus</span>'
     + (completedL.has(id) ? '<span class="mmi" style="color:var(--gr)">&#10003; Done</span>' : '');
 
-  // Strip the lesson's static quiz and inject a fresh randomized one
+  // Strip the static in-body quiz; quiz now runs as a gamified session
   var bodyHtml = l.body.replace(/<div class="qsec">[\s\S]*$/, '');
-  document.getElementById('mBody').innerHTML = bodyHtml + renderDynamicQuiz(l);
+  document.getElementById('mBody').innerHTML = bodyHtml
+    + '<button class="quiz-cta" onclick="startQuiz(curLesson)">&#127919; Take the quiz'
+    + '<span class="quiz-cta-sub">5 questions &middot; +' + l.qxp + ' bonus XP &middot; &#10084; 5 lives</span></button>';
   document.getElementById('mXpL').textContent = 'Earn +' + l.xp + ' XP';
 
   var btn  = document.getElementById('btnDone');
