@@ -331,13 +331,90 @@ function refreshQuotes() {
     .catch(function() {});
 }
 
+// ─── STATIC-HOST FALLBACK (no Node backend) ──────────────
+// Try a couple of public CORS proxies so Yahoo / Bloomberg work
+// when the app is served from a static host without /api/*.
+function proxiedFetch(url) {
+  var proxies = ['https://corsproxy.io/?url=', 'https://api.allorigins.win/raw?url='];
+  function tryAt(i) {
+    if (i >= proxies.length) return Promise.reject(new Error('no proxy'));
+    var ctrl = new AbortController();
+    var to = setTimeout(function() { ctrl.abort(); }, 7000); // never hang the UI
+    return fetch(proxies[i] + encodeURIComponent(url), { signal: ctrl.signal }).then(function(r) {
+      clearTimeout(to);
+      if (!r.ok) throw new Error('proxy ' + r.status);
+      return r.text();
+    }).catch(function() { clearTimeout(to); return tryAt(i + 1); });
+  }
+  return tryAt(0);
+}
+
+var INDEX_DEFS_C = [
+  ['NIFTY 50', '^NSEI'], ['SENSEX', '^BSESN'], ['BANKNIFTY', '^NSEBANK'],
+  ['FINNIFTY', 'NIFTY_FIN_SERVICE.NS'], ['MIDCPNIFTY', '^NSEMDCP50'],
+  ['NASDAQ', '^IXIC'], ['S&P 500', '^GSPC'], ['DOW', '^DJI']
+];
+
+function fetchIndicesDirect() {
+  var ysym = INDEX_DEFS_C.map(function(d) { return d[1]; }).join(',');
+  var yurl = 'https://query1.finance.yahoo.com/v8/finance/spark?symbols=' + encodeURIComponent(ysym) + '&range=1d&interval=15m';
+  return Promise.all([
+    proxiedFetch(yurl).then(function(t) { return JSON.parse(t); }).catch(function() { return null; }),
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT').then(function(r) { return r.json(); }).catch(function() { return null; })
+  ]).then(function(res) {
+    var yj = res[0], btc = res[1], out = [];
+    if (yj) INDEX_DEFS_C.forEach(function(d) {
+      var q = yj[d[1]]; if (!q || !q.close) return;
+      var c = q.close.filter(function(x) { return x != null; });
+      if (!c.length) return;
+      var last = c[c.length - 1], base = q.chartPreviousClose || q.previousClose || c[0];
+      out.push({ name: d[0], value: last, chg: +(((last - base) / base) * 100).toFixed(2), cur: '' });
+    });
+    if (btc && btc.lastPrice) out.push({ name: 'BTC', value: +btc.lastPrice, chg: +(+btc.priceChangePercent).toFixed(2), cur: '$' });
+    return out;
+  });
+}
+
+function getIndices() {
+  return fetch('/api/indices').then(function(r) { return r.json(); }).then(function(j) {
+    if (j && j.indices && j.indices.length) return j.indices;
+    throw new Error('no api');
+  }).catch(function() { return fetchIndicesDirect(); });
+}
+
+function parseRSS(xml, limit) {
+  var items = [], re = /<item>([\s\S]*?)<\/item>/g, m;
+  var pick = function(b, tag) {
+    var r = new RegExp('<' + tag + '>([\\s\\S]*?)<\\/' + tag + '>').exec(b);
+    if (!r) return '';
+    return r[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#\d+;/g, ' ').trim();
+  };
+  while ((m = re.exec(xml)) && items.length < limit) {
+    var b = m[1];
+    items.push({ title: pick(b, 'title'), link: (/<link>([\s\S]*?)<\/link>/.exec(b) || [, ''])[1].trim(), time: pick(b, 'pubDate'), summary: pick(b, 'description').slice(0, 180), src: 'Bloomberg' });
+  }
+  return items.filter(function(i) { return i.title; });
+}
+
+function fetchNewsDirect() {
+  return proxiedFetch('https://feeds.bloomberg.com/markets/news.rss')
+    .then(function(xml) { return parseRSS(xml, 12); });
+}
+
+function getNews() {
+  return fetch('/api/news').then(function(r) { return r.json(); }).then(function(j) {
+    if (j && j.news && j.news.length) return j.news;
+    throw new Error('no api');
+  }).catch(function() { return fetchNewsDirect(); });
+}
+
 // ─── INDEX TICKER (dashboard motion line) ────────────────
 function renderTicker() {
   var el = document.getElementById('ticker');
   if (!el) return;
-  fetch('/api/indices').then(function(r) { return r.json(); }).then(function(j) {
-    if (!j || !j.indices || !j.indices.length) return;
-    var items = j.indices.map(function(ix) {
+  getIndices().then(function(indices) {
+    if (!indices || !indices.length) return;
+    var items = indices.map(function(ix) {
       var pos = ix.chg >= 0;
       var val = ix.cur === '$'
         ? '$' + Math.round(ix.value).toLocaleString('en-US')
@@ -410,10 +487,10 @@ function renderNews() {
   var el = document.getElementById('newsList');
   if (!el) return;
   if (!el.dataset.loaded) el.innerHTML = '<div class="news-empty">Loading market news…</div>';
-  fetch('/api/news').then(function(r) { return r.json(); }).then(function(j) {
-    if (!j || !j.news || !j.news.length) { el.innerHTML = '<div class="news-empty">News feed unavailable.</div>'; return; }
+  getNews().then(function(news) {
+    if (!news || !news.length) { el.innerHTML = '<div class="news-empty">News feed unavailable.</div>'; return; }
     el.dataset.loaded = '1';
-    el.innerHTML = j.news.map(function(n) {
+    el.innerHTML = news.map(function(n) {
       return '<a class="news-row" href="' + n.link + '" target="_blank" rel="noopener noreferrer">'
         + '<div class="news-main"><div class="news-title">' + n.title + '</div>'
         + (n.summary ? '<div class="news-sum">' + n.summary + '</div>' : '') + '</div>'
