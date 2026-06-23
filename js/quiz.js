@@ -143,7 +143,8 @@ function quizCheck() {
       QZ.xp += gain;
       fb.className = 'qz-fb good on';
       var praise = QZ.combo >= 3 ? 'On fire!' : PRAISE[Math.floor(Math.random() * PRAISE.length)];
-      fb.innerHTML = '<b>&#9989; ' + praise + '</b> +' + gain + ' XP' + (QZ.combo >= 2 ? ' · &#128293; x' + QZ.combo : '');
+      fb.innerHTML = '<b>&#9989; ' + praise + '</b> +' + gain + ' XP' + (QZ.combo >= 2 ? ' · &#128293; x' + QZ.combo : '')
+        + (q.why ? '<div class="qz-why">' + q.why + '</div>' : '');
       qSound(QZ.combo >= 3 ? 'win' : 'good');
     } else {
       QZ.combo = 0; QZ.hearts--;

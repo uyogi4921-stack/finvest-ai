@@ -455,10 +455,11 @@ function renderGlossary(query) {
   });
 
   el.innerHTML = list.map(function(g) {
-    return '<div class="gloss-item">'
-      + '<div class="gloss-term">' + g.term + '</div>'
+    var t = g.term.replace(/'/g, "\\'");
+    return '<button class="gloss-item" onclick="askGloss(\'' + t + '\')">'
+      + '<div class="gloss-term">' + g.term + ' <span class="gloss-ask">Ask Fin &#8594;</span></div>'
       + '<div class="gloss-def">' + g.def + '</div>'
-      + '</div>';
+      + '</button>';
   }).join('');
 }
 

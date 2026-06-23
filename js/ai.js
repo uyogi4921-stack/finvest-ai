@@ -607,3 +607,9 @@ function qs(msg) {
   document.getElementById('aiinp').value = msg;
   sendMsg();
 }
+
+// Glossary term → open Fin and ask about it.
+function askGloss(term) {
+  openAI();
+  setTimeout(function() { qs('Explain "' + term + '" in simple terms with an example.'); }, 260);
+}
