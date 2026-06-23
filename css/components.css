@@ -1216,7 +1216,9 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .qz-fb.on { display: block; animation: qzUp .25s ease; }
 .qz-fb.good { background: rgba(47,227,164,.12); color: var(--mint); }
 .qz-fb.bad { background: rgba(255,92,114,.12); color: var(--rd); }
-.qz-why { color: var(--mu); font-size: 12px; margin-top: 5px; }
+.qz-why { color: var(--mu); font-size: 12px; margin-top: 5px; line-height: 1.5; }
+.qz-explain { display: inline-flex; align-items: center; gap: 5px; margin-top: 9px; background: var(--ca); border: 1px solid var(--grg); color: var(--mint); border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .12s; }
+.qz-explain:hover { background: var(--grd); }
 @keyframes qzUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .qz-check {
   width: 100%; border: none; border-radius: 14px; padding: 15px;

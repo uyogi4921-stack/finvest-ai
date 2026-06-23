@@ -157,6 +157,7 @@ function quizCheck() {
       stage.classList.add('shake');
       setTimeout(function () { stage.classList.remove('shake'); }, 400);
     }
+    fb.innerHTML += '<button class="qz-explain" onclick="quizExplain()">&#128172; Explain in detail</button>';
     check.textContent = (QZ.idx + 1 >= QZ.qs.length) ? 'Finish' : 'Continue';
     check.className = 'qz-check ' + (ok ? 'good' : 'bad');
     check.disabled = false;
@@ -260,6 +261,20 @@ function failQuiz() {
   document.getElementById('qzFoot').innerHTML =
     '<button class="qz-check" onclick="closeQuiz()">Back</button>'
     + '<button class="qz-check good" onclick="startQuiz(QZ.lesson)">Try again</button>';
+}
+
+// Open Fin and ask for a detailed explanation of the current question.
+function quizExplain() {
+  var q = QZ.qs[QZ.idx];
+  if (!q) return;
+  var correct = q.opts.filter(function (o) { return o.c; })[0].t;
+  closeQuiz();
+  if (typeof openAI === 'function') {
+    openAI();
+    setTimeout(function () {
+      if (typeof qs === 'function') qs('Explain this in detail with an example: "' + q.q + '" The correct answer is "' + correct + '". Why is that right and the others wrong?');
+    }, 280);
+  }
 }
 
 function closeQuiz() {

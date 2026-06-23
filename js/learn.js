@@ -238,6 +238,36 @@ window.LESSONS = [
     time:'5 min', xp:100, qxp:30, level:'Advanced',
     body:'<div class="ms"><h3>Behavioral traps</h3><ul><li><b>Herd mentality</b> — buying because everyone else is</li><li><b>Loss aversion</b> — panic-selling at the bottom</li><li><b>FOMO</b> — chasing hype after it has run up</li><li><b>Recency bias</b> — assuming the last trend continues</li></ul></div><div class="ms"><h3>How to win</h3><p>Automate investing (SIP), set rules, and ignore the noise. <b>Time in the market beats timing the market.</b></p><div class="ib"><b>Buffett:</b> “Be fearful when others are greedy, and greedy when others are fearful.”</div></div>'
   },
+
+  // ── US MARKETS, CRYPTO & CHARTS ──
+  {
+    id:24, cat:'stocks', col:'cb', icon:'&#127482;&#127480;',
+    tag:'&#128200; US Markets', title:'US Markets 101',
+    desc:'NYSE, Nasdaq, and the big US indices explained.',
+    time:'4 min', xp:70, qxp:20, level:'Beginner',
+    body:'<div class="ms"><h3>The exchanges</h3><p>US stocks trade on the <b>NYSE</b> and <b>Nasdaq</b> (tech-heavy), in <b>US dollars ($)</b>, 9:30am–4:00pm ET.</p></div><div class="ms"><h3>The big indices</h3><ul><li><b>S&amp;P 500</b> — 500 large US companies, the main benchmark</li><li><b>Nasdaq 100</b> — 100 biggest non-financial Nasdaq names (very tech)</li><li><b>Dow Jones</b> — 30 large blue-chips</li></ul></div><div class="ms"><h3>Rules &amp; costs</h3><p>The <b>SEC</b> regulates US markets (like SEBI in India). Most US brokers now charge <b>zero commission</b> on stock trades. Company filings (10-K, 10-Q) are public on <b>SEC EDGAR</b>.</p><div class="ib"><b>Tip:</b> Switch the app to the US market to practise with AAPL, MSFT, NVDA and more.</div></div>'
+  },
+  {
+    id:25, cat:'advanced', col:'co', icon:'&#9883;',
+    tag:'&#127760; Crypto', title:'Crypto & Blockchain Basics',
+    desc:'What crypto is, and why it behaves so differently.',
+    time:'5 min', xp:90, qxp:25, level:'Intermediate',
+    body:'<div class="ms"><h3>Blockchain</h3><p>A <b>blockchain</b> is a shared, tamper-resistant ledger maintained by a network — no single bank or company controls it.</p></div><div class="ms"><h3>The big two</h3><ul><li><b>Bitcoin (BTC)</b> — digital money / store of value</li><li><b>Ethereum (ETH)</b> — a platform for smart contracts and apps</li></ul></div><div class="ms"><h3>Why it’s different</h3><ul><li>Trades <b>24/7</b>, including weekends</li><li><b>Very volatile</b> — 10%+ swings in a day are common</li><li>No earnings or dividends — value is driven by demand &amp; adoption</li></ul><div class="wb"><b>Rule:</b> Only put in what you can afford to lose, keep it a small slice, and never use leverage as a beginner.</div></div>'
+  },
+  {
+    id:26, cat:'stocks', col:'cg', icon:'&#128367;',
+    tag:'&#128200; Charts', title:'Reading Candlestick Charts',
+    desc:'Decode the green and red candles on a price chart.',
+    time:'5 min', xp:85, qxp:25, level:'Intermediate',
+    body:'<div class="ms"><h3>One candle = one time period</h3><p>Each candle shows four prices for that period: <b>Open, High, Low, Close (OHLC)</b>.</p><ul><li><b>Body</b> — the open-to-close range</li><li><b>Wick/shadow</b> — the high and low extremes</li><li><b>Green</b> = closed up · <b>Red</b> = closed down</li></ul></div><div class="ms"><h3>Timeframes</h3><p>A 5-minute candle vs a daily candle tell very different stories. Zoom out for the trend, zoom in for entries.</p><div class="ib"><b>Try it:</b> Open the Market tab — the chart switches between 1D, 1W, 1M… candles for any stock.</div></div>'
+  },
+  {
+    id:27, cat:'advanced', col:'cp', icon:'&#128201;',
+    tag:'&#128640; Advanced', title:'Indicators: RSI & MACD',
+    desc:'Two popular indicators — and their limits.',
+    time:'6 min', xp:110, qxp:30, level:'Advanced',
+    body:'<div class="ms"><h3>RSI (Relative Strength Index)</h3><p>A 0–100 momentum gauge. Above <b>70</b> = often "overbought", below <b>30</b> = often "oversold". It hints at extremes, not certainties.</p></div><div class="ms"><h3>MACD</h3><p>Tracks momentum by comparing two moving averages. A line crossing its signal line is read as a momentum shift.</p></div><div class="ms"><h3>The honest truth</h3><p>Indicators describe <b>past</b> price — they’re not crystal balls. Many traders combine them with fundamentals and risk rules.</p><div class="wb"><b>Never</b> trade on a single indicator alone, and always size positions for the risk.</div></div>'
+  },
 ];
 
 // ─── RENDER LESSONS ──────────────────────────────────────
@@ -406,7 +436,17 @@ window.QUIZ_BANK = [
   { cat:'strategy', q:'Index funds aim to?', correct:'Track an index at low cost', wrong:['Beat the market by trading fast','Avoid the market entirely'], why:'They mirror an index cheaply and beat most active funds long-term.' },
   { cat:'advanced', q:'Dividend yield is calculated as?', correct:'Annual dividend ÷ share price', wrong:['Share price ÷ earnings','Profit ÷ total shares'], why:'Yield = annual dividend / price.' },
   { cat:'advanced', q:'Panic-selling at the bottom is an example of?', correct:'A behavioral bias (loss aversion)', wrong:['Smart risk management','Diversification'], why:'Emotion-driven selling locks in losses — a classic behavioral trap.' },
-  { cat:'advanced', type:'tf', q:'“Time in the market” generally beats “timing the market.”', answer:true, why:'Staying invested long-term tends to outperform trying to jump in and out.' }
+  { cat:'advanced', type:'tf', q:'“Time in the market” generally beats “timing the market.”', answer:true, why:'Staying invested long-term tends to outperform trying to jump in and out.' },
+
+  // ── US markets, crypto & charts ──
+  { cat:'stocks', q:'The main US benchmark of 500 large companies is the?', correct:'S&P 500', wrong:['Nasdaq 100','Dow Jones'], why:'The S&P 500 tracks 500 large US companies; the Dow is just 30 and the Nasdaq 100 is tech-heavy.' },
+  { cat:'stocks', q:'Who regulates the US stock market?', correct:'The SEC', wrong:['The SEBI','The RBI'], why:'The SEC regulates US markets; SEBI and RBI are Indian regulators.' },
+  { cat:'stocks', type:'tf', q:'A red candlestick means the price closed lower than it opened.', answer:true, why:'Red = close below open (a down period); green = close above open.' },
+  { cat:'stocks', q:'On a candlestick, the thin line above/below the body is the?', correct:'Wick (high/low extremes)', wrong:['Dividend marker','Volume bar'], why:'The wick (shadow) shows the high and low; the body shows open-to-close.' },
+  { cat:'advanced', q:'An RSI reading above 70 is often described as?', correct:'Overbought', wrong:['Oversold','Guaranteed to rise'], why:'RSI > 70 = often "overbought", < 30 = "oversold" — hints at extremes, not certainties.' },
+  { cat:'advanced', type:'tf', q:'Crypto markets trade 24/7, including weekends.', answer:true, why:'Unlike stock exchanges, crypto trades around the clock every day.' },
+  { cat:'advanced', q:'Bitcoin and Ethereum differ in that Ethereum is mainly a?', correct:'Platform for smart contracts and apps', wrong:['Government currency','Fixed-income bond'], why:'Ethereum runs smart contracts/apps; Bitcoin is primarily digital money / store of value.' },
+  { cat:'advanced', type:'tf', q:'Technical indicators like RSI and MACD can reliably predict future prices.', answer:false, why:'Indicators describe past price action — they are not crystal balls; combine them with risk rules.' }
 ];
 
 function pickQuiz(cat) {
