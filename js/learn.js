@@ -358,10 +358,14 @@ function renderLessons() {
       var off = WAVE[node % WAVE.length];
       node++;
       var inner = done ? '&#10003;' : (locked ? '&#128274;' : l.icon);
+      var meta = done
+        ? '<div class="pnode-xp done">&#10003; +' + l.xp + ' XP earned</div>'
+        : '<div class="pnode-xp">&#9889; +' + (l.xp + l.qxp) + ' XP &middot; &#9201; ' + l.time + '</div>';
       return '<div class="pnode ' + state + '" style="transform:translateX(' + off + 'px)">'
         + (active ? '<div class="pnode-start">START</div>' : '')
-        + '<button class="pnode-btn" onclick="openLesson(' + l.id + ')" aria-label="' + l.title + '">' + inner + '</button>'
+        + '<button class="pnode-btn" onclick="openLesson(' + l.id + ')" aria-label="' + l.title + (locked ? ' (locked — tap to preview)' : '') + '">' + inner + '</button>'
         + '<div class="pnode-label">' + l.title + '</div>'
+        + meta
         + '</div>';
     }).join('');
 
@@ -468,11 +472,48 @@ function renderDynamicQuiz(lesson) {
 }
 
 // ─── LESSON MODAL ────────────────────────────────────────
+// Locked lessons open a preview (topic, reward, time) instead of a dead end,
+// so users can see what they'll get before earning the unlock.
+function showLessonPreview(l) {
+  curLesson = null;
+  quizDone = false;
+
+  var ord = orderedLessons();
+  var nextIdx = firstIncompleteIndex();
+  var nextLesson = ord[nextIdx];
+  var unlockHint = (nextLesson && nextLesson.id !== l.id)
+    ? 'Unlocks after you complete <b>' + nextLesson.title + '</b> and the lessons before it.'
+    : 'Complete the earlier lessons on the path to unlock this.';
+
+  document.getElementById('mTag').innerHTML = l.tag + ' · ' + l.level;
+  document.getElementById('mTit').textContent = l.title;
+  document.getElementById('mMeta').innerHTML =
+    '<span class="mmi">&#9201; ' + l.time + '</span>'
+    + '<span class="mmi">&#9889; +' + l.xp + ' XP</span>'
+    + '<span class="mmi">&#127775; +' + l.qxp + ' quiz bonus</span>'
+    + '<span class="mmi" style="color:var(--or)">&#128274; Locked</span>';
+
+  document.getElementById('mBody').innerHTML =
+    '<div class="lesson-preview">'
+    + '<div class="lp-row"><span class="lp-ic">&#128214;</span><div><div class="lp-k">What you\'ll learn</div><div class="lp-v">' + l.desc + '</div></div></div>'
+    + '<div class="lp-row"><span class="lp-ic">&#127942;</span><div><div class="lp-k">Total reward</div><div class="lp-v">Up to <b>+' + (l.xp + l.qxp) + ' XP</b> (' + l.xp + ' for the lesson + ' + l.qxp + ' quiz bonus) &middot; about ' + l.time + '</div></div></div>'
+    + '<div class="lp-lock">&#128274; ' + unlockHint + '</div>'
+    + '</div>';
+  document.getElementById('mXpL').textContent = 'Locked';
+
+  var btn = document.getElementById('btnDone');
+  btn.textContent = '🔒 Locked';
+  btn.disabled = true;
+
+  document.getElementById('modal').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
 function openLesson(id) {
   var l = LESSONS.find(function(x) { return x.id === id; });
   if (!l) return;
   if (isLessonLocked(id)) {
-    showToast('🔒 Complete the earlier lessons first');
+    showLessonPreview(l);
     return;
   }
   curLesson = l;

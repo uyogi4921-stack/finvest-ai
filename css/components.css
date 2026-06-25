@@ -676,6 +676,12 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .mtit { font-family: var(--fh); font-size: 19px; font-weight: 800; line-height: 1.15; margin-bottom: 5px; }
 .mmt  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mmi  { font-size: 11px; color: var(--mu); }
+.lesson-preview { display: flex; flex-direction: column; gap: 12px; }
+.lp-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 10px; background: var(--ca); border: 1px solid var(--br); }
+.lp-ic { font-size: 20px; line-height: 1; flex-shrink: 0; }
+.lp-k { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--mu); margin-bottom: 3px; }
+.lp-v { font-size: 13px; line-height: 1.45; color: var(--tx); }
+.lp-lock { padding: 11px 13px; border-radius: 10px; font-size: 12.5px; line-height: 1.5; color: var(--tx); background: rgba(255,184,0,.1); border: 1px solid rgba(255,184,0,.28); }
 .mbdy { padding: 20px; }
 .ms   { margin-bottom: 18px; }
 .ms h3 { font-family: var(--fh); font-size: 13px; font-weight: 700; margin-bottom: 7px; }
@@ -1139,14 +1145,18 @@ select.prof-input { cursor: pointer; appearance: auto; }
 }
 .pnode-btn:active { transform: translateY(3px); }
 .pnode-label { font-size: 12px; font-weight: 600; color: var(--mu); max-width: 130px; text-align: center; line-height: 1.25; }
+.pnode-xp { font-size: 10px; font-weight: 700; color: var(--gd); margin-top: 2px; text-align: center; white-space: nowrap; }
+.pnode-xp.done { color: var(--gr); }
+.pnode.locked .pnode-xp { color: var(--mu); opacity: .8; }
 
 /* states */
 .pnode.done .pnode-btn { background: var(--grad); color: #05100c; box-shadow: 0 6px 0 #0f8f63; font-weight: 800; }
 .pnode.done .pnode-label { color: var(--tx); }
 .pnode.open .pnode-btn { background: var(--bg3); border: 2px solid var(--br); box-shadow: 0 6px 0 rgba(0,0,0,.25); }
 .pnode.open .pnode-btn:hover { border-color: var(--grg); }
-.pnode.locked .pnode-btn { background: var(--bg3); color: var(--mu); box-shadow: 0 6px 0 rgba(0,0,0,.22); opacity: .55; font-size: 24px; cursor: not-allowed; }
-.pnode.locked .pnode-label { opacity: .55; }
+.pnode.locked .pnode-btn { background: var(--bg3); color: var(--mu); box-shadow: 0 6px 0 rgba(0,0,0,.22); opacity: .6; font-size: 24px; cursor: pointer; }
+.pnode.locked .pnode-btn:hover { opacity: .85; border-color: var(--grg); }
+.pnode.locked .pnode-label { opacity: .6; }
 .pnode.active .pnode-btn {
   background: var(--grad); color: #05100c; box-shadow: 0 6px 0 #0f8f63, var(--glow);
   animation: pnodePulse 1.8s ease-in-out infinite;
