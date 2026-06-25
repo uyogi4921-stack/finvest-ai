@@ -647,11 +647,11 @@
     <input type="hidden" id="profHoldings"><input type="hidden" id="profLessons"><input type="hidden" id="profPortValue">
 
     <!-- WALLET -->
-    <div class="sechd"><div class="sect">&#128176; Wallet</div></div>
+    <div class="sechd"><div class="sect">&#128176; Wallet</div><span class="virtual-pill">&#129302; Virtual money &middot; practice only</span></div>
     <div class="wallet-card">
       <div class="wallet-top">
         <div class="wallet-bal-wrap">
-          <div class="wallet-bal-lbl">Available Balance</div>
+          <div class="wallet-bal-lbl">Available Balance <span class="virtual-tag">VIRTUAL</span></div>
           <div class="wallet-bal" id="walletBal">&#8377;10,00,000</div>
         </div>
         <div class="wallet-actions">
@@ -659,6 +659,7 @@
           <button class="wallet-btn withdraw" onclick="showWalletModal('withdraw')">- Withdraw</button>
         </div>
       </div>
+      <div class="wallet-disclaimer">&#9432; This is simulated practice money to learn investing risk-free. <b>No real funds are involved</b> — "Add Money" and "Withdraw" only adjust your practice balance.</div>
       <div class="wallet-txn-title">Recent Transactions</div>
       <div class="wallet-txns" id="walletTxns"></div>
     </div>
@@ -672,6 +673,7 @@
         </div>
         <div class="wallet-modal-body">
           <div class="wallet-modal-cur">Current Balance: <b id="walletModalBal">&#8377;0</b></div>
+          <div class="wallet-modal-note">&#129302; Virtual practice balance — no real money moves.</div>
           <label class="wallet-modal-lbl">Amount (&#8377;)</label>
           <input type="number" class="wallet-modal-inp" id="walletAmtInp" placeholder="Enter amount" min="1">
           <div class="wallet-quick-amts">
