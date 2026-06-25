@@ -1362,6 +1362,15 @@ select.prof-input { cursor: pointer; appearance: auto; }
 .news-src { font-size: 10px; font-weight: 700; color: var(--mint); }
 .news-time { font-size: 10px; color: var(--mu); white-space: nowrap; }
 .news-empty { padding: 24px; text-align: center; color: var(--mu); font-size: 13px; }
+.news-row.is-rel { background: color-mix(in oklab, var(--mint) 7%, transparent); }
+.news-row.is-rel:hover { background: color-mix(in oklab, var(--mint) 12%, transparent); }
+.news-row.is-rel { box-shadow: inset 3px 0 0 var(--mint); }
+.news-rel {
+  display: inline-block; margin-right: 7px; padding: 1px 7px; border-radius: 5px;
+  font-size: 10px; font-weight: 800; letter-spacing: .3px; vertical-align: middle;
+  background: rgba(0,229,160,.16); color: var(--gr); white-space: nowrap;
+}
+.news-rel.sector { background: rgba(77,159,255,.16); color: var(--bl); }
 
 /* ── MARKET TERMINAL (chart workspace) ── */
 .terminal { display: grid; grid-template-columns: 290px 1fr; gap: 14px; align-items: start; }

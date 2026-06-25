@@ -483,6 +483,57 @@ function renderInvestCard() {
 }
 
 // ─── BLOOMBERG NEWS TABLE (dashboard) ────────────────────
+
+// Sector → words that tend to appear in headlines about that sector.
+var NEWS_SECTOR_KW = {
+  Technology: ['tech', 'chip', 'semiconductor', 'software', 'ai ', 'artificial intelligence', 'cloud', 'apple', 'microsoft', 'nvidia'],
+  IT: ['tech', 'software', 'it services', 'cloud', 'ai ', 'outsourcing'],
+  Automotive: ['car', 'auto', 'vehicle', 'ev ', 'electric vehicle', 'tesla', 'ford'],
+  Auto: ['car', 'auto', 'vehicle', 'ev ', 'electric vehicle'],
+  Consumer: ['retail', 'consumer', 'spending', 'shopper'],
+  FMCG: ['consumer goods', 'fmcg', 'retail', 'staples'],
+  Financials: ['bank', 'fed', 'rate', 'interest rate', 'lender', 'finance', 'wall street'],
+  Banking: ['bank', 'rbi', 'rate', 'interest rate', 'lender', 'credit'],
+  Energy: ['oil', 'crude', 'gas', 'energy', 'opec', 'barrel', 'fuel'],
+  Pharma: ['pharma', 'drug', 'health', 'fda', 'vaccine', 'biotech'],
+  Metals: ['steel', 'metal', 'copper', 'aluminium', 'aluminum', 'mining', 'ore'],
+  Infra: ['infrastructure', 'construction', 'cement', 'roads'],
+  Telecom: ['telecom', '5g', 'spectrum', 'broadband'],
+  Media: ['media', 'streaming', 'netflix', 'disney', 'box office', 'studio'],
+  Realty: ['real estate', 'property', 'housing', 'realty'],
+  Insurance: ['insurance', 'insurer', 'premium'],
+  'Layer 1': ['bitcoin', 'ethereum', 'crypto', 'blockchain', 'token'],
+  DeFi: ['defi', 'crypto', 'blockchain', 'stablecoin'],
+  Meme: ['dogecoin', 'meme coin', 'crypto'],
+  Payments: ['payment', 'visa', 'mastercard', 'crypto'],
+  Stable: ['stablecoin', 'usdt', 'usdc', 'crypto']
+};
+
+// Score a headline against the user's holdings; return the best-matching tag.
+function newsRelevance(n) {
+  var text = ((n.title || '') + ' ' + (n.summary || '')).toLowerCase();
+  if (!window.HOLDS || !HOLDS.length) return null;
+  var sectorsSeen = {};
+  for (var i = 0; i < HOLDS.length; i++) {
+    var stk = ST.find(function(s) { return s.s === HOLDS[i].sym; });
+    if (!stk) continue;
+    // Direct company hit (name token or ticker) is the strongest signal
+    var nameTok = stk.n.toLowerCase().split(/[\s.,]/)[0];
+    if (nameTok.length >= 4 && text.indexOf(nameTok) !== -1) return { label: stk.s, kind: 'holding' };
+    if (new RegExp('\\b' + stk.s.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(text)) return { label: stk.s, kind: 'holding' };
+    sectorsSeen[stk.sec] = true;
+  }
+  // Otherwise fall back to a sector keyword match for a sector the user holds
+  for (var sec in sectorsSeen) {
+    var kws = NEWS_SECTOR_KW[sec];
+    if (!kws) continue;
+    for (var k = 0; k < kws.length; k++) {
+      if (text.indexOf(kws[k]) !== -1) return { label: sec, kind: 'sector' };
+    }
+  }
+  return null;
+}
+
 function renderNews() {
   var el = document.getElementById('newsList');
   if (!el) return;
@@ -490,9 +541,26 @@ function renderNews() {
   getNews().then(function(news) {
     if (!news || !news.length) { el.innerHTML = '<div class="news-empty">News feed unavailable.</div>'; return; }
     el.dataset.loaded = '1';
-    el.innerHTML = news.map(function(n) {
-      return '<a class="news-row" href="' + n.link + '" target="_blank" rel="noopener noreferrer">'
-        + '<div class="news-main"><div class="news-title">' + n.title + '</div>'
+
+    // Tag each story and float portfolio-relevant ones to the top (stable sort)
+    var tagged = news.map(function(n, i) { return { n: n, rel: newsRelevance(n), i: i }; });
+    tagged.sort(function(a, b) {
+      var ra = a.rel ? (a.rel.kind === 'holding' ? 2 : 1) : 0;
+      var rb = b.rel ? (b.rel.kind === 'holding' ? 2 : 1) : 0;
+      return rb - ra || a.i - b.i;
+    });
+
+    var relCount = tagged.filter(function(t) { return t.rel; }).length;
+    var head = document.getElementById('newsRelHead');
+    if (head) head.textContent = relCount ? relCount + ' relevant to your portfolio' : '';
+
+    el.innerHTML = tagged.map(function(t) {
+      var n = t.n, rel = t.rel;
+      var badge = rel
+        ? '<span class="news-rel ' + rel.kind + '">' + (rel.kind === 'holding' ? '★ ' : '') + rel.label + '</span>'
+        : '';
+      return '<a class="news-row' + (rel ? ' is-rel' : '') + '" href="' + n.link + '" target="_blank" rel="noopener noreferrer">'
+        + '<div class="news-main"><div class="news-title">' + badge + n.title + '</div>'
         + (n.summary ? '<div class="news-sum">' + n.summary + '</div>' : '') + '</div>'
         + '<div class="news-meta"><span class="news-src">' + (n.src || 'Bloomberg') + '</span>'
         + '<span class="news-time">' + relTime(n.time) + '</span></div></a>';
