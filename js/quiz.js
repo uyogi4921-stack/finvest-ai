@@ -86,6 +86,7 @@ function startQuiz(lesson) {
   QZ.idx = 0; QZ.hearts = QUIZ_HEARTS; QZ.combo = 0; QZ.bestCombo = 0;
   QZ.correct = 0; QZ.xp = 0; QZ.sel = -1; QZ.evaluated = false; QZ.on = true; QZ.placement = false;
   if (typeof closeModal === 'function') closeModal(); // close lesson modal if open
+  if (typeof checkFinLLM === 'function') checkFinLLM(); // know LLM availability before "explain"
   document.getElementById('quizOv').classList.add('on');
   document.body.style.overflow = 'hidden';
   renderQ();
@@ -292,7 +293,10 @@ function quizExplain(btn) {
         return '<div class="qz-ex-row bad"><span class="qz-ex-tag no">&#10007;</span><span><b>' + o.t + '</b>'
           + (o.exp ? ' — ' + o.exp : ' — doesn\'t fit the reasoning above') + '</span></div>';
       }).join('')
-    + '<button class="qz-ex-more" onclick="quizAskFin()">&#128172; Ask Fin a follow-up</button>';
+    // Only offer the Fin follow-up when the Claude backend is live — the offline
+    // engine can't answer a free-form "explain this question" prompt, so it would
+    // just return its generic menu. The inline explanation above is self-contained.
+    + (window.aiLLM === true ? '<button class="qz-ex-more" onclick="quizAskFin()">&#128172; Ask Fin a follow-up</button>' : '');
 
   document.getElementById('qzFb').appendChild(box);
   if (btn) btn.innerHTML = '&#128172; Hide explanation';
