@@ -94,7 +94,10 @@ window.LESSONS = [
     tag:'&#128200; Stocks', title:'What is a Stock?',
     desc:'The foundational concept every investor must know first.',
     time:'5 min', xp:75, qxp:20, level:'Beginner',
-    body:'<div class="ms"><h3>Ownership Slices</h3><p>A stock = a tiny slice of ownership in a company. Buy 1 TCS share = you literally own a fraction of Tata Consultancy Services.</p></div><div class="ms"><h3>Why Companies Issue Stocks</h3><p>To raise capital without bank loans. Investors become co-owners.</p><div class="ib"><b>Real example:</b> Zomato IPO 2021 raised &#8377;9,375 crore selling shares to the public.</div></div><div class="ms"><h3>How You Make Money</h3><ul><li><b>Capital Appreciation</b> — Buy &#8377;100, sell &#8377;150. Profit &#8377;50</li><li><b>Dividends</b> — Some companies pay cash from profits to shareholders</li></ul></div><div class="wb" style="margin-top:10px"><b>Golden rule:</b> Never invest money you cannot afford to lock away for 3–5 years.</div><div class="qsec"><div class="qq">You own 10 out of 1,000 total shares. What percentage do you own?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">0.1%</button><button class="qo" onclick="ansQ(this,true)">1%</button><button class="qo" onclick="ansQ(this,false)">10%</button></div><div class="qfb"></div><div class="xppop"></div></div>'
+    body:'<div class="ms"><h3>Ownership Slices</h3><p>A stock = a tiny slice of ownership in a company. Buy 1 TCS share = you literally own a fraction of Tata Consultancy Services.</p></div><div class="ms"><h3>Why Companies Issue Stocks</h3><p>To raise capital without bank loans. Investors become co-owners.</p><div class="ib"><b>Real example:</b> Zomato IPO 2021 raised &#8377;9,375 crore selling shares to the public.</div></div><div class="ms"><h3>How You Make Money</h3><ul><li><b>Capital Appreciation</b> — Buy &#8377;100, sell &#8377;150. Profit &#8377;50</li><li><b>Dividends</b> — Some companies pay cash from profits to shareholders</li></ul></div>'
+      + '<div class="mstory"><span class="mstory-k">📖 Market story</span>₹10,000 of <b>Infosys</b> shares at its 1993 IPO would be worth several <b>crores</b> today after decades of growth, bonuses and dividends. The same is true of <b>Apple</b> in the US — $1,000 in 2003 is worth over $600,000 now. Owning a sliver of a great business and holding it is how ordinary investors build real wealth.</div>'
+      + '<div class="mfact"><b>Did you know?</b> When you buy 1 share you legally become a part-owner — you can vote at the company\'s AGM and receive a slice of its profits as dividends.</div>'
+      + '<div class="wb" style="margin-top:10px"><b>Golden rule:</b> Never invest money you cannot afford to lock away for 3–5 years.</div><div class="qsec"><div class="qq">You own 10 out of 1,000 total shares. What percentage do you own?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">0.1%</button><button class="qo" onclick="ansQ(this,true)">1%</button><button class="qo" onclick="ansQ(this,false)">10%</button></div><div class="qfb"></div><div class="xppop"></div></div>'
   },
   {
     id:4, cat:'stocks', col:'cb', icon:'&#127970;',
@@ -115,14 +118,36 @@ window.LESSONS = [
     tag:'&#128737; Risk', title:'Understanding Investment Risk',
     desc:'Learn to measure it, manage it, and never fear it.',
     time:'6 min', xp:90, qxp:25, level:'Intermediate',
-    body:'<div class="ms"><h3>Risk vs. Reward</h3><p>Higher potential returns = higher risk. FD: safe but 4%. Stocks: riskier but 12–15% annual average.</p><div class="ib"><b>Key insight:</b> Risk is not bad — unmanaged risk is bad.</div></div><div class="ms"><h3>Types of Risk</h3><ul><li><b>Market Risk</b> — Whole market falls (COVID crash March 2020)</li><li><b>Company Risk</b> — Specific company fails (Yes Bank, DHFL)</li><li><b>Liquidity Risk</b> — Cannot sell quickly without loss</li><li><b>Inflation Risk</b> — Returns do not beat inflation; real value shrinks</li></ul></div><div class="qsec"><div class="qq">Which type of risk affects ALL stocks simultaneously?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">Company Risk</button><button class="qo" onclick="ansQ(this,true)">Market Risk</button><button class="qo" onclick="ansQ(this,false)">Liquidity Risk</button></div><div class="qfb"></div><div class="xppop"></div></div>'
+    body:'<div class="ms"><h3>Risk vs. Reward</h3><p>Higher potential returns = higher risk. FD: safe but 4%. Stocks: riskier but 12–15% annual average.</p><div class="ib"><b>Key insight:</b> Risk is not bad — unmanaged risk is bad.</div></div><div class="ms"><h3>Types of Risk</h3><ul><li><b>Market Risk</b> — Whole market falls (COVID crash March 2020)</li><li><b>Company Risk</b> — Specific company fails (Yes Bank, DHFL)</li><li><b>Liquidity Risk</b> — Cannot sell quickly without loss</li><li><b>Inflation Risk</b> — Returns do not beat inflation; real value shrinks</li></ul></div>'
+      + '<div class="mstory"><span class="mstory-k">📖 Market story</span>In the <b>March 2020 COVID crash</b>, the market fell ~38% in a month — that is <i>market risk</i>, hitting almost everything at once. Yet investors who held on (or kept buying) saw a full recovery within a year. The lesson: market risk is temporary for a diversified portfolio; <b>panic-selling is what makes it permanent.</b></div>'
+      + '<div class="mfact"><b>Did you know?</b> The stock market has had a positive return in roughly 3 out of every 4 years historically. Time in the market quietly tilts the odds in your favour.</div>'
+      + '<div class="qsec"><div class="qq">Which type of risk affects ALL stocks simultaneously?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">Company Risk</button><button class="qo" onclick="ansQ(this,true)">Market Risk</button><button class="qo" onclick="ansQ(this,false)">Liquidity Risk</button></div><div class="qfb"></div><div class="xppop"></div></div>'
   },
   {
     id:7, cat:'risk', col:'co', icon:'&#127919;',
     tag:'&#128737; Risk', title:'Diversification',
     desc:'The single most powerful risk-reduction strategy.',
     time:'5 min', xp:80, qxp:25, level:'Intermediate',
-    body:'<div class="ms"><h3>What is Diversification?</h3><p>Spreading investments across different stocks, sectors, and asset classes so one bad performer cannot wipe your portfolio.</p></div><div class="ms"><h3>A Balanced Portfolio</h3><ul><li>30% IT (TCS, INFY)</li><li>25% Banking (HDFC, ICICI)</li><li>20% Defensive (FMCG + Pharma)</li><li>15% Energy/Auto</li><li>10% Mid-cap growth</li></ul><div class="ib"><b>Why it works:</b> When IT falls on US recession fears, FMCG stays stable — people still buy soap.</div></div><div class="qsec"><div class="qq">Which portfolio is MOST diversified?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">100% in TCS, INFY, Wipro, HCL</button><button class="qo" onclick="ansQ(this,true)">TCS + HDFC Bank + ITC + Sun Pharma + Reliance</button><button class="qo" onclick="ansQ(this,false)">50% TCS + 50% Infosys</button></div><div class="qfb"></div><div class="xppop"></div></div>'
+    body:'<div class="ms"><h3>What is Diversification?</h3><p>Spreading investments across different stocks, sectors, and asset classes so one bad performer cannot wipe your portfolio. It is the only "free lunch" in investing — less risk without giving up much return.</p></div>'
+      + '<div class="lviz"><svg viewBox="0 0 300 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Balanced portfolio split across five sectors">'
+      + '<rect x="10" y="14" width="84" height="20" rx="3" fill="var(--gr)"/>'
+      + '<rect x="96" y="14" width="68" height="20" rx="3" fill="var(--bl)"/>'
+      + '<rect x="166" y="14" width="54" height="20" rx="3" fill="#b794ff"/>'
+      + '<rect x="222" y="14" width="40" height="20" rx="3" fill="var(--gd)"/>'
+      + '<rect x="264" y="14" width="26" height="20" rx="3" fill="var(--mu)"/>'
+      + '<text x="52" y="45" font-size="8" fill="var(--mu)" text-anchor="middle">IT 30%</text>'
+      + '<text x="130" y="45" font-size="8" fill="var(--mu)" text-anchor="middle">Bank 25%</text>'
+      + '<text x="193" y="45" font-size="8" fill="var(--mu)" text-anchor="middle">Defensive 20%</text>'
+      + '<text x="277" y="45" font-size="8" fill="var(--mu)" text-anchor="middle">rest 25%</text>'
+      + '</svg><div class="lviz-cap">A spread like this means no single sector can sink the whole portfolio.</div></div>'
+      + '<div class="ms"><h3>Why it works</h3><div class="ib"><b>Different sectors zig and zag at different times.</b> When IT falls on US recession fears, FMCG stays stable — people still buy soap, toothpaste and biscuits in any economy.</div></div>'
+      + '<div class="mstory"><span class="mstory-k">📖 Market story</span><b>Yes Bank</b> was a darling stock — ₹400 in 2018. Investors who went all-in watched it collapse to ₹12 by 2020 as bad loans surfaced. Anyone diversified across banks <i>and</i> other sectors barely felt it; the all-in crowd lost ~97%. One stock should never be able to do that to you.</div>'
+      + '<div class="lscenario"><div class="lsc-tag">🎯 Your turn</div><div class="lsc-q">You hold only TCS (IT). Tech stocks dip 8% this week on US recession fears. What is the smartest move?</div><div class="lsc-opts">'
+      + '<button class="lsc-opt" onclick="lscAnswer(this,false)">Sell everything immediately to avoid more loss</button>'
+      + '<button class="lsc-opt" data-correct="1" onclick="lscAnswer(this,true)">Add a stock from a different sector (e.g. a bank or FMCG name)</button>'
+      + '<button class="lsc-opt" onclick="lscAnswer(this,false)">Double down and buy more TCS only</button>'
+      + '</div><div class="lsc-fb"><b>✓ Diversify.</b> Selling locks in the loss; doubling down on one sector raises your risk further. Adding an unrelated sector cushions you the next time IT wobbles — exactly what this lesson is about.</div></div>'
+      + '<div class="qsec"><div class="qq">Which portfolio is MOST diversified?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">100% in TCS, INFY, Wipro, HCL</button><button class="qo" onclick="ansQ(this,true)">TCS + HDFC Bank + ITC + Sun Pharma + Reliance</button><button class="qo" onclick="ansQ(this,false)">50% TCS + 50% Infosys</button></div><div class="qfb"></div><div class="xppop"></div></div>'
   },
   {
     id:8, cat:'strategy', col:'cp', icon:'&#9822;',
@@ -164,7 +189,22 @@ window.LESSONS = [
     tag:'&#128640; Advanced', title:'Compound Interest',
     desc:"Why starting at 19 beats working harder at 35.",
     time:'6 min', xp:100, qxp:30, level:'Advanced',
-    body:'<div class="ms"><h3>Compounding</h3><p>Earning returns on your principal AND on previous returns. Money making money making money — exponential.</p></div><div class="ms"><h3>Rule of 72</h3><p>Divide 72 by your annual return = years to double your money.</p><ul><li>6% (FD): doubles in 12 years</li><li>12% (mutual funds): doubles in 6 years</li><li>18% (good stocks): doubles in 4 years</li></ul><div class="ib"><b>&#8377;1 lakh at 12% for 30 years</b> → &#8377;30 lakh. No extra deposits. Just time.</div></div><div class="wb" style="margin-top:10px"><b>The cost of waiting 1 year at age 20</b> is far greater than waiting 1 year at age 40.</div><div class="qsec"><div class="qq">Rule of 72: how long to double money at 9%/year?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">9 years</button><button class="qo" onclick="ansQ(this,true)">8 years</button><button class="qo" onclick="ansQ(this,false)">6 years</button></div><div class="qfb"></div><div class="xppop"></div></div>'
+    body:'<div class="ms"><h3>Compounding</h3><p>Earning returns on your principal AND on previous returns. Money making money making money — the growth curve bends upward over time.</p></div>'
+      + '<div class="lviz"><svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compounding growth curve vs flat savings">'
+      + '<line x1="10" y1="120" x2="290" y2="120" stroke="var(--br)" stroke-width="1"/>'
+      + '<line x1="10" y1="10" x2="10" y2="120" stroke="var(--br)" stroke-width="1"/>'
+      + '<polyline points="10,116 57,114 103,109 150,100 197,85 243,58 290,12" fill="none" stroke="var(--gr)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<polyline points="10,116 290,104" fill="none" stroke="var(--mu)" stroke-width="2" stroke-dasharray="4 4"/>'
+      + '<circle cx="290" cy="12" r="3.5" fill="var(--gr)"/>'
+      + '<text x="286" y="9" font-size="9" fill="var(--gr)" text-anchor="end">₹30L</text>'
+      + '<text x="270" y="100" font-size="8.5" fill="var(--mu)" text-anchor="end">savings ₹3.2L</text>'
+      + '<text x="14" y="118" font-size="8" fill="var(--mu)">yr 0</text>'
+      + '<text x="290" y="129" font-size="8" fill="var(--mu)" text-anchor="end">yr 30</text>'
+      + '</svg><div class="lviz-cap">₹1 lakh at 12% a year — the green curve is compounding, the dashed line is idle cash.</div></div>'
+      + '<div class="ms"><h3>Rule of 72</h3><p>Divide 72 by your annual return = years to double your money.</p><ul><li>6% (FD): doubles in 12 years</li><li>12% (mutual funds): doubles in 6 years</li><li>18% (good stocks): doubles in 4 years</li></ul><div class="ib"><b>&#8377;1 lakh at 12% for 30 years</b> → &#8377;30 lakh. No extra deposits. Just time.</div></div>'
+      + '<div class="mstory"><span class="mstory-k">📖 Market story</span>Warren Buffett is worth ~$130&nbsp;billion — but <b>over 99% of it came after his 50th birthday.</b> He started investing at 11 and simply never stopped. His edge wasn\'t picking once-in-a-lifetime stocks; it was giving compounding 80+ years to run.</div>'
+      + '<div class="mfact"><b>Did you know?</b> A 25-year-old investing ₹5,000/month at 12% retires with ~₹3 crore. Waiting just to 35 cuts that to ~₹95 lakh — the same monthly amount, a third of the result. Time matters more than amount.</div>'
+      + '<div class="wb" style="margin-top:10px"><b>The cost of waiting 1 year at age 20</b> is far greater than waiting 1 year at age 40.</div><div class="qsec"><div class="qq">Rule of 72: how long to double money at 9%/year?</div><div class="qopts"><button class="qo" onclick="ansQ(this,false)">9 years</button><button class="qo" onclick="ansQ(this,true)">8 years</button><button class="qo" onclick="ansQ(this,false)">6 years</button></div><div class="qfb"></div><div class="xppop"></div></div>'
   },
   {
     id:14, cat:'advanced', col:'cb', icon:'&#127757;',
@@ -556,6 +596,21 @@ function completeLesson() {
   addXP(curLesson.xp, '\uD83C\uDF89 +' + curLesson.xp + ' XP Earned!');
   renderLessons();
   closeModal();
+}
+
+// Inline practice scenario inside a lesson body. Reveals feedback and marks
+// the chosen option; lets users apply the concept before the graded quiz.
+function lscAnswer(btn, correct) {
+  var sc = btn.closest('.lscenario');
+  if (!sc || sc.dataset.done) return;
+  sc.dataset.done = '1';
+  sc.querySelectorAll('.lsc-opt').forEach(function(o) {
+    o.disabled = true;
+    if (o.dataset.correct === '1') o.classList.add('right');
+  });
+  if (!correct) btn.classList.add('wrong');
+  var fb = sc.querySelector('.lsc-fb');
+  if (fb) fb.classList.add('on');
 }
 
 // ─── QUIZ ─────────────────────────────────────────────────
