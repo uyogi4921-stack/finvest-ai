@@ -184,6 +184,17 @@ window.US_ST = [
   { s:'NKE',   n:'Nike',              sec:'Consumer',   p:78.55,  c:'#111111', d:'nike.com' },
   { s:'F',     n:'Ford Motor',        sec:'Automotive', p:11.02,  c:'#003478', d:'ford.com' },
   { s:'GM',    n:'General Motors',    sec:'Automotive', p:46.30,  c:'#0170ce', d:'gm.com' },
+  // ── Healthcare ──
+  { s:'UNH',   n:'UnitedHealth',      sec:'Healthcare', p:560.20, c:'#0079c1', d:'unitedhealthgroup.com' },
+  { s:'JNJ',   n:'Johnson & Johnson', sec:'Healthcare', p:152.40, c:'#cc0000', d:'jnj.com' },
+  { s:'LLY',   n:'Eli Lilly',         sec:'Healthcare', p:735.10, c:'#d52b1e', d:'lilly.com' },
+  { s:'PFE',   n:'Pfizer',            sec:'Healthcare', p:25.80,  c:'#0093d0', d:'pfizer.com' },
+  // ── more Financials / Consumer / Energy depth ──
+  { s:'MA',    n:'Mastercard',        sec:'Financials', p:498.10, c:'#eb001b', d:'mastercard.com' },
+  { s:'BAC',   n:'Bank of America',   sec:'Financials', p:44.20,  c:'#012169', d:'bankofamerica.com' },
+  { s:'WMT',   n:'Walmart',           sec:'Consumer',   p:80.40,  c:'#0071ce', d:'walmart.com' },
+  { s:'PG',    n:'Procter & Gamble',  sec:'Consumer',   p:168.30, c:'#003da5', d:'pg.com' },
+  { s:'COP',   n:'ConocoPhillips',    sec:'Energy',     p:108.50, c:'#e21836', d:'conocophillips.com' },
 ];
 window.US_IDX = [
   { n:'S&P 500',    b:5565 },
@@ -276,7 +287,7 @@ window.userProfile = Store.get('profile', null);
 
 // ─── MARKET REGISTRY (after Store + DEFAULT_HOLDS exist) ─
 window.MARKETS = {
-  US:     { id:'US',     label:'US',     flag:'🇺🇸', cur:'$', locale:'en-US', startCash:100000,  stocks:US_ST, indices:US_IDX, cats:['All','Technology','Automotive','Consumer','Financials','Energy','Media'], def:DEFAULT_HOLDS_US },
+  US:     { id:'US',     label:'US',     flag:'🇺🇸', cur:'$', locale:'en-US', startCash:100000,  stocks:US_ST, indices:US_IDX, cats:['All','Technology','Healthcare','Financials','Consumer','Automotive','Energy','Media'], def:DEFAULT_HOLDS_US },
   IN:     { id:'IN',     label:'IN',     flag:'🇮🇳', cur:'₹', locale:'en-IN', startCash:1000000, stocks:ST,    indices:IDX,    cats:['All','IT','Banking','Energy','Auto','FMCG','Pharma','Metals','Infra','Telecom','Chemicals','Realty','Insurance','Consumer'], def:DEFAULT_HOLDS },
   CRYPTO: { id:'CRYPTO', label:'Crypto', flag:'🌐', cur:'$', locale:'en-US', startCash:50000,   stocks:CR_ST, indices:CR_IDX, cats:['All','Layer 1','DeFi','Meme','Payments','Stable'], def:DEFAULT_HOLDS_CR },
 };

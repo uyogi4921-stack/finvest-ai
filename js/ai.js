@@ -29,6 +29,38 @@ function getPortfolioSummary() {
   };
 }
 
+// Sectors available in the ACTIVE market (drives diversification advice so we
+// never recommend a sector the product can't actually trade).
+function marketSectorList() {
+  if (window.MKT && MKT.cats) return MKT.cats.filter(function(c) { return c !== 'All'; });
+  // Fallback: derive from the active stock universe
+  var seen = {};
+  (window.ST || []).forEach(function(s) { seen[s.sec] = true; });
+  return Object.keys(seen);
+}
+
+// One representative, real, tradeable pick per sector in the active market.
+function sectorRepresentatives() {
+  var bySec = {};
+  (window.ST || []).forEach(function(s) { if (!bySec[s.sec]) bySec[s.sec] = s; });
+  return bySec;
+}
+
+// Sectors the user currently holds.
+function heldSectorSet() {
+  var set = {};
+  (window.HOLDS || []).forEach(function(h) {
+    var st = (window.ST || []).find(function(s) { return s.s === h.sym; });
+    if (st) set[st.sec] = true;
+  });
+  return set;
+}
+
+function missingSectors() {
+  var held = heldSectorSet();
+  return marketSectorList().filter(function(sec) { return !held[sec]; });
+}
+
 // ─── RESPONSE BANK — Multiple variants per topic ────────
 var AI_BANK = {
   diversification: [
@@ -37,44 +69,35 @@ var AI_BANK = {
         + 'You have <b>' + p.stocks + ' stocks</b> across <b>' + p.sectors + ' sectors</b>.<br><br>'
         + '<b>Sectors:</b> ' + p.sectorStr + '<br><br>'
         + (p.sectors < 3
-          ? '<span class="r">Your portfolio is under-diversified.</span> Aim for at least 4-5 sectors to reduce risk. Consider adding Banking, FMCG, or Pharma stocks.'
+          ? '<span class="r">Your portfolio is under-diversified.</span> Aim for at least 4-5 sectors to reduce risk. Consider adding ' + missingSectors().slice(0, 3).join(', ') + ' stocks.'
           : (p.sectors < 5
             ? '<span class="o">Getting better!</span> You cover ' + p.sectors + ' sectors. Adding 1-2 more would strengthen your portfolio.'
             : '<span class="g">Well diversified!</span> You cover ' + p.sectors + ' sectors — solid spread.'))
-        + '<hr><b>Tip:</b> A well-diversified Indian portfolio covers IT, Banking, Energy, FMCG, Pharma, and Auto.';
+        + '<hr><b>Tip:</b> This market offers ' + marketSectorList().join(', ') + '. Spreading across several lowers your risk.';
     },
     function(p) {
-      var missing = ['IT','Banking','Energy','FMCG','Pharma','Auto'].filter(function(s) {
-        return !p.sectorStr.includes(s);
-      });
-      return '<b>Diversification Score: ' + Math.min(100, Math.round(p.sectors / 6 * 100)) + '/100</b><br><br>'
-        + 'Your portfolio spans ' + p.sectors + ' sector' + (p.sectors !== 1 ? 's' : '') + '.<br>'
+      var sectorUniverse = marketSectorList().length || 6;
+      var missing = missingSectors();
+      return '<b>Diversification Score: ' + Math.min(100, Math.round(p.sectors / sectorUniverse * 100)) + '/100</b><br><br>'
+        + 'Your portfolio spans ' + p.sectors + ' of ' + sectorUniverse + ' sector' + (sectorUniverse !== 1 ? 's' : '') + ' in this market.<br>'
         + (missing.length > 0
           ? '<br><span class="r">Missing sectors:</span> ' + missing.join(', ') + '<br><br>Adding even one stock from a missing sector significantly reduces your portfolio risk.'
-          : '<br><span class="g">All major sectors covered!</span> Great job building a balanced portfolio.')
+          : '<br><span class="g">All sectors covered!</span> Great job building a balanced portfolio.')
         + '<hr><b>Rule of thumb:</b> No single sector should exceed 30% of your portfolio.';
     }
   ],
   missing: [
     function(p) {
-      var all = ['IT','Banking','Energy','FMCG','Pharma','Auto','Metals','Infra'];
-      var missing = all.filter(function(s) { return !p.sectorStr.includes(s); });
-      if (missing.length === 0) return '<span class="g">You\'re covering all major sectors!</span> Focus on rebalancing weights rather than adding new sectors.';
-      var recs = {
-        Banking: 'HDFC Bank or ICICI Bank — India\'s credit growth engine',
-        FMCG: 'ITC (3.5% dividend) or HUL — recession-proof',
-        Pharma: 'Sun Pharma or Cipla — USD-earning exports',
-        Auto: 'Tata Motors (EV play) or Maruti (volume leader)',
-        IT: 'TCS or Infosys — strong dollar earnings',
-        Energy: 'Reliance or NTPC — India\'s backbone',
-        Metals: 'Tata Steel or Hindalco — infrastructure boom',
-        Infra: 'L&T — India\'s largest infra company'
-      };
-      return '<b>You\'re missing ' + missing.length + ' key sector' + (missing.length > 1 ? 's' : '') + ':</b><br><br>'
+      var missing = missingSectors();
+      if (missing.length === 0) return '<span class="g">You\'re covering every sector in this market!</span> Focus on rebalancing weights rather than adding new sectors.';
+      var reps = sectorRepresentatives();
+      return '<b>You\'re missing ' + missing.length + ' sector' + (missing.length > 1 ? 's' : '') + ' available in this market:</b><br><br>'
         + missing.map(function(s, i) {
-          return '<b>' + (i+1) + '. ' + s + '</b><br>' + (recs[s] || 'Consider adding exposure') + '<br>';
+          var rep = reps[s];
+          return '<b>' + (i+1) + '. ' + s + '</b><br>'
+            + (rep ? 'e.g. <b>' + rep.n + ' (' + rep.s + ')</b> — adds ' + s + ' exposure' : 'Consider adding exposure') + '<br>';
         }).join('<br>')
-        + '<hr><span class="o">Priority:</span> Start with the sector that has the least correlation to your existing holdings.';
+        + '<hr><span class="o">Priority:</span> Start with the sector least correlated to what you already hold.';
     }
   ],
   risk: [
@@ -107,31 +130,24 @@ var AI_BANK = {
   ],
   suggestions: [
     function(p) {
-      var missing = ['IT','Banking','Energy','FMCG','Pharma','Auto'].filter(function(s) {
-        return !p.sectorStr.includes(s);
-      });
-      var picks = {
-        Banking: { sym: 'HDFC Bank', why: 'India\'s best-run private bank. Low NPAs, consistent growth.' },
-        FMCG: { sym: 'ITC', why: '3.5% dividend yield. Hotels + FMCG diversification. Recession-proof.' },
-        Pharma: { sym: 'Sun Pharma', why: 'India\'s largest pharma company. Strong global presence.' },
-        Auto: { sym: 'Tata Motors', why: 'JLR EV transition + India commercial vehicle leader.' },
-        IT: { sym: 'TCS', why: 'India\'s IT bellwether. Consistent buybacks, dollar earnings.' },
-        Energy: { sym: 'NTPC', why: 'India\'s largest power producer. Green energy transition play.' }
-      };
+      var missing = missingSectors();
       if (missing.length === 0) {
-        return '<b>Your portfolio looks well-rounded!</b><br><br>Since you cover all major sectors, focus on:<br>'
+        return '<b>Your portfolio looks well-rounded!</b><br><br>You cover every sector in this market, so focus on:<br>'
           + '<b>1.</b> Rebalancing — trim overweight positions<br>'
           + '<b>2.</b> Quality — ensure each holding is a sector leader<br>'
-          + '<b>3.</b> Consider a Nifty 50 ETF for your core allocation';
+          + '<b>3.</b> Consider a broad index ETF for your core allocation';
       }
+      var reps = sectorRepresentatives();
       var top3 = missing.slice(0, 3);
-      return '<b>Top Stock Picks to Balance Your Portfolio:</b><br><br>'
+      var first = reps[top3[0]];
+      return '<b>Top picks to balance your portfolio:</b><br><br>'
         + top3.map(function(s, i) {
-          var pick = picks[s];
-          return '<b>' + (i+1) + '. ' + pick.sym + '</b> <span class="pill pg">' + s + '</span><br>'
-            + pick.why + '<br>';
+          var pick = reps[s];
+          if (!pick) return '';
+          return '<b>' + (i+1) + '. ' + pick.n + ' (' + pick.s + ')</b> <span class="pill pg">' + s + '</span><br>'
+            + 'Adds ' + s + ' exposure — a sector you don\'t currently hold.<br>';
         }).join('<br>')
-        + '<hr><span class="o">Start with just one.</span> Adding ' + picks[top3[0]].sym + ' alone improves your diversification significantly.';
+        + '<hr><span class="o">Start with just one.</span>' + (first ? ' Adding <b>' + first.s + '</b> alone improves your diversification significantly.' : '');
     }
   ],
   beginner: [
