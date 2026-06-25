@@ -56,7 +56,8 @@ function buildQuestions(cat, n) {
     if (q.type === 'tf') {
       return { q: q.q, why: q.why || '', opts: [{ t: 'True', c: !!q.answer }, { t: 'False', c: !q.answer }] };
     }
-    var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function (w) { return { t: w, c: false }; }));
+    var wrongWhy = q.wrongWhy || {};
+    var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function (w) { return { t: w, c: false, exp: wrongWhy[w] || '' }; }));
     return { q: q.q, why: q.why || '', opts: shuffle(opts) };
   });
 }
@@ -157,7 +158,7 @@ function quizCheck() {
       stage.classList.add('shake');
       setTimeout(function () { stage.classList.remove('shake'); }, 400);
     }
-    fb.innerHTML += '<button class="qz-explain" onclick="quizExplain()">&#128172; Explain in detail</button>';
+    fb.innerHTML += '<button class="qz-explain" onclick="quizExplain(this)">&#128172; Explain in detail</button>';
     check.textContent = (QZ.idx + 1 >= QZ.qs.length) ? 'Finish' : 'Continue';
     check.className = 'qz-check ' + (ok ? 'good' : 'bad');
     check.disabled = false;
@@ -178,7 +179,8 @@ function buildPlacement() {
   var chosen = [].concat(pickFrom(['basics'], 2), pickFrom(['stocks', 'risk'], 2), pickFrom(['strategy', 'advanced'], 2));
   return chosen.map(function (q) {
     if (q.type === 'tf') return { q: q.q, why: q.why || '', opts: [{ t: 'True', c: !!q.answer }, { t: 'False', c: !q.answer }] };
-    var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function (w) { return { t: w, c: false }; }));
+    var wrongWhy = q.wrongWhy || {};
+    var opts = [{ t: q.correct, c: true }].concat(q.wrong.map(function (w) { return { t: w, c: false, exp: wrongWhy[w] || '' }; }));
     return { q: q.q, why: q.why || '', opts: shuffle(opts) };
   });
 }
@@ -263,18 +265,50 @@ function failQuiz() {
     + '<button class="qz-check good" onclick="startQuiz(QZ.lesson)">Try again</button>';
 }
 
-// Open Fin and ask for a detailed explanation of the current question.
-function quizExplain() {
+// Show a detailed explanation INLINE inside the quiz — never close the quiz, so
+// dismissing it returns the user to the exact question they were on. Toggles.
+function quizExplain(btn) {
   var q = QZ.qs[QZ.idx];
   if (!q) return;
-  var correct = q.opts.filter(function (o) { return o.c; })[0].t;
-  closeQuiz();
-  if (typeof openAI === 'function') {
-    openAI();
-    setTimeout(function () {
-      if (typeof qs === 'function') qs('Explain this in detail with an example: "' + q.q + '" The correct answer is "' + correct + '". Why is that right and the others wrong?');
-    }, 280);
+
+  var existing = document.getElementById('qzExplainBox');
+  if (existing) {
+    existing.remove();
+    if (btn) btn.innerHTML = '&#128172; Explain in detail';
+    return;
   }
+
+  var correctTxt = q.opts.filter(function (o) { return o.c; })[0].t;
+  var wrongs = q.opts.filter(function (o) { return !o.c; });
+
+  var box = document.createElement('div');
+  box.id = 'qzExplainBox';
+  box.className = 'qz-explain-box';
+  box.innerHTML =
+    '<div class="qz-ex-hd">&#128161; Here\'s why</div>'
+    + (q.why ? '<p class="qz-ex-why">' + q.why + '</p>' : '')
+    + '<div class="qz-ex-row good"><span class="qz-ex-tag ok">&#10003; Correct</span><span>' + correctTxt + '</span></div>'
+    + wrongs.map(function (o) {
+        return '<div class="qz-ex-row bad"><span class="qz-ex-tag no">&#10007;</span><span><b>' + o.t + '</b>'
+          + (o.exp ? ' — ' + o.exp : ' — doesn\'t fit the reasoning above') + '</span></div>';
+      }).join('')
+    + '<button class="qz-ex-more" onclick="quizAskFin()">&#128172; Ask Fin a follow-up</button>';
+
+  document.getElementById('qzFb').appendChild(box);
+  if (btn) btn.innerHTML = '&#128172; Hide explanation';
+  box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+// Optional deeper dive: open Fin. The quiz overlay stays mounted underneath,
+// so closing Fin returns the user to the same question.
+function quizAskFin() {
+  var q = QZ.qs[QZ.idx];
+  if (!q || typeof openAI !== 'function') return;
+  var correct = q.opts.filter(function (o) { return o.c; })[0].t;
+  openAI();
+  setTimeout(function () {
+    if (typeof qs === 'function') qs('Explain this in detail with an example: "' + q.q + '" The correct answer is "' + correct + '". Why is that right and the others wrong?');
+  }, 280);
 }
 
 function closeQuiz() {
