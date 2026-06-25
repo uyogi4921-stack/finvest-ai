@@ -542,6 +542,9 @@ function openAI() {
     aiStarted = true;
     // Welcome message is already in HTML, no need to add another
   }
+
+  // Refresh the health score from the live portfolio each time Fin opens
+  if (typeof renderHealthScore === 'function') renderHealthScore();
 }
 
 function closeAI() {

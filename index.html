@@ -187,17 +187,21 @@
   </div>
   <div class="aihlth">
     <div class="hlr">
-      <span class="hll">Portfolio Health Score</span>
+      <span class="hll">Portfolio Health Score
+        <button class="hl-info-btn" id="hlInfoBtn" onclick="toggleHealthInfo()" aria-label="How is this score calculated?" title="How is this calculated?">&#9432;</button>
+      </span>
       <div style="display:flex;align-items:center;gap:6px;">
-        <span class="hlsc">42/100</span>
-        <span class="hlgr">Needs Work</span>
+        <span class="hlsc" id="hlScore">&mdash;/100</span>
+        <span class="hlgr" id="hlGrade">&mdash;</span>
       </div>
     </div>
     <div class="hlsegs">
-      <div class="hls"><div class="hlsl">Diversification</div><div class="hlsv" style="color:var(--rd)">Poor</div></div>
-      <div class="hls"><div class="hlsl">Sector Spread</div><div class="hlsv" style="color:var(--gd)">2/6</div></div>
-      <div class="hls"><div class="hlsl">Risk Level</div><div class="hlsv" style="color:var(--or)">High</div></div>
+      <div class="hls"><div class="hlsl">Diversification</div><div class="hlsv" id="hlDiv">&mdash;</div></div>
+      <div class="hls"><div class="hlsl">Sector Spread</div><div class="hlsv" id="hlSpread">&mdash;</div></div>
+      <div class="hls"><div class="hlsl">Risk Level</div><div class="hlsv" id="hlRisk">&mdash;</div></div>
     </div>
+    <div class="hlnote" id="hlNote"></div>
+    <div class="hlinfo" id="hlInfo" hidden></div>
   </div>
   <div class="aichat" id="aichat">
     <div class="aimsg ai">

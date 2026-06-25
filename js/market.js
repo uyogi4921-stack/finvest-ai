@@ -96,6 +96,109 @@ function calcPortfolio() {
   };
 }
 
+// ─── PORTFOLIO HEALTH SCORE ──────────────────────────────
+// Transparent, market-aware score. Three weighted components so a holder of
+// great-but-concentrated stocks isn't simply branded "Needs Work" with no
+// explanation. The breakdown + formula are shown via toggleHealthInfo().
+function computeHealth() {
+  var port = calcPortfolio();
+  var total = port.totalValue || 0;
+  var secs = Object.keys(port.sectorAlloc);
+  var nSec = secs.length;
+  var nStock = port.stockCount;
+
+  // Sector universe of the active market (cap target at 6 for parity across markets)
+  var marketCats = (window.MKT && MKT.cats) ? MKT.cats.filter(function(c) { return c !== 'All'; }) : [];
+  var targetSec = Math.min(6, Math.max(4, marketCats.length || 6));
+
+  // Largest single-sector weight = concentration proxy
+  var topWeight = total > 0
+    ? Math.max.apply(null, secs.map(function(s) { return port.sectorAlloc[s]; })) / total * 100
+    : 0;
+
+  // 1) Diversification (0–45): sectors covered vs a sensible 5-sector goal
+  var divScore = Math.round(Math.min(1, nSec / Math.min(5, targetSec)) * 45);
+  // 2) Concentration (0–30): reward spreading risk across sectors
+  var conc = topWeight <= 30 ? 30 : topWeight <= 45 ? 24 : topWeight <= 60 ? 16 : topWeight <= 80 ? 9 : 4;
+  // 3) Breadth (0–25): number of distinct positions
+  var breadth = [0, 8, 13, 17, 21][nStock];
+  if (breadth === undefined) breadth = 25;
+
+  var score = nStock === 0 ? 0 : Math.round(divScore + conc + breadth);
+
+  var grade = score >= 90 ? 'Excellent' : score >= 75 ? 'Strong'
+    : score >= 60 ? 'Balanced' : score >= 40 ? 'Building' : nStock === 0 ? 'Empty' : 'Just Starting';
+  var gradeColor = score >= 75 ? 'var(--gr)' : score >= 60 ? '#8bc34a' : score >= 40 ? 'var(--gd)' : 'var(--or)';
+
+  var divLabel = nSec >= 5 ? 'Great' : nSec >= 4 ? 'Good' : nSec >= 3 ? 'Fair' : nSec >= 1 ? 'Concentrated' : '—';
+  var divColor = nSec >= 4 ? 'var(--gr)' : nSec >= 3 ? 'var(--gd)' : 'var(--or)';
+  var riskLabel = nStock === 0 ? '—' : topWeight <= 30 ? 'Low' : topWeight <= 50 ? 'Moderate' : topWeight <= 80 ? 'Elevated' : 'High';
+  var riskColor = topWeight <= 30 ? 'var(--gr)' : topWeight <= 50 ? 'var(--gd)' : 'var(--or)';
+
+  return {
+    score: score, grade: grade, gradeColor: gradeColor,
+    nSec: nSec, targetSec: targetSec, nStock: nStock, topWeight: Math.round(topWeight),
+    topSector: total > 0 ? secs.reduce(function(a, b) { return port.sectorAlloc[a] > port.sectorAlloc[b] ? a : b; }) : null,
+    divLabel: divLabel, divColor: divColor, riskLabel: riskLabel, riskColor: riskColor,
+    divScore: divScore, conc: conc, breadth: breadth,
+    parts: { divScore: divScore, conc: conc, breadth: breadth }
+  };
+}
+
+function renderHealthScore() {
+  if (!document.getElementById('hlScore')) return;
+  var h = computeHealth();
+  var set = function(id, txt, color) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = txt;
+    if (color) el.style.color = color;
+  };
+  set('hlScore', h.score + '/100');
+  set('hlGrade', h.grade, h.gradeColor);
+  document.getElementById('hlGrade').style.background = 'transparent';
+  set('hlDiv', h.divLabel, h.divColor);
+  set('hlSpread', h.nSec + '/' + h.targetSec, h.nSec >= h.targetSec ? 'var(--gr)' : 'var(--gd)');
+  set('hlRisk', h.riskLabel, h.riskColor);
+
+  var note = document.getElementById('hlNote');
+  if (note) {
+    if (h.nStock === 0) {
+      note.innerHTML = 'No holdings yet — buy a few stocks across sectors and watch this climb.';
+    } else if (h.nSec <= 2) {
+      note.innerHTML = h.topSector
+        ? 'Your picks may be solid, but ' + h.topWeight + '% sits in <b>' + h.topSector + '</b>. Spreading into another sector is the fastest way to raise this score.'
+        : 'Add holdings from a second sector to reduce concentration risk.';
+    } else if (h.score >= 75) {
+      note.innerHTML = 'Nicely balanced across ' + h.nSec + ' sectors. Keep rebalancing as prices move.';
+    } else {
+      note.innerHTML = 'Good start across ' + h.nSec + ' sectors. One or two more sectors would push you into Strong territory.';
+    }
+  }
+
+  var info = document.getElementById('hlInfo');
+  if (info) {
+    var cats = (window.MKT && MKT.cats) ? MKT.cats.filter(function(c) { return c !== 'All'; }) : [];
+    info.innerHTML =
+      '<div class="hli-h">How this score works</div>'
+      + '<ul class="hli-list">'
+      + '<li><b>Diversification</b> — sectors you hold vs a 5-sector goal <span class="hli-pts">' + h.parts.divScore + '/45</span></li>'
+      + '<li><b>Concentration</b> — how much sits in your biggest sector (' + h.topWeight + '%) <span class="hli-pts">' + h.parts.conc + '/30</span></li>'
+      + '<li><b>Breadth</b> — number of different holdings (' + h.nStock + ') <span class="hli-pts">' + h.parts.breadth + '/25</span></li>'
+      + '</ul>'
+      + '<div class="hli-sub"><b>' + (window.MKT ? MKT.label : '') + ' sectors:</b> ' + (cats.length ? cats.join(', ') : 'n/a') + '</div>'
+      + '<div class="hli-sub">A higher score means lower risk from any single company or sector — not a judgment of the stocks themselves.</div>';
+  }
+}
+
+function toggleHealthInfo() {
+  var info = document.getElementById('hlInfo');
+  if (!info) return;
+  info.hidden = !info.hidden;
+  var btn = document.getElementById('hlInfoBtn');
+  if (btn) btn.classList.toggle('on', !info.hidden);
+}
+
 // ─── HOLDINGS INIT ────────────────────────────────────────
 function initHoldings() {
   renderHoldingsTable();
@@ -192,6 +295,9 @@ function updateDashboardStats() {
 
   // "Your investments" sidebar card
   if (typeof renderInvestCard === 'function') renderInvestCard();
+
+  // Live portfolio health score
+  if (typeof renderHealthScore === 'function') renderHealthScore();
 }
 
 // ─── SECTOR CHART (Canvas) ──────────────────────────────
