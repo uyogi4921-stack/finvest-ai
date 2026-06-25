@@ -603,6 +603,52 @@ function hideTyping() {
   if (t) t.remove();
 }
 
+// ─── HYBRID ANSWER ENGINE ────────────────────────────────
+// Use the Anthropic-backed tutor when the server has a key; otherwise fall back
+// to the built-in offline engine so Fin always answers.
+window.aiLLM = null; // null = unknown, true/false once checked
+
+function checkFinLLM() {
+  if (aiLLM !== null) return Promise.resolve(aiLLM);
+  return fetch('/api/chat/status').then(function(r) { return r.json(); })
+    .then(function(j) { aiLLM = !!(j && j.llm); return aiLLM; })
+    .catch(function() { aiLLM = false; return false; });
+}
+
+function finContext() {
+  var ctx = { market: (window.MKT ? MKT.label : window.currentMarket) };
+  try {
+    var p = getPortfolioSummary();
+    ctx.holdings = p.holdings; ctx.sectors = p.sectorStr;
+    ctx.gainPct = p.gainPct; ctx.value = (typeof fINR === 'function' ? fINR(p.value) : p.value);
+  } catch (e) {}
+  if (window.userProfile) ctx.profile = { name: userProfile.name, goal: userProfile.goal, risk: userProfile.risk };
+  return ctx;
+}
+
+function escapeHtmlAI(s) {
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// LLM output is rendered as HTML, so escape first, then re-introduce only
+// paragraph/line breaks. Prevents any injection from model output.
+function finFormat(text) {
+  return escapeHtmlAI(text).trim().split(/\n{2,}/).map(function(b) {
+    return b.replace(/\n/g, '<br>');
+  }).join('<br><br>');
+}
+
+function fetchFinLLM(txt) {
+  return fetch('/api/chat', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ message: txt, context: finContext() })
+  }).then(function(r) { return r.json(); })
+    .then(function(j) { return (j && j.ok && j.reply) ? finFormat(j.reply) : null; })
+    .catch(function() { return null; });
+}
+
 function sendMsg() {
   if (aiTyping) return;
   var inp = document.getElementById('aiinp');
@@ -618,13 +664,21 @@ function sendMsg() {
   document.getElementById('aisend').disabled = true;
   showTyping();
 
-  setTimeout(function() {
+  // Keep a small floor so the typing indicator doesn't flash; race the LLM
+  // (when available) against the offline engine as a guaranteed fallback.
+  var minDelay = new Promise(function(res) { setTimeout(res, 450); });
+  var reply = checkFinLLM().then(function(useLLM) {
+    return useLLM ? fetchFinLLM(txt) : null;
+  });
+
+  Promise.all([reply, minDelay]).then(function(arr) {
     hideTyping();
-    addBot(getReply(txt));
+    addBot(arr[0] || getReply(txt));
     aiTyping = false;
-    document.getElementById('aisend').disabled = false;
+    var sendBtn = document.getElementById('aisend');
+    if (sendBtn) sendBtn.disabled = false;
     document.getElementById('aichat').scrollTop = 99999;
-  }, 700 + Math.random() * 600);
+  });
 }
 
 function qs(msg) {

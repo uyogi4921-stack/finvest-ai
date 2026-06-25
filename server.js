@@ -12,6 +12,20 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// Minimal zero-dependency .env loader (only sets vars not already in env).
+(function loadDotEnv() {
+  try {
+    var envPath = path.join(__dirname, '.env');
+    if (!fs.existsSync(envPath)) return;
+    fs.readFileSync(envPath, 'utf8').split('\n').forEach(function(line) {
+      var m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+      if (!m || line.trim().charAt(0) === '#') return;
+      var val = m[2].replace(/^["']|["']$/g, '');
+      if (process.env[m[1]] === undefined && val !== '') process.env[m[1]] = val;
+    });
+  } catch (e) { /* ignore */ }
+})();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -467,6 +481,75 @@ app.get('/api/news', async function(req, res) {
     } catch (e) {}
   }
   res.json({ ok: false, news: [] });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  AI TUTOR (Fin) — Anthropic-backed when a key is configured.
+//  No key → { ok:false, reason:'no-key' } and the client uses its
+//  built-in offline engine, so Fin always answers.
+// ═══════════════════════════════════════════════════════════
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const FINVEST_MODEL = process.env.FINVEST_MODEL || 'claude-haiku-4-5-20251001';
+
+function buildFinSystem(ctx) {
+  ctx = ctx || {};
+  var lines = [
+    'You are Fin, the friendly AI investing tutor inside Finvest AI — a gamified PAPER-TRADING app (virtual money, no real funds).',
+    'Audience: Gen-Z beginners. Be warm, encouraging and conversational, like a knowledgeable friend — never robotic or templated.',
+    'Keep answers concise (about 60-150 words). Lead with the direct answer, then a short why. Avoid jargon, or define it in plain words.',
+    'Always ground advice in the user\'s actual portfolio context below when relevant. Personalise — refer to their holdings, sectors and goal.',
+    'Never give real-money financial advice or price predictions; frame everything as education for practice. No disclaimers longer than one short clause.',
+    'Formatting: plain text only. Use blank lines between short paragraphs and "• " for bullet points. Do NOT use markdown symbols like # or **.'
+  ];
+  var c = [];
+  if (ctx.market) c.push('Active market: ' + ctx.market);
+  if (ctx.profile) c.push('User: ' + [ctx.profile.name, ctx.profile.goal && ('goal ' + ctx.profile.goal), ctx.profile.risk && (ctx.profile.risk + ' risk')].filter(Boolean).join(', '));
+  if (ctx.holdings) c.push('Holdings: ' + ctx.holdings);
+  if (ctx.sectors) c.push('Sectors: ' + ctx.sectors);
+  if (typeof ctx.gainPct === 'number') c.push('Overall P&L: ' + ctx.gainPct.toFixed(1) + '%');
+  if (ctx.value) c.push('Portfolio value: ' + ctx.value);
+  if (c.length) lines.push('\nUser portfolio context:\n' + c.join('\n'));
+  return lines.join('\n');
+}
+
+app.get('/api/chat/status', function(req, res) {
+  res.json({ ok: true, llm: !!ANTHROPIC_API_KEY, model: ANTHROPIC_API_KEY ? FINVEST_MODEL : null });
+});
+
+app.post('/api/chat', async function(req, res) {
+  if (!ANTHROPIC_API_KEY) return res.json({ ok: false, reason: 'no-key' });
+  var message = String((req.body && req.body.message) || '').slice(0, 1200).trim();
+  if (!message) return res.status(400).json({ ok: false, error: 'message required' });
+  var ctx = (req.body && req.body.context) || {};
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: FINVEST_MODEL,
+        max_tokens: 700,
+        system: buildFinSystem(ctx),
+        messages: [{ role: 'user', content: message }]
+      })
+    });
+    if (!r.ok) {
+      var errTxt = await r.text();
+      console.error('Anthropic error', r.status, errTxt.slice(0, 200));
+      return res.json({ ok: false, error: 'api ' + r.status });
+    }
+    var j = await r.json();
+    var text = (j.content || []).filter(function(b) { return b.type === 'text'; })
+      .map(function(b) { return b.text; }).join('\n').trim();
+    if (!text) return res.json({ ok: false, error: 'empty' });
+    res.json({ ok: true, reply: text });
+  } catch (e) {
+    console.error('chat error', e.message);
+    res.json({ ok: false, error: String(e.message || e) });
+  }
 });
 
 // ─── SERVE ADMIN PAGE ────────────────────────────────────
