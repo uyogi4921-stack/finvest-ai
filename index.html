@@ -326,6 +326,19 @@
   <div class="page on" id="page-dashboard">
     <div class="ticker" id="ticker"></div>
 
+    <!-- First-trade onboarding CTA (shown to brand-new users, dismissible) -->
+    <div class="ft-cta" id="ftCta" hidden>
+      <div class="ft-cta-ic">&#127881;</div>
+      <div class="ft-cta-main">
+        <div class="ft-cta-t" id="ftCtaTitle">Welcome! You've got virtual money to practice with.</div>
+        <div class="ft-cta-d" id="ftCtaDesc">Make your first trade — buy any stock to see how your portfolio moves. Zero real-world risk.</div>
+      </div>
+      <div class="ft-cta-actions">
+        <button class="ft-cta-btn" onclick="goFirstTrade()">Make your first trade &rarr;</button>
+        <button class="ft-cta-x" onclick="dismissFirstTrade()" aria-label="Dismiss">&#10005;</button>
+      </div>
+    </div>
+
     <div class="dash-grid2">
       <!-- Main column -->
       <div class="dash-main">

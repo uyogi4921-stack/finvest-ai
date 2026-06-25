@@ -37,7 +37,16 @@ function renderIntro() {
   var s = INTRO_SLIDES[_intro.idx];
   document.getElementById('introIc').innerHTML = s.ic;
   document.getElementById('introT').innerHTML = s.t;
-  document.getElementById('introD').innerHTML = s.d;
+  // Welcome slide surfaces the market-specific virtual cash grant
+  var desc = s.d;
+  if (_intro.idx === 0) {
+    var m = window.MKT || (window.MARKETS && MARKETS[currentMarket]);
+    if (m) {
+      var bal = (typeof fINR === 'function') ? fINR(m.startCash) : m.cur + m.startCash.toLocaleString();
+      desc = 'You start with <b>' + bal + '</b> in virtual money — practice investing with <b>real market data</b> at zero real-world risk. Learn, trade, and level up.';
+    }
+  }
+  document.getElementById('introD').innerHTML = desc;
   document.getElementById('introDots').innerHTML = INTRO_SLIDES.map(function (_, i) {
     return '<span class="intro-dot' + (i === _intro.idx ? ' on' : '') + '"></span>';
   }).join('');
@@ -77,3 +86,36 @@ function closeIntro() {
 function startOnboarding() { showIntro('onboard'); }
 // Re-open the guide anytime (navbar "?" button).
 function openHelp() { showIntro('help'); }
+
+// ─── FIRST-TRADE CTA ─────────────────────────────────────
+// Duolingo-style next action for brand-new users: surface the virtual cash
+// grant and point them at their first trade. Hidden once they trade or dismiss.
+function renderFirstTradeCTA() {
+  var el = document.getElementById('ftCta');
+  if (!el) return;
+  var traded = (window.tradeHistory && tradeHistory.length > 0);
+  var dismissed = Store.get('ftDismissed', false);
+  if (traded || dismissed) { el.hidden = true; return; }
+
+  var m = window.MKT || (window.MARKETS && MARKETS[currentMarket]);
+  var bal = (window.wallet && typeof wallet.balance === 'number') ? wallet.balance : (m ? m.startCash : 0);
+  var name = (window.userProfile && userProfile.name) ? userProfile.name.split(' ')[0] : 'there';
+  var balText = (typeof fINR === 'function') ? fINR(bal) : (m ? m.cur + bal.toLocaleString() : bal);
+
+  var t = document.getElementById('ftCtaTitle');
+  var d = document.getElementById('ftCtaDesc');
+  if (t) t.innerHTML = 'Welcome, ' + name + '! You have <b>' + balText + '</b> in virtual money to practice with.';
+  if (d) d.textContent = 'Make your first trade — buy any stock to see how your portfolio moves. Zero real-world risk.';
+  el.hidden = false;
+}
+
+function goFirstTrade() {
+  if (typeof navTo === 'function') navTo('market');
+  if (typeof showToast === 'function') showToast('💡 Pick a stock and tap Buy to start');
+}
+
+function dismissFirstTrade() {
+  Store.set('ftDismissed', true);
+  var el = document.getElementById('ftCta');
+  if (el) el.hidden = true;
+}

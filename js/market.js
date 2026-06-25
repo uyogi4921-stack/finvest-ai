@@ -298,6 +298,9 @@ function updateDashboardStats() {
 
   // Live portfolio health score
   if (typeof renderHealthScore === 'function') renderHealthScore();
+
+  // First-trade onboarding nudge for brand-new users
+  if (typeof renderFirstTradeCTA === 'function') renderFirstTradeCTA();
 }
 
 // ─── SECTOR CHART (Canvas) ──────────────────────────────
