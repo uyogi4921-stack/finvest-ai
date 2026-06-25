@@ -445,6 +445,43 @@ var AI_BANK = {
   }
 };
 
+// Keyword sets for a scoring fallback — catches paraphrases the strict regex
+// chain misses, so the offline engine rarely drops to the generic menu.
+var TOPIC_KW = {
+  portfolio:       ['how am i doing', 'how is my', 'hows my', 'how are my', 'my portfolio', 'my holdings', 'my returns', 'review my', 'doing well', 'net worth', 'overall', 'how do i look', 'whats my'],
+  diversification: ['diversif', 'spread out', 'spread across', 'concentrat', 'balanced', 'too much in', 'well rounded', 'all in one', 'sector mix', 'variety'],
+  suggestions:     ['what should i buy', 'what to buy', 'recommend', 'suggest', 'what do i add', 'which should i', 'good buy', 'worth buying', 'next stock'],
+  risk:            ['risky', 'how risky', 'too risky', 'dangerous', 'how safe', 'exposure', 'worst stock', 'biggest risk', 'losing'],
+  missing:         ['missing', 'what sector', 'which sector', 'gap', 'dont have', 'lacking', 'should add'],
+  beginner:        ['how do i start', 'new to', 'just starting', 'beginner', 'first time', 'begin', 'start invest', 'getting started', 'where do i'],
+  sip:             ['sip', 'monthly invest', 'systematic', 'recurring', 'every month', 'invest regularly'],
+  compounding:     ['compound', 'rule of 72', 'snowball', 'interest on interest', 'grow over time'],
+  inflation:       ['inflation', 'cost of living', 'purchasing power', 'money losing value'],
+  tax:             ['tax', 'capital gain', 'ltcg', 'stcg', '80c', 'how much tax'],
+  dividend:        ['dividend', 'yield', 'payout', 'passive income'],
+  pe_ratio:        ['p/e', 'pe ratio', 'price to earning', 'valuation', 'overvalued', 'undervalued', 'expensive stock'],
+  etf:             ['etf', 'index fund', 'exchange traded'],
+  gold:            ['gold', 'precious metal', 'sovereign gold'],
+  crypto_ai:       ['crypto', 'bitcoin', 'ethereum', 'blockchain', 'btc', 'should i buy crypto'],
+  volatility:      ['volatil', 'swing', 'swinging', 'ups and downs', 'price swing', 'fluctuat', 'jumping around', 'moving so much'],
+  recession:       ['recession', 'crash', 'market falling', 'downturn', 'bear market', 'market dip', 'should i sell'],
+  allocation:      ['asset allocation', 'how much in stocks', 'stock bond mix', 'how to split', 'allocation'],
+  emergency:       ['emergency fund', 'rainy day', 'safety net', 'how much cash'],
+  bluechip:        ['blue chip', 'safe stock', 'stable stock', 'reliable stock', 'large cap']
+};
+
+function scoreTopic(q) {
+  var best = null, bestScore = 0;
+  Object.keys(TOPIC_KW).forEach(function(t) {
+    var kws = TOPIC_KW[t], s = 0;
+    for (var i = 0; i < kws.length; i++) {
+      if (q.indexOf(kws[i]) !== -1) s += kws[i].indexOf(' ') !== -1 ? 3 : 2;
+    }
+    if (s > bestScore) { bestScore = s; best = t; }
+  });
+  return bestScore >= 2 ? best : null;
+}
+
 // ─── SMART REPLY ENGINE ─────────────────────────────────
 function getReply(msg) {
   var q = msg.toLowerCase();
@@ -506,6 +543,10 @@ function getReply(msg) {
   else if (q.match(/demat|account|kyc|broker|open.*account/)) topic = 'demat';
   else if (q.match(/blue.?chip|safe.*stock|stable.*stock|reliable/)) topic = 'bluechip';
   else if (q.match(/stop.?loss|trailing|protect.*loss|limit.*loss/)) topic = 'stop_loss';
+
+  // Second pass: score the query against keyword sets to catch paraphrases the
+  // strict regex chain missed (e.g. "how's my money doing?" → portfolio).
+  if (!topic) topic = scoreTopic(q);
 
   if (!topic) {
     // No confident match — give a helpful menu instead of a random answer.
