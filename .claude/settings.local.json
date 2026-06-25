@@ -68,7 +68,14 @@
       "Bash(node -e 'let d=\"\";process.stdin.on\\(\"data\",c=>d+=c\\).on\\(\"end\",\\(\\)=>{const j=JSON.parse\\(d\\);console.log\\(\"ok\",j.ok,\"n\",j.news.length,\"src\",j.news[0]&&j.news[0].src,\"| first:\",j.news[0]&&j.news[0].title\\)}\\)')",
       "Bash(node --check js/quiz.js)",
       "Bash(grep -oE \"color:var\\\\\\(--[a-z]+\\\\\\)|color:#[0-9a-fA-F]{3,6}\" js/data.js)",
-      "Bash(node --check js/ai.js)"
+      "Bash(node --check js/ai.js)",
+      "Bash(npm install *)",
+      "Bash(echo \"install EXIT=$?\")",
+      "Bash(npm test *)",
+      "Bash(npx vitest *)",
+      "Bash(sed -n '/function calcSIP/,/^}/p' js/ui.js)",
+      "Bash(sed -n '/function calcLumpsum/,/^}/p' js/ui.js)",
+      "Bash(grep -rnoE \"sk-ant-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{20,}|eyJ[A-Za-z0-9_-]{20,}|supabase\\\\.co|service_role\" ai-tutor --include=\"*.ts\" --include=\"*.mjs\" --include=\"*.json\" --include=\"*.example\")"
     ]
   }
 }

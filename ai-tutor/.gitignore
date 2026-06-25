@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# next
+.next/
+out/
+
+# env — NEVER commit real secrets
+.env
+.env.local
+.env*.local
+
+# misc
+*.tsbuildinfo
+.DS_Store
