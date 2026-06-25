@@ -434,12 +434,17 @@ function getReply(msg) {
   var q = msg.toLowerCase();
   var p = getPortfolioSummary();
 
-  // Check for specific stock names
+  // Check for a specific stock — but only on a WHOLE-WORD match, so a 1-letter
+  // ticker like F (Ford) or V (Visa) doesn't fire on "diversiFied" etc.
   var stockMatch = null;
   ST.forEach(function(s) {
-    if (q.includes(s.s.toLowerCase()) || q.includes(s.n.toLowerCase())) {
-      stockMatch = s.s;
-    }
+    if (stockMatch) return;
+    var sym = s.s.toLowerCase();
+    var nm = s.n.toLowerCase();
+    var esc = sym.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var symHit = new RegExp('\\b' + esc + '\\b').test(q);
+    var nameHit = nm.length >= 4 && q.indexOf(nm) !== -1;
+    if (symHit || nameHit) stockMatch = s.s;
   });
   if (stockMatch && AI_BANK.specific_stock) {
     var resp = AI_BANK.specific_stock(stockMatch);
