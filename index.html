@@ -215,7 +215,7 @@
       <div class="qpchip" onclick="qs('What sectors am I missing?')">Missing sectors</div>
       <div class="qpchip" onclick="qs('Which stock is my riskiest?')">Riskiest stock</div>
       <div class="qpchip" onclick="qs('Suggest stocks to balance my portfolio')">Suggestions</div>
-      <div class="qpchip" onclick="qs('Should I hold or reduce ONGC?')">ONGC advice</div>
+      <div class="qpchip" id="chipHold" onclick="qs('Should I hold or reduce ONGC?')">ONGC advice</div>
       <div class="qpchip" onclick="qs('How do I start investing as a beginner?')">Beginner guide</div>
     </div>
   </div>
@@ -475,7 +475,7 @@
     <div class="calc-card">
       <div class="calc-row">
         <div class="calc-field">
-          <label>Monthly Investment (&#8377;)</label>
+          <label id="sipAmtLbl">Monthly Investment (&#8377;)</label>
           <input type="number" id="sipAmount" value="5000" min="100" class="calc-input" oninput="calcSIP()">
         </div>
         <div class="calc-field">
@@ -500,7 +500,7 @@
     <div class="calc-card">
       <div class="calc-row">
         <div class="calc-field">
-          <label>Investment Amount (&#8377;)</label>
+          <label id="lsAmtLbl">Investment Amount (&#8377;)</label>
           <input type="number" id="lsAmount" value="100000" min="1000" class="calc-input" oninput="calcLumpsum()">
         </div>
         <div class="calc-field">

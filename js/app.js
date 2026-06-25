@@ -52,9 +52,9 @@ function initApp() {
     });
   }
 
-  // Calculator defaults
-  calcSIP();
-  calcLumpsum();
+  // Calculator defaults — currency follows the active market
+  if (typeof syncCalcCurrency === 'function') syncCalcCurrency(); else { calcSIP(); calcLumpsum(); }
+  if (typeof syncTopHoldingChip === 'function') syncTopHoldingChip();
 
   // Show profile prompt if no profile exists
   if (!userProfile) {

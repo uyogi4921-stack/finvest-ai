@@ -362,6 +362,8 @@ function syncMarketUI() {
   });
   var lbl = document.querySelector('#page-dashboard .h-lbl');
   if (lbl) lbl.textContent = 'Total Net Worth (' + MKT.label + ')';
+  if (typeof syncCalcCurrency === 'function') syncCalcCurrency();
+  if (typeof syncTopHoldingChip === 'function') syncTopHoldingChip();
 }
 
 // ─── MARKET GRID ─────────────────────────────────────────

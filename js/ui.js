@@ -443,6 +443,45 @@ function calcLumpsum() {
   document.getElementById('lsTotal').textContent = fINR(futureValue);
 }
 
+// Keep the Resources calculators in sync with the active market: currency symbol
+// in the amount labels + result placeholders, and re-run both calculations so
+// values never show a stale currency.
+function syncCalcCurrency() {
+  var cur = (window.MKT || MARKETS[currentMarket]).cur;
+  var amtLbls = { sipAmtLbl: 'Monthly Investment', lsAmtLbl: 'Investment Amount' };
+  Object.keys(amtLbls).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = amtLbls[id] + ' (' + cur + ')';
+  });
+  ['sipInvested', 'sipReturns', 'sipTotal', 'lsInvested', 'lsReturns', 'lsTotal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && /^[₹$]?0$/.test(el.textContent.trim())) el.textContent = cur + '0';
+  });
+  if (typeof calcSIP === 'function') calcSIP();
+  if (typeof calcLumpsum === 'function') calcLumpsum();
+}
+
+// The "hold or reduce X" quick-ask must point at a stock that exists in the
+// active market — hardcoding ONGC broke it in US/Crypto. Pick the user's
+// largest holding; fall back to the market's first stock.
+function syncTopHoldingChip() {
+  var chip = document.getElementById('chipHold');
+  if (!chip) return;
+  var sym = null;
+  if (window.HOLDS && HOLDS.length) {
+    var top = HOLDS.slice().sort(function(a, b) {
+      var pa = (window.prices && prices[a.sym]) || a.avgPrice || 0;
+      var pb = (window.prices && prices[b.sym]) || b.avgPrice || 0;
+      return (b.qty * pb) - (a.qty * pa);
+    })[0];
+    if (top) sym = top.sym;
+  }
+  if (!sym && window.ST && ST.length) sym = ST[0].s;
+  if (!sym) return;
+  chip.textContent = sym + ' advice';
+  chip.setAttribute('onclick', "qs('Should I hold or reduce " + sym + "?')");
+}
+
 // ─── GLOSSARY ────────────────────────────────────────────
 function renderGlossary(query) {
   var el = document.getElementById('glossaryList');
