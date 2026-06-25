@@ -1526,6 +1526,53 @@ html.light .iv-btn.on { background: rgba(15,32,25,.08); }
 .lb-tab.on { background: var(--grad); color: #05100c; }
 
 .lb-podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px; align-items: end; }
+.lb-row-click { cursor: pointer; }
+.lb-row-click:hover { background: var(--ca); }
+.lb-pod-click { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.lb-pod-click:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+
+/* ── TRADER PROFILE MODAL (social) ── */
+.trader-modal {
+  position: fixed; inset: 0; z-index: 120; display: none;
+  align-items: center; justify-content: center; padding: 18px;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(3px);
+}
+.trader-modal.on { display: flex; }
+.trader-box {
+  position: relative; width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto;
+  background: var(--bg2); border: 1px solid var(--br); border-radius: 20px; padding: 22px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.4);
+}
+.trader-cls { position: absolute; top: 14px; right: 14px; background: none; border: none; color: var(--mu); font-size: 16px; cursor: pointer; }
+.trader-cls:hover { color: var(--tx); }
+.trader-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.trader-av { width: 48px; height: 48px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--br); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.trader-nm { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.trader-sub { font-size: 12px; color: var(--mu); margin-top: 2px; }
+.trader-follow {
+  margin-left: auto; padding: 8px 14px; border-radius: 9px; border: 1px solid var(--grg);
+  background: transparent; color: var(--gr); font-family: var(--fh); font-weight: 700; font-size: 13px; cursor: pointer;
+  transition: all .15s; white-space: nowrap; flex-shrink: 0;
+}
+.trader-follow:hover { background: color-mix(in oklab, var(--gr) 12%, transparent); }
+.trader-follow.on { background: var(--gr); color: #05100c; }
+.trader-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+.trader-stat { background: var(--ca); border: 1px solid var(--br); border-radius: 11px; padding: 10px 8px; text-align: center; }
+.trader-stat-v { font-family: var(--fh); font-size: 16px; font-weight: 800; }
+.trader-stat-v.pos { color: var(--gr); }
+.trader-stat-v.neg { color: var(--rd); }
+.trader-stat-k { font-size: 9.5px; color: var(--mu); text-transform: uppercase; letter-spacing: .3px; margin-top: 2px; }
+.trader-sec-t { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--mu); margin-bottom: 9px; }
+.trader-holds { display: flex; flex-direction: column; gap: 7px; }
+.trader-hold { display: flex; align-items: center; gap: 10px; }
+.trader-hold-l { display: flex; flex-direction: column; min-width: 78px; }
+.trader-hold-sym { font-size: 13px; font-weight: 700; }
+.trader-hold-sec { font-size: 10px; color: var(--mu); }
+.trader-hold-bar { flex: 1; height: 7px; border-radius: 4px; background: var(--bg3); overflow: hidden; }
+.trader-hold-bar > div { height: 100%; border-radius: 4px; background: var(--grad, linear-gradient(90deg, var(--gr), #00a87a)); }
+.trader-hold-pct { font-size: 12px; font-weight: 700; color: var(--mu); min-width: 34px; text-align: right; }
+.trader-note { margin-top: 16px; padding: 9px 11px; border-radius: 9px; font-size: 11px; color: var(--mu); background: var(--ca); border: 1px solid var(--br); line-height: 1.45; }
+
 .lb-pod {
   background: color-mix(in oklab, var(--bg2) 80%, transparent);
   border: 1px solid var(--br); border-radius: 20px; padding: 20px;

@@ -323,7 +323,7 @@ function renderLB() {
 
   var all = roster.map(function(p) {
     return {
-      e: p.f, nm: p.nm, bot: p.bot, you: false,
+      e: p.f, nm: p.nm, bot: p.bot, you: false, pidx: LB_PLAYERS.indexOf(p),
       trades: Math.round(p.trades * (lbTab === 'all' ? 4.2 : 1)),
       win: p.win,
       pnl: +(p.pnl * (lbTab === 'all' ? 1.6 : 1)).toFixed(1),
@@ -334,7 +334,7 @@ function renderLB() {
   // Estimate the user's win-rate / P&L from their portfolio
   var port = (typeof calcPortfolio === 'function') ? calcPortfolio() : { gainPct: 0 };
   all.push({
-    e: userAvatar, nm: userName, bot: false, you: true,
+    e: userAvatar, nm: userName, bot: false, you: true, pidx: -1,
     trades: tradeHistory.length,
     win: tradeHistory.length ? Math.min(95, 50 + Math.round(port.gainPct)) : 0,
     pnl: +(port.gainPct || 0).toFixed(1),
@@ -365,7 +365,8 @@ function renderLB() {
       var u = top3[oi];
       if (!u) return '';
       var barW = Math.min(100, Math.round(Math.abs(u.pnl) / maxPnl * 100));
-      return '<div class="lb-pod' + (u.r === 1 ? ' lb-pod-1' : '') + (u.you ? ' you' : '') + '">'
+      var podClick = (!u.you && u.pidx >= 0) ? ' lb-pod-click" onclick="openTrader(' + u.pidx + ')' : '';
+      return '<div class="lb-pod' + (u.r === 1 ? ' lb-pod-1' : '') + (u.you ? ' you' : '') + podClick + '">'
         + '<div class="lb-pod-rank">' + medals[oi] + ' RANK #' + u.r + '</div>'
         + '<div class="lb-pod-user"><span class="lb-pod-av">' + u.e + '</span>'
         + '<div><div class="lb-pod-nm">' + u.nm + (u.you ? ' <span class="lb-you">(You)</span>' : ' <span class="lb-bot">Demo</span>') + '</div>'
@@ -385,7 +386,8 @@ function renderLB() {
     + '<span class="lb-c-num">TRADES</span><span class="lb-c-num">WIN RATE</span>'
     + '<span class="lb-c-num">P&L</span><span class="lb-c-num">XP</span></div>';
   el.innerHTML = header + all.map(function(u) {
-    return '<div class="lb-row' + (u.you ? ' you' : '') + '">'
+    var click = (!u.you && u.pidx >= 0) ? ' lb-row-click" onclick="openTrader(' + u.pidx + ')' : '';
+    return '<div class="lb-row' + (u.you ? ' you' : '') + click + '">'
       + '<span class="lb-c-rank">#' + u.r + '</span>'
       + '<span class="lb-c-name"><span class="lb-flag">' + u.e + '</span>'
       + '<span class="lb-tname">' + u.nm + '</span>'
@@ -400,6 +402,101 @@ function renderLB() {
   }).join('');
 }
 
+
+// ─── TRADER PROFILE (basic social) ───────────────────────
+// Deterministic seed from a name so a trader's demo portfolio is stable.
+function traderSeed(str) {
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h;
+}
+
+// Build a plausible, stable demo portfolio for a leaderboard trader from the
+// active market's stocks. These are simulated accounts, labelled as such.
+function genTraderPortfolio(player) {
+  var seed = traderSeed(player.nm + '|' + currentMarket);
+  var rng = function() { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 4294967296; };
+  var pool = (window.ST || []).slice();
+  for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(rng() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  var n = Math.min(pool.length, 4 + Math.floor(rng() * 4));
+  var picks = pool.slice(0, n);
+  var weights = picks.map(function() { return 0.4 + rng(); });
+  var sum = weights.reduce(function(a, b) { return a + b; }, 0);
+  return picks.map(function(s, i) { return { sym: s.s, name: s.n, sec: s.sec, weight: weights[i] / sum }; });
+}
+
+function isFollowing(name) {
+  return (Store.get('following', []) || []).indexOf(name) !== -1;
+}
+
+function toggleFollow(name) {
+  var list = Store.get('following', []) || [];
+  var idx = list.indexOf(name);
+  if (idx === -1) { list.push(name); showToast('Following ' + name); }
+  else { list.splice(idx, 1); showToast('Unfollowed ' + name); }
+  Store.set('following', list);
+  var btn = document.getElementById('traderFollowBtn');
+  if (btn) {
+    var on = isFollowing(name);
+    btn.textContent = on ? '✓ Following' : '+ Follow';
+    btn.classList.toggle('on', on);
+  }
+}
+
+function ensureTraderModal() {
+  if (document.getElementById('traderModal')) return;
+  var ov = document.createElement('div');
+  ov.className = 'trader-modal'; ov.id = 'traderModal';
+  ov.onclick = function(e) { if (e.target === ov) closeTrader(); };
+  ov.innerHTML = '<div class="trader-box" id="traderBox"></div>';
+  document.body.appendChild(ov);
+}
+
+function openTrader(pidx) {
+  var p = LB_PLAYERS[pidx];
+  if (!p) return;
+  ensureTraderModal();
+  var port = genTraderPortfolio(p);
+
+  // Aggregate sector allocation
+  var bySec = {};
+  port.forEach(function(h) { bySec[h.sec] = (bySec[h.sec] || 0) + h.weight; });
+  var sectors = Object.keys(bySec).sort(function(a, b) { return bySec[b] - bySec[a]; });
+
+  var following = isFollowing(p.nm);
+  var holdingsHtml = port.map(function(h) {
+    return '<div class="trader-hold">'
+      + '<div class="trader-hold-l"><span class="trader-hold-sym">' + h.sym + '</span>'
+      + '<span class="trader-hold-sec">' + h.sec + '</span></div>'
+      + '<div class="trader-hold-bar"><div style="width:' + Math.round(h.weight * 100) + '%"></div></div>'
+      + '<span class="trader-hold-pct">' + Math.round(h.weight * 100) + '%</span></div>';
+  }).join('');
+
+  document.getElementById('traderBox').innerHTML =
+    '<button class="trader-cls" onclick="closeTrader()">&#10005;</button>'
+    + '<div class="trader-hd"><span class="trader-av">' + p.f + '</span>'
+    + '<div><div class="trader-nm">' + p.nm + ' <span class="lb-bot">' + (p.bot ? '&#129302; Demo bot' : 'Demo') + '</span></div>'
+    + '<div class="trader-sub">' + sectors.length + ' sectors &middot; ' + port.length + ' holdings</div></div>'
+    + '<button class="trader-follow' + (following ? ' on' : '') + '" id="traderFollowBtn" onclick="toggleFollow(\'' + p.nm.replace(/'/g, "\\'") + '\')">' + (following ? '✓ Following' : '+ Follow') + '</button></div>'
+    + '<div class="trader-stats">'
+    + '<div class="trader-stat"><div class="trader-stat-v">' + p.trades + '</div><div class="trader-stat-k">Trades</div></div>'
+    + '<div class="trader-stat"><div class="trader-stat-v">' + p.win + '%</div><div class="trader-stat-k">Win rate</div></div>'
+    + '<div class="trader-stat"><div class="trader-stat-v ' + (p.pnl >= 0 ? 'pos' : 'neg') + '">' + (p.pnl >= 0 ? '+' : '') + p.pnl + '%</div><div class="trader-stat-k">P&L</div></div>'
+    + '<div class="trader-stat"><div class="trader-stat-v">' + p.xp.toLocaleString() + '</div><div class="trader-stat-k">XP</div></div>'
+    + '</div>'
+    + '<div class="trader-sec-t">Portfolio holdings</div>'
+    + '<div class="trader-holds">' + holdingsHtml + '</div>'
+    + '<div class="trader-note">🤖 Simulated demo account — holdings are illustrative, not real positions.</div>';
+
+  document.getElementById('traderModal').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTrader() {
+  var m = document.getElementById('traderModal');
+  if (m) m.classList.remove('on');
+  document.body.style.overflow = '';
+}
 
 // ─── SIP CALCULATOR ──────────────────────────────────────
 function calcSIP() {
