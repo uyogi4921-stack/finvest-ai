@@ -416,6 +416,7 @@ var AI_BANK = {
   // ── Expanded finance knowledge ──
   inflation: [ function() { return '<b>What is Inflation?</b><br><br>Inflation is the rate at which prices rise over time, shrinking what your money can buy.<br><br>• ₹100 today buys less in 10 years (~₹56 at 6% inflation).<br>• <b>Real return = your return − inflation.</b> Earn 7% with 6% inflation → just 1% real gain.<br><br><b>Why it matters:</b> Idle cash <span class="r">loses</span> value every year. Beating inflation is the whole point of investing — stocks and equity funds have historically done so over the long run.'; } ],
   compounding: [ function() { return '<b>The Power of Compounding</b><br><br>Compounding = your returns earning their own returns. It snowballs over time.<br><br>• <b>Rule of 72:</b> Years to double ≈ 72 ÷ return%. At 12%, money doubles in ~6 years.<br>• ₹10,000/month at 12% for 30 years → ~₹3.5 crore (you invested ₹36 lakh!).<br><br><b>Key:</b> Start early and stay invested. Time matters more than timing.'; } ],
+  stock_basics: [ function() { return '<b>What is a Stock?</b><br><br>A <b>stock</b> (or share) is a tiny slice of ownership in a company. Buy one share of Apple and you literally own a fraction of Apple.<br><br><b>How you make money:</b><br>• <b>Price goes up</b> — buy at ₹100, sell at ₹150, keep the ₹50.<br>• <b>Dividends</b> — some companies pay you a share of their profits.<br><br>Companies sell shares to raise money to grow; you become a part-owner hoping the business gets more valuable over time.<br><br><span class="o">Try it:</span> open the <b>Market</b> tab and tap Buy on any stock — it\'s all virtual practice money.'; } ],
   etf: [ function() { return '<b>What is an ETF?</b><br><br>An <b>Exchange-Traded Fund</b> holds a basket of stocks/bonds and trades on the exchange like a single stock.<br><br>• <b>Instant diversification</b> — one buy = many companies<br>• <b>Low cost</b> — tiny expense ratios vs active funds<br>• <b>Liquid</b> — buy/sell anytime markets are open<br><br><b>Example:</b> A NIFTY 50 ETF gives you all 50 top companies in one share.'; } ],
   bonds: [ function() { return '<b>Stocks vs Bonds</b><br><br>• <b>Stocks</b> = ownership in a company. Higher risk, higher long-term return (~10-12%).<br>• <b>Bonds</b> = lending money for fixed interest. Lower risk, lower return.<br><br>Most healthy portfolios hold both: stocks for growth, bonds for stability. Your mix depends on your goal and time horizon.'; } ],
   allocation: [ function() { return '<b>Asset Allocation 101</b><br><br>How you split money across <b>stocks</b> (growth), <b>bonds</b> (stability) and <b>cash</b> (safety). It drives most of your returns — more than stock picking.<br><br>• Young / long horizon → more stocks<br>• Near a goal → more bonds & cash<br>• Rough guide: stock % ≈ <b>110 − your age</b><br><br><b>Rebalance</b> once a year back to your target mix.'; } ],
@@ -460,6 +461,7 @@ var TOPIC_KW = {
   tax:             ['tax', 'capital gain', 'ltcg', 'stcg', '80c', 'how much tax'],
   dividend:        ['dividend', 'yield', 'payout', 'passive income'],
   pe_ratio:        ['p/e', 'pe ratio', 'price to earning', 'valuation', 'overvalued', 'undervalued', 'expensive stock'],
+  stock_basics:    ['what is a stock', 'what is stock', 'what are stocks', 'what is a share', 'what is equity', 'stock mean', 'explain stock', 'how do stocks work', 'what is the stock market'],
   etf:             ['etf', 'index fund', 'exchange traded'],
   gold:            ['gold', 'precious metal', 'sovereign gold'],
   crypto_ai:       ['crypto', 'bitcoin', 'ethereum', 'blockchain', 'btc', 'should i buy crypto'],
@@ -509,6 +511,8 @@ function getReply(msg) {
   if (q.match(/^(hi|hey|hello|sup|yo|hola|namaste)/)) topic = 'greeting';
   else if (q.match(/\b(thanks?|thank you|thx|ty|appreciate[ds]?)\b/)) topic = 'thanks';
   else if (q.match(/joke|funny|humor|laugh/)) topic = 'joke';
+  // "What is a stock/share/equity?" — a basic definition, not a buy request.
+  else if (q.match(/(what|whats|what's|wat|explain|define|meaning|tell me about)[\s\w]{0,12}\b(stocks?|shares?|equit|stock market)\b/) && !q.match(/buy|sell|pick|recommend|should i|my stock/)) topic = 'stock_basics';
   // Specific finance concepts take priority over generic catch-alls
   else if (q.match(/market\s*cap|capitali[sz]ation|large.?cap|mid.?cap|small.?cap/)) topic = 'market_cap';
   else if (q.match(/inflation|cost of living|purchasing power/)) topic = 'inflation';
