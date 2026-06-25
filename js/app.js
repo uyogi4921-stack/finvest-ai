@@ -52,8 +52,9 @@ function initApp() {
     });
   }
 
-  // SIP calculator default
+  // Calculator defaults
   calcSIP();
+  calcLumpsum();
 
   // Show profile prompt if no profile exists
   if (!userProfile) {
