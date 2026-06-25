@@ -368,7 +368,7 @@ function renderLB() {
       return '<div class="lb-pod' + (u.r === 1 ? ' lb-pod-1' : '') + (u.you ? ' you' : '') + '">'
         + '<div class="lb-pod-rank">' + medals[oi] + ' RANK #' + u.r + '</div>'
         + '<div class="lb-pod-user"><span class="lb-pod-av">' + u.e + '</span>'
-        + '<div><div class="lb-pod-nm">' + u.nm + (u.you ? ' <span class="lb-you">(You)</span>' : '') + '</div>'
+        + '<div><div class="lb-pod-nm">' + u.nm + (u.you ? ' <span class="lb-you">(You)</span>' : ' <span class="lb-bot">Demo</span>') + '</div>'
         + '<div class="lb-pod-sub">' + u.trades + ' trades &middot; ' + u.win + '% win</div></div></div>'
         + '<div class="lb-pod-xp">' + u.pts.toLocaleString() + ' XP</div>'
         + '<div class="lb-pod-pnl">' + (u.pnl >= 0 ? '+' : '') + u.pnl + '% P&L</div>'
@@ -389,8 +389,9 @@ function renderLB() {
       + '<span class="lb-c-rank">#' + u.r + '</span>'
       + '<span class="lb-c-name"><span class="lb-flag">' + u.e + '</span>'
       + '<span class="lb-tname">' + u.nm + '</span>'
-      + (u.bot ? '<span class="lb-bot">&#129302; bot</span>' : '')
-      + (u.you ? '<span class="lb-you">You</span>' : '') + '</span>'
+      + (u.you ? '<span class="lb-you">You</span>'
+               : '<span class="lb-bot">' + (u.bot ? '&#129302; Demo bot' : 'Demo') + '</span>')
+      + '</span>'
       + '<span class="lb-c-num">' + u.trades + '</span>'
       + '<span class="lb-c-num">' + u.win + '%</span>'
       + '<span class="lb-c-num ' + (u.pnl >= 0 ? 'pos' : 'neg') + '">' + (u.pnl >= 0 ? '&#8599; +' : '&#8600; ') + u.pnl + '%</span>'
